@@ -21,4 +21,7 @@ public class Category {
 
     @Column
     private float price;
+
+    @Column
+    private Boolean status;
 }

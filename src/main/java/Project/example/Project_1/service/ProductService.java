@@ -17,8 +17,7 @@ public class ProductService {
     public Product disableProduct(long id){
         Product product = productRepository.findProductById(id);
         product.setStatus(!product.getStatus());
-        productRepository.save(product);
-        return product;
+        return  productRepository.save(product);
     }
 
     @Transactional

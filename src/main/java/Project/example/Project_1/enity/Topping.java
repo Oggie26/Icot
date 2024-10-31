@@ -22,5 +22,7 @@ public class Topping {
     @Column
     private int quantity;
 
+    @Column
+    private Boolean status;
 
 }
