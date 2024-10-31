@@ -46,8 +46,10 @@ public class User implements UserDetails {
     private Boolean status;
 
     @Column
-    private EnumRole role;
+    private String address;
 
+    @Enumerated(EnumType.STRING)
+    private EnumRole role;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

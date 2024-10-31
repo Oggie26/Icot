@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Template</title>
+    <style>
+        /* Add your CSS styles here */
+        body {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-size: 14px;
+            margin: 0;
+            background-color: #f6f6f6;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .content {
+            padding: 20px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .main {
+            border-radius: 3px;
+            background-color: #fff;
+            border: 1px solid #e9e9e9;
+        }
+
+        .header {
+            background-color: #38414a;
+            color: #fff;
+            text-align: center;
+            padding: 20px;
+            border-radius: 3px 3px 0 0;
+            font-weight: 500;
+        }
+
+        .content-wrap {
+            padding: 20px;
+        }
+
+        .btn-primary {
+            display: inline-block;
+            text-align: center;
+            text-decoration: none;
+            color: #FFF;
+            background-color: #f1556c;
+            border: 1px solid #f1556c;
+            border-radius: 5px;
+            padding: 8px 16px;
+            font-weight: bold;
+            text-transform: capitalize;
+        }
+
+        .footer {
+            clear: both;
+            padding: 20px;
+            color: #999;
+        }
+
+        .footer a {
+            color: #999;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+<table class="body-wrap" bgcolor="#f6f6f6">
+    <tr>
+        <td></td>
+        <td class="container">
+            <div class="content">
+                <table class="main" cellpadding="0" cellspacing="0" bgcolor="#fff">
+                    <tr>
+                        <td class="header" bgcolor="#38414a">
+                            <a href="#" style="font-size: 32px; color: #fff;">Happy Golden</a> <br>
+                            <span style="margin-top: 10px; display: block;">Warning: You're approaching your limit. Please upgrade.</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="content-wrap">
+                            <table cellpadding="0" cellspacing="0">
+                                <tr>
+                                    <td class="content-block">
+                                        Hi <strong>[[${name}]]</strong>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="content-block">
+                                        You have <strong>invited</strong> to our system.
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="content-block">
+                                        Lorem ipsum dolor sit, amet consectetur adipisicing elit. Quae, alias ab? Sed ad debitis placeat iusto officia commodi distinctio velit.
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="content-block">
+                                        <a th:href="${link}" class="btn-primary">[[${button}]]</a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="content-block">
+                                        Thanks for choosing <b>jewerystorepoppy</b> Admin.
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+                <div class="footer">
+                    <table>
+                        <tr>
+                            <td class="aligncenter content-block" align="center">
+                                <a href="#" style="font-size: 12px; color: #999;">Unsubscribe</a> from these alerts.
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </td>
+        <td></td>
+    </tr>
+</table>
+</body>
+
+</html>

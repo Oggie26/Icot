@@ -36,7 +36,8 @@ public class Filter extends OncePerRequestFilter {
             "/swagger-ui/**",
             "/v3/api-docs/**",
             "/swagger-resources/**",
-            "/api/login"
+            "/api/login",
+            "/api/register"
     );
 
     private boolean isPermitted(String uri){

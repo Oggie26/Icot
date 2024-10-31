@@ -9,12 +9,5 @@ import java.util.Date;
 @Data
 public class UserResponse  {
     String token;
-    Long id;
-    String email;
-    String fullName;
-    String phone;
-    String gender;
-    EnumRole role;
-    Boolean status;
-    Date birthday;
+    User user;
 }

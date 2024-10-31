@@ -1,6 +1,7 @@
 package Project.example.Project_1.api;
 
 import Project.example.Project_1.request.LoginRequest;
+import Project.example.Project_1.request.RegisterRequest;
 import Project.example.Project_1.response.UserResponse;
 import Project.example.Project_1.service.AuthenticationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,5 +22,11 @@ public class AuthenticationAPI {
     public ResponseEntity<UserResponse> login(@RequestBody LoginRequest loginRequest){
         UserResponse loginResponse =  authenticationService.login(loginRequest);
         return ResponseEntity.ok(loginResponse);
+    }
+
+    @PostMapping("register")
+    public ResponseEntity<UserResponse> register(@RequestBody RegisterRequest registerRequest){
+        UserResponse registerResponse = authenticationService.register(registerRequest);
+        return ResponseEntity.ok(registerResponse);
     }
 }

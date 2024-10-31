@@ -9,8 +9,6 @@ import java.util.List;
 
 public interface UserRepository extends JpaRepository<User, Long> {
     User findUserByUsername(String username);
-    User findById(long id);
+    User findUserById(long id);
 
-//    @Query(value = "SELECT * FROM account c WHERE c.id = :param OR c.phone like concat('%',:param,'%') "  , nativeQuery = true)
-//    List<User> findByStaff(@Param("param") String param);
 }
