@@ -51,6 +51,9 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     private EnumRole role;
 
+    @Column
+    private int point;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of( new SimpleGrantedAuthority(role.toString()));

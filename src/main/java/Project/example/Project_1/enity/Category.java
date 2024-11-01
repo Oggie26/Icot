@@ -16,7 +16,7 @@ public class Category {
     @Column(unique = true)
     private String name;
 
-    @Column
+    @Enumerated(EnumType.STRING)
     private EnumSize size;
 
     @Column

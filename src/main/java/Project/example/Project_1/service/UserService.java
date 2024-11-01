@@ -33,6 +33,7 @@ public class UserService {
         user.setGender(userRequest.getGender());
         user.setPhone(userRequest.getPhone());
         user.setRole(userRequest.getRole());
+        user.setPoint(0);
         user.setStatus(true);
         userResponse.setUser(user);
         userRepository.save(user);
@@ -52,6 +53,7 @@ public class UserService {
         user.setPhone(userRequest.getPhone());
         user.setRole(userRequest.getRole());
         user.setStatus(userRequest.getStatus());
+        user.setPoint(userRequest.getPoint());
         UserResponse userResponse = new UserResponse();
         userRepository.save(user);
         userResponse.setUser(user);
