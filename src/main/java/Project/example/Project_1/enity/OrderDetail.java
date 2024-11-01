@@ -1,20 +1,20 @@
 package Project.example.Project_1.enity;
-
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import net.minidev.json.annotate.JsonIgnore;
 
-@Getter
-@Setter
 @Entity
-public class Topping {
+@Setter
+@Getter
+public class OrderDetail {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Column(unique = true)
-    private String name;
+    @Column
+    private String productName;
 
     @Column
     private Float price;
@@ -23,10 +23,17 @@ public class Topping {
     private int quantity;
 
     @Column
-    private Boolean status;
+    private String note;
+
+    @ManyToOne
+    @JoinColumn(name = "order_id")
+    @JsonIgnore
+    Order order;
 
     @ManyToOne
     @JoinColumn(name = "product_id")
+    @JsonIgnore
     Product product;
+
 
 }

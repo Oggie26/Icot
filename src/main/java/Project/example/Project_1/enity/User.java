@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import net.minidev.json.annotate.JsonIgnore;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -51,6 +52,9 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     private EnumRole role;
 
+    @Column
+    private int point;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of( new SimpleGrantedAuthority(role.toString()));
@@ -76,6 +80,17 @@ public class User implements UserDetails {
         return false;
     }
 
+    @OneToMany(mappedBy = "user")
+    @JsonIgnore
+    List<ProcessOrder> processOrder;
 
+    @OneToMany(mappedBy = "user")
+    @JsonIgnore
+    List<Voucher> voucher;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "store_id", unique = true)
+    @JsonIgnore
+    Store store;
 
 }
