@@ -1,19 +1,20 @@
 package Project.example.Project_1.enity;
+
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
-@Entity
-@Setter
 @Getter
-public class OrderDetail {
+@Setter
+@Entity
+public class Topping {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Column
-    private String productName;
+    @Column(unique = true)
+    private String name;
 
     @Column
     private Float price;
@@ -22,5 +23,6 @@ public class OrderDetail {
     private int quantity;
 
     @Column
-    private String note;
+    private Boolean status;
+
 }
