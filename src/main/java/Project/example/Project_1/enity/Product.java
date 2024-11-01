@@ -3,6 +3,10 @@ package Project.example.Project_1.enity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import net.minidev.json.annotate.JsonIgnore;
+
+import java.util.List;
+
 @Entity
 @Getter
 @Setter
@@ -30,5 +34,15 @@ public class Product {
     @Column
     private int purchases;
 
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
+    List<OrderDetail> orderDetail;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "category_id", unique = true)
+    @JsonIgnore
+    Category category;
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
+    List<Topping> topping;
 
 }

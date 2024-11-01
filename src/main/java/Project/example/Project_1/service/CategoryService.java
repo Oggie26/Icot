@@ -32,7 +32,7 @@ public class CategoryService {
     }
 
     public CategoryResponse updateCategory(CategoryRequest categoryRequest, long id){
-        Category category = new Category();
+        Category category = categoryRepository.findCategoryById(id);
         category.setName(categoryRequest.getName());
         category.setPrice(categoryRequest.getPrice());
         category.setStatus(categoryRequest.getStatus());
