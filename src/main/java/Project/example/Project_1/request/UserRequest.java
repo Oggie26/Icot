@@ -17,4 +17,5 @@ public class UserRequest {
     private Boolean status;
     private String address;
     private EnumRole role;
+    private int point;
 }

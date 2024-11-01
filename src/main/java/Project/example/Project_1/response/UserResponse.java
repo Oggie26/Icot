@@ -9,5 +9,4 @@ import java.util.Date;
 @Data
 public class UserResponse  {
     String token;
-    User user;
 }

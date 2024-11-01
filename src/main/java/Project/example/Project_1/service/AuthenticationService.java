@@ -3,19 +3,25 @@ package Project.example.Project_1.service;
 
 import Project.example.Project_1.enity.User;
 import Project.example.Project_1.enums.EnumRole;
-import Project.example.Project_1.exception.AuthException;
+import Project.example.Project_1.enums.EnumStatus;
+import Project.example.Project_1.enums.ErrorCode;
+import Project.example.Project_1.exception.AppException;
 import Project.example.Project_1.repository.UserRepository;
-import Project.example.Project_1.request.EmailDetail;
 import Project.example.Project_1.request.LoginRequest;
 import Project.example.Project_1.request.RegisterRequest;
+import Project.example.Project_1.response.LoginResponse;
+import Project.example.Project_1.response.RegisterResponse;
 import Project.example.Project_1.response.UserResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Optional;
 
 
 @Service
@@ -25,86 +31,71 @@ public class AuthenticationService implements UserDetailsService {
     UserRepository userRepository;
 
     @Autowired
-    EmailService emailService;
-
-    @Autowired
     TokenService tokenService;
+
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return userRepository.findUserByUsername(username);
+        return userRepository.findUserByUsername(username).orElseThrow(() -> new UsernameNotFoundException(username));
     }
 
-    public User getCurrentAccount() {
+    public Optional<User> getCurrentAccount() {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return userRepository.findUserById(user.getId()) != null ? userRepository.findUserById(user.getId()) : null;
+        return userRepository.findUserByIdAndIsDeletedFalse(String.valueOf(user.getId())).isPresent() ?
+                userRepository.findUserByIdAndIsDeletedFalse(String.valueOf(user.getId())) : null;
     }
 
     //Login
-    public UserResponse login(LoginRequest loginRequest) {
-        User user = userRepository.findUserByUsername(loginRequest.getUsername());
-
-        if (user == null) {
-            throw new AuthException("User not found");
+    @Transactional
+    public LoginResponse login(LoginRequest request) {
+        User user = userRepository.findUserByIdAndIsDeletedFalse(request.getUsername())
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        if(user == null){
+            throw new AppException(ErrorCode.USER_NOT_EXISTED);
         }
-
-        if (loginRequest.getPassword() == null) {
-            throw new AuthException("Password cannot be null");
-        }
-
-        if (!user.getPassword().equals(loginRequest.getPassword())) {
-            throw new AuthException("Invalid credentials");
-        }
-
-        if (!user.getStatus()) {
-            throw new AuthException("Account blocked!!!");
-        }
-
-        UserResponse userResponse = new UserResponse();
+        if (user.getStatus().equals(EnumStatus.BLOCKED))
+            throw new AppException(ErrorCode.ACCOUNT_BLOCKED);
         String token = tokenService.generateToken(user);
-        userResponse.setUser(user);
-        userResponse.setToken(token);
-        return userResponse;
+        // Trả về Token
+        return LoginResponse.builder()
+                .token(token)
+                .fullName(user.getFullName())
+                .role(user.getRole())
+                .build();
     }
 
-    //Register
-    @Transactional
-    public UserResponse register(RegisterRequest registerRequest) {
-        UserResponse userResponse = new UserResponse();
-        User user = new User();
-        try {
-            user = new User();
-            user.setUsername(registerRequest.getUsername());
-            user.setFullName(registerRequest.getFullName());
-            user.setPassword(registerRequest.getPassword());
-            user.setEmail(registerRequest.getEmail());
-            user.setAddress(registerRequest.getAddress());
-            user.setBirthday(registerRequest.getBirthday());
-            user.setGender(registerRequest.getGender());
-            user.setPhone(registerRequest.getPhone());
-            user.setRole(EnumRole.CUSTOMER);
-            user.setStatus(true);
-            userResponse.setUser(user);
-            EmailDetail emailDetail = new EmailDetail();
-            emailDetail.setRecipient(user.getEmail());
-            emailDetail.setMsgBody("Welcome to join The Happy Food");
-            emailDetail.setSubject("TheHappyFood");
-            emailDetail.setButton("Login To System");
-            emailDetail.setLink("localhost:8080/login");
-            emailDetail.setFullName(user.getFullName());
-            Runnable r = new Runnable() {
-                @Override
-                public void run() {
-                    emailService.sendMailTemplate(emailDetail);
-                }
-            };
-            new Thread(r).start();
-
-        } catch (Exception e) {
-            e.printStackTrace();
+    @Transactional()
+    public RegisterResponse register(RegisterRequest request) {
+        if (userRepository.findUserByUsername(request.getUsername()).isPresent()) {
+            throw new AppException(ErrorCode.USERNAME_EXISTED);
         }
+        if (userRepository.findUserByEmail(request.getEmail()).isPresent()) {
+            throw new AppException(ErrorCode.EMAIL_EXISTED);
+        }
+        User user = User.builder()
+               .username(request.getUsername())
+               .password(request.getPassword())
+               .email(request.getEmail())
+               .fullName(request.getFullName())
+               .role(EnumRole.CUSTOMER)
+               .birthday(request.getBirthday())
+               .gender(request.getGender())
+               .phone(request.getPhone())
+               .point(0)
+               .avatar("")
+               .status(EnumStatus.INACTIVE)
+               .build();
+        user.setIsDeleted(false);
         userRepository.save(user);
-        return userResponse;
+
+        return RegisterResponse.builder()
+                .userId(user.getId())
+                .email(user.getEmail())
+                .fullName(user.getFullName())
+                .phone(user.getPhone())
+                .gender(user.getGender())
+                .birthday(user.getBirthday())
+                .build();
     }
 
 

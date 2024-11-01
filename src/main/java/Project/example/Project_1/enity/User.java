@@ -1,13 +1,16 @@
 package Project.example.Project_1.enity;
 import Project.example.Project_1.enums.EnumRole;
+import Project.example.Project_1.enums.EnumStatus;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -15,11 +18,14 @@ import java.util.List;
 @Entity
 @Getter
 @Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @ToString
-public class User implements UserDetails {
+public class User extends AbstractEntity implements UserDetails {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    String id;
 
     @Column(unique = true)
     private String username;
@@ -31,25 +37,33 @@ public class User implements UserDetails {
     private String email;
 
     @Column
-    private String  fullName;
+    private String fullName;
 
     @Column
     private String gender;
 
     @Column
-    private Date birthday;
+    @JsonFormat(pattern = "dd-MM-yyyy")
+    private LocalDate birthday;
+
+    @Column
+    private String avatar;
 
     @Column(unique = true)
     private String phone;
 
-    @Column(nullable = false)
-    private Boolean status;
-
-    @Column
-    private String address;
+    @Enumerated(EnumType.STRING)
+    EnumStatus status;
 
     @Enumerated(EnumType.STRING)
-    private EnumRole role;
+    EnumRole role;
+
+    @Column
+    private int point;
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JsonIgnore
+    List<Otp> otps;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

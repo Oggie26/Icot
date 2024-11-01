@@ -9,7 +9,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
 @SecurityScheme(name = "api", scheme = "bearer", type = SecuritySchemeType.HTTP, in = SecuritySchemeIn.HEADER)
-@OpenAPIDefinition(info = @Info(title = "MyProject", version = "1.0", description = "MyProject"))
+@OpenAPIDefinition(info = @Info(title = "Icot", version = "1.0", description = "Icot"))
 
 public class Project1Application {
 
