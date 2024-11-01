@@ -4,6 +4,7 @@ import Project.example.Project_1.enums.EnumSize;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import net.minidev.json.annotate.JsonIgnore;
 
 @Entity
 @Getter
@@ -16,7 +17,7 @@ public class Category {
     @Column(unique = true)
     private String name;
 
-    @Column
+    @Enumerated(EnumType.STRING)
     private EnumSize size;
 
     @Column
@@ -24,4 +25,9 @@ public class Category {
 
     @Column
     private Boolean status;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "product_id", unique = true)
+    @JsonIgnore
+    Product product;
 }

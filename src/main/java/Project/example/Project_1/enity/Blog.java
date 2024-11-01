@@ -7,26 +7,22 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-public class Topping {
+public class Blog {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Column(unique = true)
-    private String name;
+    @Column
+    private String blogName;
 
     @Column
-    private Float price;
-
-    @Column
-    private int quantity;
+    private String content;
 
     @Column
     private Boolean status;
 
-    @ManyToOne
-    @JoinColumn(name = "product_id")
-    Product product;
+    @Column
+    private String description;
 
 }
