@@ -43,7 +43,6 @@ public class User extends AbstractEntity implements UserDetails {
     private String gender;
 
     @Column
-    @JsonFormat(pattern = "dd-MM-yyyy")
     private LocalDate birthday;
 
     @Column
