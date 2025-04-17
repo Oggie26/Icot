@@ -65,9 +65,6 @@ public class User extends AbstractEntity implements UserDetails {
     @JsonIgnore
     List<Otp> otps;
 
-    @Column
-    private int point;
-
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of( new SimpleGrantedAuthority(role.toString()));
