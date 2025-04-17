@@ -43,7 +43,6 @@ public class User extends AbstractEntity implements UserDetails {
     private String gender;
 
     @Column
-    @JsonFormat(pattern = "dd-MM-yyyy")
     private LocalDate birthday;
 
     @Column
@@ -64,6 +63,11 @@ public class User extends AbstractEntity implements UserDetails {
     @OneToMany(mappedBy = "user", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JsonIgnore
     List<Otp> otps;
+
+    @OneToMany(mappedBy = "user")
+    @JsonIgnore
+    List<ProcessOrder> processOrders;
+
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

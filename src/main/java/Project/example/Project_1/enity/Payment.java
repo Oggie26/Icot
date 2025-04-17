@@ -1,27 +1,29 @@
 package Project.example.Project_1.enity;
 
+import Project.example.Project_1.enums.EnumPayment;
 import Project.example.Project_1.enums.EnumPaymentMethod;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
-import java.time.LocalDate;
-
+@Builder
 @Getter
 @Setter
+@ToString
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
-public class Payment {
+public class Payment extends AbstractEntity{
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
 
     @Enumerated(EnumType.STRING)
-    private EnumPaymentMethod method;
+    EnumPaymentMethod paymentMethod;
+
+    @Enumerated(EnumType.STRING)
+    EnumPayment payment;
 
     @Column
-    private LocalDate date;
-
-    @Column
-    private Float price;
+    Double amount;
 }

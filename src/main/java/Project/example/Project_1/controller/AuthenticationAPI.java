@@ -39,7 +39,7 @@ public class AuthenticationAPI {
     @ResponseStatus(HttpStatus.CREATED)
     public ApiResponse<RegisterResponse> register(@RequestBody @Valid RegisterRequest registerRequest){
         return ApiResponse.<RegisterResponse>builder()
-                .code(HttpStatus.OK.value())
+                .code(HttpStatus.CREATED.value())
                 .message("Đăng kí thành công")
                 .result(authenticationService.register(registerRequest))
                 .build();

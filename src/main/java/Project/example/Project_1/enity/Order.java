@@ -1,30 +1,25 @@
 package Project.example.Project_1.enity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-import java.time.LocalDate;
+import lombok.*;
 
+import java.util.List;
+
+@Entity
 @Getter
 @Setter
-@Entity
+@ToString
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Table(name = "orders")
-public class Order {
+public class Order extends  AbstractEntity{
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    Long id;
 
-    @Column
-    private LocalDate orderDate;
-
-    @Column
-    private Float total;
-
-    @Column
-    private String address;
-
-    @Column
-    private String customerName;
-
-}
+    @OneToMany(mappedBy = "order")
+    @JsonIgnore
+    List<ProcessOrder> processOrders;}

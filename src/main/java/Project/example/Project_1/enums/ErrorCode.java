@@ -15,11 +15,20 @@ public enum ErrorCode {
     ACCOUNT_BLOCKED(1004,"Tài khoản này đã bị chặn", HttpStatus.BAD_REQUEST),
     EMAIL_EXISTED(1005,"Email đã được sử dụng", HttpStatus.BAD_REQUEST),
     EMAIL_SEND_FAILED(1006, "Email send fail", HttpStatus.BAD_REQUEST),
+    PRODUCT_NOT_FOUND(1007, "Sản phẩm không tồn tại", HttpStatus.BAD_REQUEST),
+    PRODUCT_INACTIVE(1008, "Sản phẩm này đẫ không còn hoặc đã xoá ", HttpStatus.BAD_REQUEST),
+
     //11xx
     INVALID_KEY(1100, "Invalid uncategorized error", HttpStatus.BAD_REQUEST),
     INVALID_JSON(1101, "Json invalid", HttpStatus.BAD_REQUEST),
     OTP_EXPIRED(1102, "Otp expired", HttpStatus.BAD_REQUEST),
     INVALID_OTP(1103, "Invalid Otp", HttpStatus.BAD_REQUEST),
+    INVALID_QUANTITY(1104, "Quantity invalid", HttpStatus.BAD_REQUEST),
+    INVALID_LOGIN(1105, "Invalid Login", HttpStatus.BAD_REQUEST),
+    INVALID_PASSWORD(1106, "Invalid Password", HttpStatus.BAD_REQUEST),
+    INVALID_PHONE(1107, "Invalid Phone", HttpStatus.BAD_REQUEST),
+    INVALID_EMAIL(1108, "Invalid Email", HttpStatus.BAD_REQUEST),
+
 
     //12xx
     UNAUTHENTICATED(1201, "Unauthenticated", HttpStatus.UNAUTHORIZED),

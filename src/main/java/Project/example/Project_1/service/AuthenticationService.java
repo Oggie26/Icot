@@ -13,10 +13,12 @@ import Project.example.Project_1.response.LoginResponse;
 import Project.example.Project_1.response.RegisterResponse;
 import Project.example.Project_1.response.UserResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,13 +28,15 @@ import java.util.Optional;
 
 @Service
 public class AuthenticationService implements UserDetailsService {
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final TokenService tokenService;
 
-    @Autowired
-    UserRepository userRepository;
-
-    @Autowired
-    TokenService tokenService;
-
+    public AuthenticationService(UserRepository userRepository, PasswordEncoder passwordEncoder, TokenService tokenService) {
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.tokenService = tokenService;
+    }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -48,19 +52,18 @@ public class AuthenticationService implements UserDetailsService {
     //Login
     @Transactional
     public LoginResponse login(LoginRequest request) {
-        User user = userRepository.findUserByIdAndIsDeletedFalse(request.getUsername())
+        User user = userRepository. findUserByUsername(request.getUsername())
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
-        if(user == null){
-            throw new AppException(ErrorCode.USER_NOT_EXISTED);
-        }
-        if (user.getStatus().equals(EnumStatus.BLOCKED))
+        if (user.getStatus().equals(EnumStatus.BLOCKED)) {
             throw new AppException(ErrorCode.ACCOUNT_BLOCKED);
+        }
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            throw new AppException(ErrorCode.INVALID_LOGIN);
+        }
         String token = tokenService.generateToken(user);
         // Trả về Token
         return LoginResponse.builder()
                 .token(token)
-                .fullName(user.getFullName())
-                .role(user.getRole())
                 .build();
     }
 
@@ -72,15 +75,17 @@ public class AuthenticationService implements UserDetailsService {
         if (userRepository.findUserByEmail(request.getEmail()).isPresent()) {
             throw new AppException(ErrorCode.EMAIL_EXISTED);
         }
+        String encodedPassword = passwordEncoder.encode(request.getPassword());
+
         User user = User.builder()
                .username(request.getUsername())
-               .password(request.getPassword())
                .email(request.getEmail())
                .fullName(request.getFullName())
                .role(EnumRole.CUSTOMER)
                .birthday(request.getBirthday())
                .gender(request.getGender())
                .phone(request.getPhone())
+                .password(encodedPassword)
                .point(0)
                .avatar("")
                .status(EnumStatus.ACTIVE)
