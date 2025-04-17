@@ -83,7 +83,7 @@ public class AuthenticationService implements UserDetailsService {
                .phone(request.getPhone())
                .point(0)
                .avatar("")
-               .status(EnumStatus.ACTIVE)
+               .status(EnumStatus.INACTIVE)
                .build();
         user.setIsDeleted(false);
         userRepository.save(user);
