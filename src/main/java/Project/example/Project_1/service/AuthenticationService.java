@@ -59,8 +59,6 @@ public class AuthenticationService implements UserDetailsService {
         // Trả về Token
         return LoginResponse.builder()
                 .token(token)
-                .fullName(user.getFullName())
-                .role(user.getRole())
                 .build();
     }
 

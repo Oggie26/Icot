@@ -2,19 +2,19 @@ package Project.example.Project_1.enity;
 
 import Project.example.Project_1.enums.EnumStatus;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.data.domain.Auditable;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class Design extends AbstractEntity  {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -33,7 +33,13 @@ public class Design extends AbstractEntity  {
     @Column
     String fileName;
 
-
+    @ManyToMany
+    @JoinTable(
+            name = "design_tags",
+            joinColumns = @JoinColumn(name = "design_id"),
+            inverseJoinColumns = @JoinColumn(name = "tag_id")
+    )
+    private List<Tag> tags = new ArrayList<>();
 
 
 }

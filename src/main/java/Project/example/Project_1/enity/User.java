@@ -68,6 +68,14 @@ public class User extends AbstractEntity implements UserDetails {
     @JsonIgnore
     List<ProcessOrder> processOrders;
 
+    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
+    @JsonIgnore
+    List<Feedback> feedbacks;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
+    List<Address> addresses;
+
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

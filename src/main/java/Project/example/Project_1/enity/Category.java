@@ -1,7 +1,11 @@
 package Project.example.Project_1.enity;
 
+import Project.example.Project_1.enums.EnumStatus;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.List;
 
 @Entity
 @AllArgsConstructor
@@ -20,5 +24,11 @@ public class Category extends AbstractEntity {
     @Column
     String description;
 
+    @Enumerated(EnumType.STRING)
+    EnumStatus status;
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "category", fetch = FetchType.EAGER)
+    @JsonIgnore
+    List<Product> products;
 
 }

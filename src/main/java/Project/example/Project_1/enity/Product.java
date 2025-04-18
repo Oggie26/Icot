@@ -2,8 +2,11 @@ package Project.example.Project_1.enity;
 
 import Project.example.Project_1.enums.EnumSize;
 import Project.example.Project_1.enums.EnumStatus;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.List;
 
 @Entity
 @Getter
@@ -35,4 +38,13 @@ public class Product extends AbstractEntity{
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
     EnumStatus status;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JsonIgnore
+    @JoinColumn(name = "category_id")
+    Category category;
+
+    @OneToMany(mappedBy = "product", fetch = FetchType.EAGER)
+    @JsonIgnore
+    List<Feedback> feedbacks;
 }

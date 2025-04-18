@@ -22,4 +22,12 @@ public class Order extends  AbstractEntity{
 
     @OneToMany(mappedBy = "order")
     @JsonIgnore
-    List<ProcessOrder> processOrders;}
+    List<ProcessOrder> processOrders;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "address_id")
+    @JsonIgnore
+    Address address;
+}
+
+
