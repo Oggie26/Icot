@@ -5,7 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 
 @Getter
-public enum ErrorCode {
+public enum     ErrorCode {
     UNCATEGORIZED_EXCEPTION(9999, "Uncategorized error", HttpStatus.INTERNAL_SERVER_ERROR),
     //10XX
     RESOURCE_NOT_FOUND(1000, "Resource not found", HttpStatus.NOT_FOUND),
@@ -17,7 +17,11 @@ public enum ErrorCode {
     EMAIL_SEND_FAILED(1006, "Email send fail", HttpStatus.BAD_REQUEST),
     PRODUCT_NOT_FOUND(1007, "Sản phẩm không tồn tại", HttpStatus.BAD_REQUEST),
     PRODUCT_INACTIVE(1008, "Sản phẩm này đẫ không còn hoặc đã xoá ", HttpStatus.BAD_REQUEST),
-
+    ADDRESS_NOT_FOUND(1009, "Address not found", HttpStatus.BAD_REQUEST),
+    TAG_NOT_FOUND(1010, "Tag not found", HttpStatus.BAD_REQUEST),
+    TAG_NAME_EXISTED(1011, "Tag name existed", HttpStatus.BAD_REQUEST),
+    TAG_NAME_NOT_FOUND(1012, "Tag name not found", HttpStatus.BAD_REQUEST),
+    TAG_NAME_ALREADY_EXISTS(1013, "Tag name already exists", HttpStatus.BAD_REQUEST),
     //11xx
     INVALID_KEY(1100, "Invalid uncategorized error", HttpStatus.BAD_REQUEST),
     INVALID_JSON(1101, "Json invalid", HttpStatus.BAD_REQUEST),
@@ -28,6 +32,7 @@ public enum ErrorCode {
     INVALID_PASSWORD(1106, "Invalid Password", HttpStatus.BAD_REQUEST),
     INVALID_PHONE(1107, "Invalid Phone", HttpStatus.BAD_REQUEST),
     INVALID_EMAIL(1108, "Invalid Email", HttpStatus.BAD_REQUEST),
+
 
 
     //12xx

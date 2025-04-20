@@ -21,12 +21,19 @@ public class Tag extends AbstractEntity
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column
+    @Column(unique = true)
     String name;
 
     @Enumerated(EnumType.STRING)
     EnumStatus status;
 
+    @Column
+    String description;
+
     @ManyToMany(mappedBy = "tags")
     private List<DesignTemplate> designTemplates = new ArrayList<>();
+
+    @ManyToMany(mappedBy = "tags")
+    private List<Design> designs = new ArrayList<>();
+
 }

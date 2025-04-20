@@ -7,6 +7,7 @@ import Project.example.Project_1.response.LoginResponse;
 import Project.example.Project_1.response.RegisterResponse;
 import Project.example.Project_1.service.AuthenticationService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,6 +19,8 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 @RequestMapping("/api/auth")
 @SecurityRequirement(name = "api")
 @CrossOrigin("*")
+@Tag(name = "Authentication Controller")
+
 public class AuthenticationAPI {
 
     @Autowired
