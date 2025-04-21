@@ -27,11 +27,9 @@ import java.util.Optional;
 @Service
 public class AuthenticationService implements UserDetailsService {
 
-    @Autowired
     UserRepository userRepository;
-
-    @Autowired
     TokenService tokenService;
+    PasswordEncoder passwordEncoder;
 
 
     @Override
@@ -67,12 +65,13 @@ public class AuthenticationService implements UserDetailsService {
         if (userRepository.findUserByUsername(request.getUsername()).isPresent()) {
             throw new AppException(ErrorCode.USERNAME_EXISTED);
         }
-        if (userRepository.findUserByEmail(request.getEmail()).isPresent()) {
+        if (userRepository.findUserByEmailAndIsDeletedFalse(request.getEmail()).isPresent()) {
             throw new AppException(ErrorCode.EMAIL_EXISTED);
         }
+
         User user = User.builder()
                .username(request.getUsername())
-               .password(request.getPassword())
+               .password(passwordEncoder.encode(request.getPassword()))
                .email(request.getEmail())
                .fullName(request.getFullName())
                .role(EnumRole.CUSTOMER)

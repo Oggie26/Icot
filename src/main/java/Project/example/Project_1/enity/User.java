@@ -11,6 +11,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -109,6 +110,36 @@ public class User extends AbstractEntity implements UserDetails {
     @Override
     public boolean isEnabled() {
         return false;
+    }
+
+
+    public void addOtp(Otp obj) {
+        if (this.otps == null) {
+            this.otps = new ArrayList<>();
+        }
+        otps.add(obj);
+        obj.setUser(this);
+    }
+
+    public void addVoucher(Voucher obj) {
+        if (this.vouchers == null) {
+            this.vouchers = new ArrayList<>();
+        }
+        vouchers.add(obj);
+        obj.addUser(this);
+    }
+
+    public void removeVoucher(Voucher obj) {
+        for (Voucher voucher : vouchers) {
+            if (voucher.getCode().equals(obj.getCode())) {
+                vouchers.remove(voucher);
+                obj.getUsers().remove(this);
+                break;
+            }
+        }
+    }
+    public void addPoint(Integer point) {
+        this.point += point;
     }
 
 

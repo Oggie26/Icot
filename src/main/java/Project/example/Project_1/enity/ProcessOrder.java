@@ -13,7 +13,7 @@ import lombok.*;
 @AllArgsConstructor
 @ToString
 @Entity
-public class ProcessOrder {
+public class ProcessOrder extends  AbstractEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

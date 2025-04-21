@@ -78,7 +78,7 @@ public class OptService {
 
     @Transactional
     public void resendOtpByEmail(String email) {
-        User user = userRepository.findUserByEmail(email)
+        User user = userRepository.findUserByEmailAndIsDeletedFalse(email)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
         // Vô hiệu hóa OTP cũ (nếu có)

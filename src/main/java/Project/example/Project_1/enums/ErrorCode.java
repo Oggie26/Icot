@@ -22,6 +22,11 @@ public enum     ErrorCode {
     TAG_NAME_EXISTED(1011, "Tag name existed", HttpStatus.BAD_REQUEST),
     TAG_NAME_NOT_FOUND(1012, "Tag name not found", HttpStatus.BAD_REQUEST),
     TAG_NAME_ALREADY_EXISTS(1013, "Tag name already exists", HttpStatus.BAD_REQUEST),
+    PHONE_EXISTED(1014, "Phone number existed", HttpStatus.BAD_REQUEST),
+    USER_NOT_FOUND(1015, "User not found", HttpStatus.BAD_REQUEST),
+    VOUCHER_NOT_FOUND(1016, "Voucher not found", HttpStatus.BAD_REQUEST),
+    VOUCHER_CODE_ALREADY_EXISTS(1017, "Voucher code already exists", HttpStatus.BAD_REQUEST),
+
     //11xx
     INVALID_KEY(1100, "Invalid uncategorized error", HttpStatus.BAD_REQUEST),
     INVALID_JSON(1101, "Json invalid", HttpStatus.BAD_REQUEST),
@@ -32,12 +37,13 @@ public enum     ErrorCode {
     INVALID_PASSWORD(1106, "Invalid Password", HttpStatus.BAD_REQUEST),
     INVALID_PHONE(1107, "Invalid Phone", HttpStatus.BAD_REQUEST),
     INVALID_EMAIL(1108, "Invalid Email", HttpStatus.BAD_REQUEST),
+    INVALID_EXCHANGE_VOUCHER(1109, "Invalid Exchange voucher", HttpStatus.BAD_REQUEST),
 
 
 
     //12xx
     UNAUTHENTICATED(1201, "Unauthenticated", HttpStatus.UNAUTHORIZED),
-
+    NOT_ENOUGH_POINT(1202, "Not enough point", HttpStatus.BAD_REQUEST),
     ;
 
 
