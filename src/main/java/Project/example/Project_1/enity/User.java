@@ -76,6 +76,15 @@ public class User extends AbstractEntity implements UserDetails {
     @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
     List<Address> addresses;
 
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JsonIgnore
+    @JoinTable(
+            name = "tbl_user_voucher",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "voucher_id")
+    )
+    List<Voucher> vouchers;
+
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

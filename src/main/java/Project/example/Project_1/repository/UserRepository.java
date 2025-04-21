@@ -16,6 +16,7 @@ public interface UserRepository extends JpaRepository<User, String> {
     Optional<User> findUserByIdAndIsDeletedFalse(String id);
     Optional<User> findUserByEmail(String email);
 
+
     default User findByUsernameOrThrow(String username) {
         return findUserByUsername(username)
                 .orElseThrow(() -> new AppException(ErrorCode.UNAUTHENTICATED));
