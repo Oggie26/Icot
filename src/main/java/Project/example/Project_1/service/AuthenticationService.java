@@ -46,7 +46,7 @@ public class AuthenticationService implements UserDetailsService {
     //Login
     @Transactional
     public LoginResponse login(LoginRequest request) {
-        User user = userRepository.findUserByIdAndIsDeletedFalse(request.getUsername())
+        User user = userRepository.findUserByUsername(request.getUsername())
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
         if(user == null){
             throw new AppException(ErrorCode.USER_NOT_EXISTED);
