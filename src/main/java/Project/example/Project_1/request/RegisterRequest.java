@@ -38,9 +38,9 @@ public class RegisterRequest {
     private String gender;
     @NotNull(message = "Name không được null")
     private String fullName;
-    @Enumerated(EnumType.STRING)
-    private EnumStatus status;
-    @Enumerated(EnumType.STRING)
-    private EnumRole role;
+//    @Enumerated(EnumType.STRING)
+//    private EnumStatus status;
+//    @Enumerated(EnumType.STRING)
+//    private EnumRole role;
 
 }

@@ -1,8 +1,11 @@
 package Project.example.Project_1.config;
+import Project.example.Project_1.response.PageResponse;
 import Project.example.Project_1.service.AuthenticationService;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.domain.Page;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -18,6 +21,8 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @EnableMethodSecurity
 @Configuration
@@ -68,4 +73,10 @@ public class SecurityConfig {
         source.registerCorsConfiguration("/**", cors);
         return source;
     }
+
+    @Bean
+    public ModelMapper modelMapper() {
+        return new ModelMapper();
+    }
+
 }
