@@ -28,11 +28,9 @@ import java.util.Optional;
 @Service
 public class AuthenticationService implements UserDetailsService {
 
-    @Autowired
     UserRepository userRepository;
-
-    @Autowired
     TokenService tokenService;
+    PasswordEncoder passwordEncoder;
 
 
     @Override
@@ -55,7 +53,7 @@ public class AuthenticationService implements UserDetailsService {
     //Login
     @Transactional
     public LoginResponse login(LoginRequest request) {
-        User user = userRepository.findUserByIdAndIsDeletedFalse(request.getUsername())
+        User user = userRepository.findUserByUsername(request.getUsername())
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
         if(user == null){
             throw new AppException(ErrorCode.USER_NOT_EXISTED);
@@ -66,8 +64,6 @@ public class AuthenticationService implements UserDetailsService {
         // Trả về Token
         return LoginResponse.builder()
                 .token(token)
-                .fullName(user.getFullName())
-                .role(user.getRole())
                 .build();
     }
 
@@ -76,12 +72,13 @@ public class AuthenticationService implements UserDetailsService {
         if (userRepository.findUserByUsername(request.getUsername()).isPresent()) {
             throw new AppException(ErrorCode.USERNAME_EXISTED);
         }
-        if (userRepository.findUserByEmail(request.getEmail()).isPresent()) {
+        if (userRepository.findUserByEmailAndIsDeletedFalse(request.getEmail()).isPresent()) {
             throw new AppException(ErrorCode.EMAIL_EXISTED);
         }
+
         User user = User.builder()
                .username(request.getUsername())
-               .password(request.getPassword())
+               .password(passwordEncoder.encode(request.getPassword()))
                .email(request.getEmail())
                .fullName(request.getFullName())
                .role(EnumRole.CUSTOMER)

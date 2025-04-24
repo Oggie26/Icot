@@ -49,13 +49,13 @@ public class UserAPI {
         return ResponseEntity.ok(userService.updateUser(id, userRequest));
     }
 
-    @PutMapping("/disable/{id}")
-    public ResponseEntity<User> disableUser(@PathVariable String id) {
-        return ResponseEntity.ok(userService.disableUser(id));
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<User> deleteUser(@PathVariable String id) {
-        return ResponseEntity.ok(userService.deleteUser(id));
-    }
+//    @PutMapping("/disable/{id}")
+//    public ResponseEntity<User> disableUser(@PathVariable String id) {
+//        return ResponseEntity.ok(userService.disableUser(id));
+//    }
+//
+//    @DeleteMapping("/{id}")
+//    public ResponseEntity<User> deleteUser(@PathVariable String id) {
+//        return ResponseEntity.ok(userService.deleteUser(id));
+//    }
 }
