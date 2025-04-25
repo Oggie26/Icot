@@ -302,7 +302,7 @@ public class UserService {
                                                 .build())
                                         .toList().toString())
                         .build())
-                .filter(user -> user.getStatus().equals(EnumStatus.INACTIVE))
+                .filter(user -> user.getStatus().equals(EnumStatus.ACTIVE))
                 .toList();
     }
 
