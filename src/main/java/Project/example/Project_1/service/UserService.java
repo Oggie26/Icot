@@ -65,7 +65,7 @@ public class UserService {
         return currentUser.get().getRole().equals(EnumRole.ADMIN);
     }
 
-    @Transactional
+    /*@Transactional
     public UserResponse addNewUser(UserRequest userRequest) {
         if (userRepository.findUserByEmail(userRequest.getEmail()).isPresent()) {
             throw new AppException(ErrorCode.EMAIL_EXISTED);
@@ -76,10 +76,10 @@ public class UserService {
         User user = new User();
         modelMapper.map(userRequest, user);
 
-        /*boolean isAdmin = authenticationService.getCurrentAccount()
+        *//*boolean isAdmin = authenticationService.getCurrentAccount()
                 .map(User::getRole)
                 .map(role -> role == EnumRole.ADMIN)
-                .orElse(false);*/
+                .orElse(false);*//*
         if(isAdmin())
             user.setRole(userRequest.getRole());
         else
@@ -143,7 +143,7 @@ public class UserService {
             e.printStackTrace();
             throw new EntityNotFoundException("Error when saving updated user to db");
         }
-    }
+    }*/
 
 
     public User getUserById(String id){
