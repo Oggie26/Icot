@@ -9,10 +9,11 @@ import Project.example.Project_1.exception.AppException;
 import Project.example.Project_1.repository.UserRepository;
 import Project.example.Project_1.request.UserCreateRequest;
 import Project.example.Project_1.request.UserRequest;
+import Project.example.Project_1.request.UserSearchRequest;
 import Project.example.Project_1.request.UserUpdateRequest;
 import Project.example.Project_1.response.*;
 import jakarta.persistence.EntityNotFoundException;
-import javassist.NotFoundException;
+import jakarta.persistence.criteria.Predicate;
 import org.modelmapper.Conditions;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,12 +21,14 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -56,14 +59,20 @@ public class UserService {
 //        return userRepository.save(user);
 //    }
 
-    private boolean isAdmin() throws NotFoundException {
+    private boolean isAdmin() {
         Optional<User> currentUser = authenticationService.getCurrentAccount();
-        if (currentUser.isEmpty()) throw new NotFoundException("User is not found");
+        if (currentUser.isEmpty()) throw new AppException(ErrorCode.UNAUTHENTICATED);
         return currentUser.get().getRole().equals(EnumRole.ADMIN);
     }
 
     @Transactional
-    public UserResponse addNewUser(UserRequest userRequest) throws NotFoundException {
+    public UserResponse addNewUser(UserRequest userRequest) {
+        if (userRepository.findUserByEmail(userRequest.getEmail()).isPresent()) {
+            throw new AppException(ErrorCode.EMAIL_EXISTED);
+        }
+        if (userRepository.findUserByPhone(userRequest.getPhone()) != null) {
+            throw new AppException(ErrorCode.PHONE_EXISTED);
+        }
         User user = new User();
         modelMapper.map(userRequest, user);
 
@@ -88,11 +97,29 @@ public class UserService {
     }
 
     @Transactional
-    public UserResponse updateUser(String id, UserRequest userRequest) throws NotFoundException {
+    public UserResponse updateUser(String id, UserRequest userRequest) {
         User user = userRepository.findUserById(id);
         if (user == null) {
-            throw new NotFoundException("User not found with id: " + id);
+            throw new AppException(ErrorCode.USER_NOT_FOUND);
         }
+        // check duplicated email
+        if (userRequest.getEmail() != null && !userRequest.getEmail().equals(user.getEmail())) {
+            boolean emailExists = userRepository.existsByEmailAndIdNot(userRequest.getEmail(), user.getId());
+            if (emailExists) {
+                throw new AppException(ErrorCode.EMAIL_EXISTED);
+            }
+            user.setEmail(userRequest.getEmail());
+        }
+
+        // check duplicate phone
+        if (userRequest.getPhone() != null && !userRequest.getPhone().equals(user.getPhone())) {
+            boolean phoneExists = userRepository.existsByPhoneAndIdNot(userRequest.getPhone(), user.getId());
+            if (phoneExists) {
+                throw new AppException(ErrorCode.PHONE_EXISTED);
+            }
+            user.setPhone(userRequest.getPhone());
+        }
+
 
         modelMapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
         modelMapper.map(userRequest, user);
@@ -124,32 +151,22 @@ public class UserService {
         return modelMapper.map(user, User.class);
     }
 
-    public GetUserResponse getUserByUsername(String username) throws NotFoundException {
-        boolean checkAdmin = isAdmin();
-        if(checkAdmin){
+    public GetUserResponse getUserByUsername(String username) {
+        if(isAdmin()){
             Optional<User> user = userRepository.findUserByUsername(username);
-            if (user.isEmpty()) throw new NotFoundException("User is not found");
+            if (user.isEmpty()) throw new AppException(ErrorCode.USER_NOT_FOUND);
             return modelMapper.map(user, GetUserResponse.class);
         }
         else{
             Optional<User> currentUser = authenticationService.getCurrentAccount();
-            if (currentUser.isEmpty()) throw new NotFoundException("User is not found");
+            if (currentUser.isEmpty()) throw new AppException(ErrorCode.USER_NOT_FOUND);
             return modelMapper.map(currentUser, GetUserResponse.class);
         }
     }
 
-//    public List<User> getAllUsers() throws NotFoundException {
-//        Optional<User> currentUserId = authenticationService.getCurrentAccount();
-//        if (currentUserId.isEmpty()) throw new NotFoundException("User is not found");
-//        if (!currentUserId.get().getRole().equals(EnumRole.ADMIN)) throw new NotFoundException("User is not found");
-//        List<User> users = userRepository.findAll();
-//        return users.stream().map(user -> modelMapper.map(user, User.class)).toList();
-//    }
-
-    public PageResponse<GetUserResponse> getAllUsers(int page, int size) throws NotFoundException {
-        boolean checkAdmin = isAdmin();
-        if(!checkAdmin){
-            throw new NotFoundException("You are not allowed to use this feature!");
+    public PageResponse<GetUserResponse> getAllUsers(int page, int size) {
+        if(!isAdmin()){
+            throw new AppException(ErrorCode.UNAUTHENTICATED);
         }
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
         Page<User> users = userRepository.findAll(pageable);
@@ -241,13 +258,15 @@ public class UserService {
     public void deleteUser(String userId) {
         User user = userRepository.findByIdAndIsDeletedFalse(userId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        user.setIsDeleted(true);
+        user.setStatus(EnumStatus.DELETED);
         userRepository.save(user);
     }
 
     public void disableUser (String  userId) {
         User user = userRepository.findByIdAndIsDeletedFalse(userId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
-        user.setStatus(EnumStatus.INACTIVE);
+        user.setStatus(EnumStatus.BLOCKED);
         userRepository.save(user);
     }
 
@@ -331,5 +350,62 @@ public class UserService {
                 .address(null) // hoặc ánh xạ nếu có
                 .build();
     }
+
+    public PageResponse<GetUserResponse> searchUsers(UserSearchRequest request, int page, int size) {
+        if (!isAdmin()) {
+            throw new AppException(ErrorCode.UNAUTHENTICATED);
+        }
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+
+        Specification<User> spec = (root, query, cb) -> {
+            List<Predicate> predicates = new ArrayList<>();
+
+            if (request.getUsername() != null) {
+                predicates.add(cb.like(cb.lower(root.get("username")), "%" + request.getUsername().toLowerCase() + "%"));
+            }
+            if (request.getFullName() != null) {
+                predicates.add(cb.like(cb.lower(root.get("fullName")), "%" + request.getFullName().toLowerCase() + "%"));
+            }
+            if (request.getEmail() != null) {
+                predicates.add(cb.like(cb.lower(root.get("email")), "%" + request.getEmail().toLowerCase() + "%"));
+            }
+            if (request.getPhone() != null) {
+                predicates.add(cb.like(root.get("phone"), "%" + request.getPhone() + "%"));
+            }
+            if (request.getRole() != null) {
+                predicates.add(cb.equal(root.get("role"), request.getRole()));
+            }
+            if (request.getStatus() != null) {
+                predicates.add(cb.equal(root.get("status"), request.getStatus()));
+            }
+            if (request.getGender() != null) {
+                predicates.add(cb.equal(root.get("gender"), request.getGender()));
+            }
+            if (request.getFromBirthday() != null) {
+                predicates.add(cb.greaterThanOrEqualTo(root.get("birthday"), request.getFromBirthday()));
+            }
+            if (request.getToBirthday() != null) {
+                predicates.add(cb.lessThanOrEqualTo(root.get("birthday"), request.getToBirthday()));
+            }
+            if (request.getFromCreatedAt() != null) {
+                predicates.add(cb.greaterThanOrEqualTo(root.get("createdAt"), request.getFromCreatedAt()));
+            }
+            if (request.getToCreatedAt() != null) {
+                predicates.add(cb.lessThanOrEqualTo(root.get("createdAt"), request.getToCreatedAt()));
+            }
+
+            if(request.getIsDeleted() != null) {
+                predicates.add(cb.equal(root.get("isDeleted"), request.getIsDeleted()));
+            }
+
+            return cb.and(predicates.toArray(new Predicate[0]));
+        };
+
+        Page<User> userPage = userRepository.findAll(spec, pageable);
+
+        return pageMaper.convertToPageResponse(userPage, user -> modelMapper.map(user, GetUserResponse.class));
+    }
+
 
 }
