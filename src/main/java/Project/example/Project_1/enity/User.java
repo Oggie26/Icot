@@ -11,6 +11,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -43,7 +44,6 @@ public class User extends AbstractEntity implements UserDetails {
     private String gender;
 
     @Column
-    @JsonFormat(pattern = "dd-MM-yyyy")
     private LocalDate birthday;
 
     @Column
@@ -64,6 +64,28 @@ public class User extends AbstractEntity implements UserDetails {
     @OneToMany(mappedBy = "user", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JsonIgnore
     List<Otp> otps;
+
+    @OneToMany(mappedBy = "user")
+    @JsonIgnore
+    List<ProcessOrder> processOrders;
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
+    @JsonIgnore
+    List<Feedback> feedbacks;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
+    List<Address> addresses;
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JsonIgnore
+    @JoinTable(
+            name = "tbl_user_voucher",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "voucher_id")
+    )
+    List<Voucher> vouchers;
+
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -88,6 +110,36 @@ public class User extends AbstractEntity implements UserDetails {
     @Override
     public boolean isEnabled() {
         return false;
+    }
+
+
+    public void addOtp(Otp obj) {
+        if (this.otps == null) {
+            this.otps = new ArrayList<>();
+        }
+        otps.add(obj);
+        obj.setUser(this);
+    }
+
+    public void addVoucher(Voucher obj) {
+        if (this.vouchers == null) {
+            this.vouchers = new ArrayList<>();
+        }
+        vouchers.add(obj);
+        obj.addUser(this);
+    }
+
+    public void removeVoucher(Voucher obj) {
+        for (Voucher voucher : vouchers) {
+            if (voucher.getCode().equals(obj.getCode())) {
+                vouchers.remove(voucher);
+                obj.getUsers().remove(this);
+                break;
+            }
+        }
+    }
+    public void addPoint(Integer point) {
+        this.point += point;
     }
 
 
