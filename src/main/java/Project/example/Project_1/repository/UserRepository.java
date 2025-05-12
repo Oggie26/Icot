@@ -12,13 +12,13 @@ public interface UserRepository extends JpaRepository<User, String>, JpaSpecific
     Optional<User> findUserByUsername(String username);
     User findByUsername(String username);
     Optional<User> findUserByIdAndIsDeletedFalse(String id);
-//    Optional<User> findUserByEmail(String email);
+    Optional<User> findUserByEmail(String email);
     User findUserById(String id);
 //    List<User> findAllByIsDeletedFalse();
     Optional<User> findUserByEmailAndIsDeletedFalse(String email);
     Optional<User> findUserByPhoneAndIsDeletedFalse(String phone);
     Optional<User> findByIdAndIsDeletedFalse(String id);
-//    User findUserByPhone(String phone);
+    User findUserByPhone(String phone);
 
     default User findByUsernameOrThrow(String username) {
         return findUserByUsername(username)
@@ -26,6 +26,6 @@ public interface UserRepository extends JpaRepository<User, String>, JpaSpecific
     }
 //    Optional<User> findUserById(String id);
 
-//    boolean existsByEmailAndIdNot(String email, String id);
-//    boolean existsByPhoneAndIdNot(String phone, String id);
+    boolean existsByEmailAndIdNot(String email, String id);
+    boolean existsByPhoneAndIdNot(String phone, String id);
 }

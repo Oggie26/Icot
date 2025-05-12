@@ -28,8 +28,11 @@ import java.util.Optional;
 @Service
 public class AuthenticationService implements UserDetailsService {
 
+    @Autowired
     UserRepository userRepository;
+    @Autowired
     TokenService tokenService;
+    @Autowired
     PasswordEncoder passwordEncoder;
 
 
