@@ -54,10 +54,11 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration cors = new CorsConfiguration();
-        cors.setAllowedOrigins(List.of("*")); // hoặc whitelist cụ thể origin
+        cors.setAllowedOrigins(List.of("*"));
         cors.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         cors.setAllowedHeaders(List.of("Authorization", "Content-Type"));
         cors.setAllowCredentials(true);
+        cors.setMaxAge(1440000L);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", cors);
         return source;

@@ -11,7 +11,6 @@ import Project.example.Project_1.request.LoginRequest;
 import Project.example.Project_1.request.RegisterRequest;
 import Project.example.Project_1.response.LoginResponse;
 import Project.example.Project_1.response.RegisterResponse;
-import Project.example.Project_1.response.UserResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -26,9 +25,11 @@ import java.util.Optional;
 
 @Service
 public class AuthenticationService implements UserDetailsService {
-
+    @Autowired
     UserRepository userRepository;
+    @Autowired
     TokenService tokenService;
+    @Autowired
     PasswordEncoder passwordEncoder;
 
 

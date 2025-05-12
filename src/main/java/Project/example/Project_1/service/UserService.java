@@ -10,6 +10,7 @@ import Project.example.Project_1.request.UserUpdateRequest;
 import Project.example.Project_1.response.AddressResponse;
 import Project.example.Project_1.response.UserStaffResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -21,9 +22,10 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class UserService {
-
-    private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
+    @Autowired
+     UserRepository userRepository;
+    @Autowired
+     PasswordEncoder passwordEncoder;
 
     @Transactional
     public UserStaffResponse createUser(UserCreateRequest userCreateRequest) {
@@ -170,7 +172,7 @@ public class UserService {
                                                 .build())
                                         .toList().toString())
                         .build())
-                .filter(user -> user.getStatus().equals(EnumStatus.INACTIVE))
+                .filter(user -> user.getStatus().equals(EnumStatus.ACTIVE))
                 .toList();
     }
 

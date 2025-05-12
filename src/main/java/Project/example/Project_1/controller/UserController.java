@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,7 +22,7 @@ import java.util.List;
 @SecurityRequirement(name = "api")
 @CrossOrigin("*")
 public class UserController {
-
+    @Autowired
     UserService userService;
 
     @PostMapping
@@ -77,7 +78,7 @@ public class UserController {
     }
 
     @GetMapping
-    @Operation(summary = "Lấy danh sách người dùng (status = INACTIVE)")
+    @Operation(summary = "Lấy danh sách người dùng (status = ACTIVE)")
     public ApiResponse<List<UserStaffResponse>> getUsers() {
         return ApiResponse.<List<UserStaffResponse>>builder()
                 .code(HttpStatus.OK.value())
