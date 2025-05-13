@@ -5,7 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 
 @Getter
-public enum     ErrorCode {
+public enum ErrorCode {
     UNCATEGORIZED_EXCEPTION(9999, "Uncategorized error", HttpStatus.INTERNAL_SERVER_ERROR),
     //10XX
     RESOURCE_NOT_FOUND(1000, "Resource not found", HttpStatus.NOT_FOUND),
@@ -27,6 +27,7 @@ public enum     ErrorCode {
     VOUCHER_NOT_FOUND(1016, "Voucher not found", HttpStatus.BAD_REQUEST),
     VOUCHER_CODE_ALREADY_EXISTS(1017, "Voucher code already exists", HttpStatus.BAD_REQUEST),
 
+
     //11xx
     INVALID_KEY(1100, "Invalid uncategorized error", HttpStatus.BAD_REQUEST),
     INVALID_JSON(1101, "Json invalid", HttpStatus.BAD_REQUEST),
@@ -38,8 +39,12 @@ public enum     ErrorCode {
     INVALID_PHONE(1107, "Invalid Phone", HttpStatus.BAD_REQUEST),
     INVALID_EMAIL(1108, "Invalid Email", HttpStatus.BAD_REQUEST),
     INVALID_EXCHANGE_VOUCHER(1109, "Invalid Exchange voucher", HttpStatus.BAD_REQUEST),
-
-
+    INVALID_PRODUCT_NAME(1110, "Invalid Product name", HttpStatus.BAD_REQUEST),
+    INVALID_PRODUCT_PRICE(1111, "Invalid Product price! Must be a positive number", HttpStatus.BAD_REQUEST),
+    INVALID_PRODUCT_DESCRIPTION(1112, "Invalid Product description", HttpStatus.BAD_REQUEST),
+    INVALID_PRODUCT_SIZE(1113, "Invalid Product size", HttpStatus.BAD_REQUEST),
+    INVALID_PRODUCT_IMAGE(1114, "Invalid Product image", HttpStatus.BAD_REQUEST),
+    INVALID_PRODUCT_CATEGORY(1115, "Invalid Product category", HttpStatus.BAD_REQUEST),
 
     //12xx
     UNAUTHENTICATED(1201, "Unauthenticated", HttpStatus.UNAUTHORIZED),

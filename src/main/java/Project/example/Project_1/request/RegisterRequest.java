@@ -28,7 +28,7 @@ public class RegisterRequest {
     @NotNull(message = "Ngày sinh nhật không được null")
     private LocalDate birthday;
     @NotBlank(message = "SĐT không được trống")
-    @ValidPhoneNumber(message = "EMAIL_INVALID")
+    @ValidPhoneNumber(message = "INVALID_PHONE")
     private String phone;
     @NotBlank(message = "Email không được để trống")
     @ValidEmail(message = "INVALID_EMAIL")
@@ -37,9 +37,9 @@ public class RegisterRequest {
     private String gender;
     @NotNull(message = "Name không được null")
     private String fullName;
-    @Enumerated(EnumType.STRING)
-    private EnumStatus status;
-    @Enumerated(EnumType.STRING)
-    private EnumRole role;
+//    @Enumerated(EnumType.STRING)
+//    private EnumStatus status;
+//    @Enumerated(EnumType.STRING)
+//    private EnumRole role;
 
 }

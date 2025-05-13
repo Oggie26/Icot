@@ -1,5 +1,6 @@
 package Project.example.Project_1.config;
 import Project.example.Project_1.service.AuthenticationService;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -67,5 +68,9 @@ public class SecurityConfig {
 
     }
 
+    @Bean
+    public ModelMapper modelMapper() {
+        return new ModelMapper();
+    }
 
 }

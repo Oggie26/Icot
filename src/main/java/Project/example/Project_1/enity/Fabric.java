@@ -1,4 +1,4 @@
-package Project.example.Project_1.entity;
+package Project.example.Project_1.enity;
 
 import Project.example.Project_1.enums.EnumMaterial;
 import Project.example.Project_1.enums.EnumStatus;

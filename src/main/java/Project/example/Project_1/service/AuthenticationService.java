@@ -11,7 +11,9 @@ import Project.example.Project_1.request.LoginRequest;
 import Project.example.Project_1.request.RegisterRequest;
 import Project.example.Project_1.response.LoginResponse;
 import Project.example.Project_1.response.RegisterResponse;
+import Project.example.Project_1.response.UserResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -25,6 +27,7 @@ import java.util.Optional;
 
 @Service
 public class AuthenticationService implements UserDetailsService {
+
     @Autowired
     UserRepository userRepository;
     @Autowired
@@ -39,9 +42,15 @@ public class AuthenticationService implements UserDetailsService {
     }
 
     public Optional<User> getCurrentAccount() {
-        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return userRepository.findUserByIdAndIsDeletedFalse(String.valueOf(user.getId())).isPresent() ?
-                userRepository.findUserByIdAndIsDeletedFalse(String.valueOf(user.getId())) : null;
+//        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+//        return userRepository.findUserByIdAndIsDeletedFalse(String.valueOf(user.getId())).isPresent() ?
+//                userRepository.findUserByIdAndIsDeletedFalse(String.valueOf(user.getId())) : null;
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (authentication == null || !authentication.isAuthenticated()) {
+                return Optional.empty();
+            }
+            User user = (User) authentication.getPrincipal();
+            return userRepository.findUserByIdAndIsDeletedFalse(String.valueOf(user.getId()));
     }
 
     //Login
@@ -95,6 +104,4 @@ public class AuthenticationService implements UserDetailsService {
                 .birthday(user.getBirthday())
                 .build();
     }
-
-
 }

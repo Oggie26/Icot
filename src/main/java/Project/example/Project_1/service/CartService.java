@@ -142,7 +142,7 @@ public class CartService {
                         .productName(item.getProduct().getProductName())
                         .price(item.getPrice())
                         .quantity(item.getQuantity())
-                        .image(item.getProduct().getImage())
+                        .image(item.getProduct().getImageThumbnail())
                         .totalItemPrice(item.getPrice() * item.getQuantity())
                         .build())
                 .collect(Collectors.toList());

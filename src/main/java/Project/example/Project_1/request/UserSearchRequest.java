@@ -8,16 +8,18 @@ import java.time.LocalDate;
 import java.util.Date;
 
 @Data
-public class UserRequest {
+public class UserSearchRequest {
     private String username;
-    private String password ;
-    private LocalDate birthday;
-    private String  phone;
-    private String email;
-    private String gender;
     private String fullName;
-    private EnumStatus status;
-    private String address;
+    private String email;
+    private String phone;
     private EnumRole role;
-    private int point;
+    private EnumStatus status;
+    private String gender;
+    private LocalDate fromBirthday;
+    private LocalDate toBirthday;
+    private Date fromCreatedAt;
+    private Date toCreatedAt;
+    private Boolean isDeleted;
 }
+

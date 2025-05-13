@@ -1,14 +1,18 @@
-package Project.example.Project_1.request;
+package Project.example.Project_1.response;
 
 import Project.example.Project_1.enums.EnumRole;
 import Project.example.Project_1.enums.EnumStatus;
-import lombok.Data;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDate;
 import java.util.Date;
 
-@Data
-public class UserRequest {
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class GetUserResponse {
     private String username;
     private String password ;
     private LocalDate birthday;
@@ -20,4 +24,6 @@ public class UserRequest {
     private String address;
     private EnumRole role;
     private int point;
+    private Date createdAt;
+    private Date updatedAt;
 }
