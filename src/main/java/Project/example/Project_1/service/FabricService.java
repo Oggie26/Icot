@@ -136,7 +136,7 @@ public class FabricService {
         }
 
         // Tạo Pageable cho phân trang
-        PageRequest pageable = PageRequest.of(page, size, Sort.by("fabriceName").ascending());
+        PageRequest pageable = PageRequest.of(page, size, Sort.by("createdAt").ascending());
 
         // Tìm kiếm trong repository
         Page<Fabric> fabricPage = fabricRepository.findByFabricNameContainingIgnoreCase(key, pageable);
