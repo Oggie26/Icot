@@ -26,6 +26,11 @@ public enum ErrorCode {
     USER_NOT_FOUND(1015, "User not found", HttpStatus.BAD_REQUEST),
     VOUCHER_NOT_FOUND(1016, "Voucher not found", HttpStatus.BAD_REQUEST),
     VOUCHER_CODE_ALREADY_EXISTS(1017, "Voucher code already exists", HttpStatus.BAD_REQUEST),
+    FABRIC_NAME_EXISTED(1018, "Fabric name existed", HttpStatus.BAD_REQUEST),
+    FABRIC_NOT_FOUND(1019, "Fabric not found", HttpStatus.BAD_REQUEST),
+    BLOG_NAME_EXISTED(1020, "Blog name existed", HttpStatus.BAD_REQUEST),
+    BLOG_NOT_EXIST(1021, "Blog not existed", HttpStatus.BAD_REQUEST),
+
 
 
     //11xx
@@ -45,6 +50,7 @@ public enum ErrorCode {
     INVALID_PRODUCT_SIZE(1113, "Invalid Product size", HttpStatus.BAD_REQUEST),
     INVALID_PRODUCT_IMAGE(1114, "Invalid Product image", HttpStatus.BAD_REQUEST),
     INVALID_PRODUCT_CATEGORY(1115, "Invalid Product category", HttpStatus.BAD_REQUEST),
+    INVALID_BLOG_NAME(1116, "Invalid Blog name", HttpStatus.BAD_REQUEST),
 
     //12xx
     UNAUTHENTICATED(1201, "Unauthenticated", HttpStatus.UNAUTHORIZED),

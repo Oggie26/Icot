@@ -144,7 +144,7 @@ public class UserService {
 
 
     public User getUserById(String id){
-        User user = userRepository.findUserById(id);
+        User user = userRepository.findUserById(id).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
         return modelMapper.map(user, User.class);
     }
 

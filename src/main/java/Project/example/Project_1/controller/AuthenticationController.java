@@ -21,7 +21,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 @CrossOrigin("*")
 @Tag(name = "Authentication Controller")
 
-public class AuthenticationAPI {
+public class AuthenticationController {
 
     @Autowired
     AuthenticationService authenticationService;

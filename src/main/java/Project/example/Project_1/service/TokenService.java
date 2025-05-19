@@ -1,6 +1,8 @@
 package Project.example.Project_1.service;
 
 import Project.example.Project_1.enity.User;
+import Project.example.Project_1.enums.ErrorCode;
+import Project.example.Project_1.exception.AppException;
 import Project.example.Project_1.repository.UserRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -55,7 +57,7 @@ public class TokenService {
     // get userName form CLAIM
     public User extractAccount (String token){
         String username = extractClaim(token,Claims::getSubject);
-        return userRepository.findByUsername(username);
+        return userRepository.findByUsername(username).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
     }
 
 
