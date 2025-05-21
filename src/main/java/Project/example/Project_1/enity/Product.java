@@ -55,4 +55,9 @@ public class Product extends AbstractEntity{
     @JsonIgnore
     List<Image> images;
 
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JsonIgnore
+    @JoinColumn(name = "fabric_id")
+    Fabric fabric;
+
 }

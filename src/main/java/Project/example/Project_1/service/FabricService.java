@@ -26,11 +26,13 @@ public class FabricService {
 
     @Autowired
     FabricRepository fabricRepository;
+    @Autowired
+    AuthenticationService authenticationService;
 
     @Transactional
     public FabricResponse createFabric (FabricCreationRequest request){
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || !authentication.isAuthenticated()) {
+        var currentUser = authenticationService.getCurrentAccount();
+        if(currentUser.isEmpty()){
             throw new AppException(ErrorCode.UNAUTHENTICATED);
         }
         boolean checkName = fabricRepository.findByFabricName(request.getFabricName()).isPresent();

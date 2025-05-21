@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 
 public interface FabricRepository extends JpaRepository<Fabric, Long> {
+    Optional<Fabric> findFabricById(Long id);
     Optional<Fabric> findByFabricName(String fabricName);
     Optional<Fabric> findByIdAndIsDeletedFalse(Long id);
     Page<Fabric> findByFabricNameContainingIgnoreCase(String fabricName, PageRequest pageable);

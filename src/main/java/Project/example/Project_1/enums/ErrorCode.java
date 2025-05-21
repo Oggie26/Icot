@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatusCode;
 @Getter
 public enum ErrorCode {
     UNCATEGORIZED_EXCEPTION(9999, "Uncategorized error", HttpStatus.INTERNAL_SERVER_ERROR),
+    INTERNAL_SERVER_ERROR(500, "Internal server error", HttpStatus.INTERNAL_SERVER_ERROR),
     //10XX
     RESOURCE_NOT_FOUND(1000, "Resource not found", HttpStatus.NOT_FOUND),
     USERNAME_EXISTED(1001, "Tên tài khoản đã tồn tại", HttpStatus.BAD_REQUEST),
@@ -30,8 +31,8 @@ public enum ErrorCode {
     FABRIC_NOT_FOUND(1019, "Fabric not found", HttpStatus.BAD_REQUEST),
     BLOG_NAME_EXISTED(1020, "Blog name existed", HttpStatus.BAD_REQUEST),
     BLOG_NOT_EXIST(1021, "Blog not existed", HttpStatus.BAD_REQUEST),
-
-
+    CATEGORY_NOT_FOUND(1022, "Category not found", HttpStatus.BAD_REQUEST),
+    CATEGORY_HAS_PRODUCTS(1023, "Category has products", HttpStatus.BAD_REQUEST),
 
     //11xx
     INVALID_KEY(1100, "Invalid uncategorized error", HttpStatus.BAD_REQUEST),
@@ -51,6 +52,11 @@ public enum ErrorCode {
     INVALID_PRODUCT_IMAGE(1114, "Invalid Product image", HttpStatus.BAD_REQUEST),
     INVALID_PRODUCT_CATEGORY(1115, "Invalid Product category", HttpStatus.BAD_REQUEST),
     INVALID_BLOG_NAME(1116, "Invalid Blog name", HttpStatus.BAD_REQUEST),
+    ERROR_SAVE_PRODUCT(1117, "Error when saving product", HttpStatus.BAD_REQUEST),
+    INVALID_CATEGORY_NAME(1118, "Invalid Category name", HttpStatus.BAD_REQUEST),
+    INVALID_CATEGORY_DESCRIPTION(1119, "Invalid Category description", HttpStatus.BAD_REQUEST),
+    ERROR_SAVE_CATEGORY(1120, "Error when saving category", HttpStatus.BAD_REQUEST),
+    ERROR_UPDATE_PRODUCT(1121, "Error when updating product", HttpStatus.BAD_REQUEST),
 
     //12xx
     UNAUTHENTICATED(1201, "Unauthenticated", HttpStatus.UNAUTHORIZED),

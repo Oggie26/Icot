@@ -1,18 +1,23 @@
 package Project.example.Project_1.service;
 
 import Project.example.Project_1.config.PageMapper;
+import Project.example.Project_1.enity.Category;
+import Project.example.Project_1.enity.Fabric;
+import Project.example.Project_1.enity.Image;
 import Project.example.Project_1.enity.Product;
 import Project.example.Project_1.enums.EnumStatus;
 import Project.example.Project_1.enums.ErrorCode;
 import Project.example.Project_1.exception.AppException;
+import Project.example.Project_1.repository.CategoryRepository;
+import Project.example.Project_1.repository.FabricRepository;
+import Project.example.Project_1.repository.ImageRepository;
 import Project.example.Project_1.repository.ProductRepository;
 import Project.example.Project_1.request.ProductCreateRequest;
 import Project.example.Project_1.request.ProductUpdateRequest;
-import Project.example.Project_1.response.ProductResponse;
-import Project.example.Project_1.response.PageResponse;
-import Project.example.Project_1.response.ProductSearchRequest;
+import Project.example.Project_1.response.*;
 import jakarta.persistence.criteria.Predicate;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -20,6 +25,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,6 +38,12 @@ public class ProductService {
     ModelMapper modelMapper;
     @Autowired
     PageMapper pageMapper;
+    @Autowired
+    ImageRepository imageRepository;
+    @Autowired
+    CategoryRepository categoryRepository;
+    @Autowired
+    private FabricRepository fabricRepository;
 
     private void validateNewProduct(ProductCreateRequest request) {
         if(request.getProductName().isEmpty() || request.getProductName().isBlank() ||
@@ -54,7 +66,7 @@ public class ProductService {
         if(request.getImageThumbnail() == null || request.getImageThumbnail().isEmpty()){
             throw new AppException(ErrorCode.INVALID_PRODUCT_IMAGE);
         }
-        if(request.getImages() == null || request.getImages().isEmpty()){
+        if(request.getImagesUrls() == null || request.getImagesUrls().isEmpty()){
             throw new AppException(ErrorCode.INVALID_PRODUCT_IMAGE);
         }
     }
@@ -80,7 +92,7 @@ public class ProductService {
         if(request.getImageThumbnail() == null || request.getImageThumbnail().isEmpty()){
             throw new AppException(ErrorCode.INVALID_PRODUCT_IMAGE);
         }
-        if(request.getImages() == null || request.getImages().isEmpty()){
+        if(request.getImagesUrls() == null || request.getImagesUrls().isEmpty()){
             throw new AppException(ErrorCode.INVALID_PRODUCT_IMAGE);
         }
     }
@@ -91,29 +103,122 @@ public class ProductService {
         return input != null && input.matches(".*" + specialCharPattern + ".*");
     }
 
+    @Transactional
     public ProductResponse createProduct(ProductCreateRequest request) {
-        validateNewProduct(request);
+        try {
+            validateNewProduct(request);
 
-        Product product = modelMapper.map(request, Product.class);
-        product.setIsDeleted(false);
-        product.setStatus(EnumStatus.ACTIVE);
+            Product product = modelMapper.map(request, Product.class);
+            product.setPrice(request.getPrice() * 1.5); // tuong duong voi price + price * 50%
+            product.setIsDeleted(false);
+            product.setStatus(EnumStatus.ACTIVE);
 
-        product = productRepository.save(product);
-        return modelMapper.map(product, ProductResponse.class);
+            if (request.getCategory() != null) {
+                Category category = categoryRepository.findByIdAndIsDeletedFalse(request.getCategory())
+                        .orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_FOUND));
+                product.setCategory(category);
+            }
+
+            // Lưu sản phẩm để có product ID
+            product = productRepository.save(product);
+
+            if (request.getFabric() != null) {
+                Fabric fabric = fabricRepository.findByIdAndIsDeletedFalse(request.getFabric())
+                        .orElseThrow(() -> new AppException(ErrorCode.FABRIC_NOT_FOUND));
+                product.setFabric(fabric);
+            }
+
+            if (request.getImagesUrls() != null && !request.getImagesUrls().isEmpty()) {
+                List<Image> images = new ArrayList<>();
+                for (String imageUrl : request.getImagesUrls()) {
+                    Image image = new Image();
+                    image.setUrl(imageUrl);
+                    image.setProduct(product);
+                    images.add(image);
+                }
+                imageRepository.saveAll(images);
+            }
+            // Re-fetch the updated product to ensure all relationships and timestamps are correctly loaded
+            product = productRepository.findProductById(product.getId()).orElse(product);
+
+            return mapToResponse(product);
+        } catch (Exception e) {
+            System.err.println("Error creating product: " + e.getMessage());
+            e.printStackTrace();
+
+            if (e instanceof AppException) {
+                throw e;
+            } else {
+                throw new AppException(ErrorCode.ERROR_SAVE_PRODUCT);
+            }
+        }
     }
 
+    @Transactional
     public ProductResponse updateProduct(String productId, ProductUpdateRequest request) {
-        Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
-        validateUpdatedProduct(request);
-        modelMapper.map(request, product);
-        product = productRepository.save(product);
-        return modelMapper.map(product, ProductResponse.class);
+        try {
+            var checkProductId = productRepository.findProductById(productId)
+                    .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
+
+            validateUpdatedProduct(request);
+
+            Product product = modelMapper.map(request, Product.class);
+            product.setPrice(request.getPrice() * 1.5); // tuong duong voi price + price * 50%
+            product.setIsDeleted(false);
+            product.setStatus(EnumStatus.ACTIVE);
+
+            // Update category if provided
+            if (request.getCategory() != null) {
+                Category category = categoryRepository.findByIdAndIsDeletedFalse(request.getCategory())
+                        .orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_FOUND));
+                product.setCategory(category);
+            }
+
+            // Save first update
+            product = productRepository.save(product);
+
+            if (request.getFabric() != null) {
+                Fabric fabric = fabricRepository.findByIdAndIsDeletedFalse(request.getFabric())
+                        .orElseThrow(() -> new AppException(ErrorCode.FABRIC_NOT_FOUND));
+                product.setFabric(fabric);
+                product = productRepository.save(product);
+            }
+
+            if (request.getImagesUrls() != null && !request.getImagesUrls().isEmpty()) {
+                // Remove existing images
+                imageRepository.deleteImagesByProductId(productId);
+
+                // Add new images
+                List<Image> images = new ArrayList<>();
+                for (String imageUrl : request.getImagesUrls()) {
+                    Image image = new Image();
+                    image.setUrl(imageUrl);
+                    image.setProduct(product);
+                    images.add(image);
+                }
+                imageRepository.saveAll(images);
+            }
+
+            // Re-fetch the updated product to ensure all relationships and timestamps are correctly loaded
+            product = productRepository.findProductById(product.getId())
+                    .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
+
+            return mapToResponse(product);
+        } catch (Exception e) {
+            System.err.println("Error updating product: " + e.getMessage());
+            e.printStackTrace();
+
+            if (e instanceof AppException) {
+                throw e;
+            } else {
+                throw new AppException(ErrorCode.ERROR_UPDATE_PRODUCT);
+            }
+        }
     }
 
     public void deleteProduct(String productId) {
-        Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        Product product = productRepository.findProductById(productId)
+                .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
         product.setIsDeleted(true);
         product.setStatus(EnumStatus.DELETED);
         productRepository.save(product);
@@ -182,5 +287,40 @@ public class ProductService {
         return modelMapper.map(product, ProductResponse.class);
     }
 
+
+    public ProductResponse mapToResponse(Product product) {
+        return ProductResponse.builder()
+                .id(product.getId())
+                .productName(product.getProductName())
+                .price(product.getPrice())
+                .description(product.getDescription())
+                .imageThumbnail(product.getImageThumbnail())
+                .size(product.getSize())
+                .status(product.getStatus())
+                .isDeleted(product.getIsDeleted())
+                .createdAt(product.getCreatedAt())
+                .updatedAt(product.getUpdatedAt())
+                .category(mapCategory(product.getCategory()))
+                .fabric(mapFabric(product.getFabric()))
+                .images(product.getImages())
+                .feedbacks(product.getFeedbacks())
+                .build();
+    }
+
+    private CategoryResponse mapCategory(Category category) {
+        return category == null ? null : CategoryResponse.builder()
+                .id(category.getId())
+                .categoryName(category.getCategoryName())
+                .build();
+    }
+
+    private FabricResponse mapFabric(Fabric fabric) {
+        return fabric == null ? null : FabricResponse.builder()
+                .id(fabric.getId())
+                .fabriceName(fabric.getFabricName())
+                .price(fabric.getPrice())
+                .status(fabric.getStatus())
+                .build();
+    }
 
 }

@@ -6,6 +6,8 @@ import jakarta.persistence.Column;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -20,7 +22,8 @@ import java.util.Date;
 @Builder
 public class FabricCreationRequest {
     String fabricName;
-    @NotBlank(message = "Price not null")
+    @NotNull(message = "Price must not be null")
+    @Positive(message = "Price must be greater than 0")
     Double price;
     @Enumerated(EnumType.STRING)
     EnumStatus status;

@@ -14,6 +14,8 @@ public class ProductUpdateRequest {
     String description;
     String imageThumbnail;
     EnumSize size;
-    Category category;
-    List<Image> images;
+    String color;
+    Long category;
+    List<String> imagesUrls;
+    Long fabric;
 }
