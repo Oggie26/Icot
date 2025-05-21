@@ -168,20 +168,16 @@ public class ProductService {
             product.setStatus(EnumStatus.ACTIVE);
 
             // Update category if provided
-            if (request.getCategory() != null) {
+            if (request.getCategory() != null && !request.getCategory().equals(checkProductId.getCategory().getId())) {
                 Category category = categoryRepository.findByIdAndIsDeletedFalse(request.getCategory())
                         .orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_FOUND));
                 product.setCategory(category);
             }
 
-            // Save first update
-            product = productRepository.save(product);
-
-            if (request.getFabric() != null) {
+            if (request.getFabric() != null && !request.getFabric().equals(checkProductId.getFabric().getId())) {
                 Fabric fabric = fabricRepository.findByIdAndIsDeletedFalse(request.getFabric())
                         .orElseThrow(() -> new AppException(ErrorCode.FABRIC_NOT_FOUND));
                 product.setFabric(fabric);
-                product = productRepository.save(product);
             }
 
             if (request.getImagesUrls() != null && !request.getImagesUrls().isEmpty()) {
@@ -198,6 +194,7 @@ public class ProductService {
                 }
                 imageRepository.saveAll(images);
             }
+            productRepository.save(product);
 
             // Re-fetch the updated product to ensure all relationships and timestamps are correctly loaded
             product = productRepository.findProductById(product.getId())
