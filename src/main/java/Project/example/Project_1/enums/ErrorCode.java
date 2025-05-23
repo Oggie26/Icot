@@ -31,6 +31,8 @@ public enum ErrorCode {
     BLOG_NAME_EXISTED(1020, "Blog name existed", HttpStatus.BAD_REQUEST),
     BLOG_NOT_EXIST(1021, "Blog not existed", HttpStatus.BAD_REQUEST),
     ORDER_NOT_FOUND(1022, "Order not found", HttpStatus.BAD_REQUEST),
+    CATEGORY_NOT_FOUND(1023,"Category not found", HttpStatus.BAD_REQUEST),
+    TYPEPRINT_NOT_FOUNT(1024,"TypePrint not found", HttpStatus.BAD_REQUEST),
 
 
 
