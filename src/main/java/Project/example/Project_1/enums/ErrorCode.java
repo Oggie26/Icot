@@ -33,6 +33,11 @@ public enum ErrorCode {
     BLOG_NOT_EXIST(1021, "Blog not existed", HttpStatus.BAD_REQUEST),
     CATEGORY_NOT_FOUND(1022, "Category not found", HttpStatus.BAD_REQUEST),
     CATEGORY_HAS_PRODUCTS(1023, "Category has products", HttpStatus.BAD_REQUEST),
+    ORDER_NOT_FOUND(1022, "Order not found", HttpStatus.BAD_REQUEST),
+    CATEGORY_NOT_FOUND(1023,"Category not found", HttpStatus.BAD_REQUEST),
+    TYPEPRINT_NOT_FOUNT(1024,"TypePrint not found", HttpStatus.BAD_REQUEST),
+
+
 
     //11xx
     INVALID_KEY(1100, "Invalid uncategorized error", HttpStatus.BAD_REQUEST),

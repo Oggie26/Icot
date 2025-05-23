@@ -31,6 +31,7 @@ public class Fabric extends AbstractEntity {
     EnumStatus status;
 
     @OneToMany(mappedBy = "fabric", fetch = FetchType.EAGER)
+    @JsonIgnore
     List<Product> products;
 
 }

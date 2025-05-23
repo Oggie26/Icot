@@ -31,4 +31,8 @@ public class Category extends AbstractEntity {
     @JsonIgnore
     List<Product> products;
 
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "category", fetch = FetchType.EAGER)
+    @JsonIgnore
+    List<BookOrder> bookOrders;
+
 }

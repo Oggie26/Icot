@@ -25,7 +25,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import javax.swing.text.html.Option;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -178,7 +177,7 @@ public class BlogService  {
             page = 0;
         }
         if (size < 1) {
-            size = 10; // Mặc định 5 bài viết mỗi trang
+            size = 10;
         }
 
         // Tạo Pageable cho phân trang, sắp xếp theo createdAt giảm dần
