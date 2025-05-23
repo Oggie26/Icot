@@ -46,53 +46,53 @@ public class ProductService {
     private FabricRepository fabricRepository;
 
     private void validateNewProduct(ProductCreateRequest request) {
-        if(request.getProductName().isEmpty() || request.getProductName().isBlank() ||
+        if (request.getProductName().isEmpty() || request.getProductName().isBlank() ||
                 containsSpecialCharacter(request.getProductName())) {
             throw new AppException(ErrorCode.INVALID_PRODUCT_NAME);
         }
-        if(request.getPrice() <= 0 || request.getPrice() == null){
+        if (request.getPrice() <= 0 || request.getPrice() == null) {
             throw new AppException(ErrorCode.INVALID_PRODUCT_PRICE);
         }
-        if(request.getCategory() == null){
+        if (request.getCategory() == null) {
             throw new AppException(ErrorCode.INVALID_PRODUCT_CATEGORY);
         }
-        if(request.getDescription().isEmpty() || request.getDescription().isBlank() ||
+        if (request.getDescription().isEmpty() || request.getDescription().isBlank() ||
                 containsSpecialCharacter(request.getDescription())) {
             throw new AppException(ErrorCode.INVALID_PRODUCT_DESCRIPTION);
         }
-        if(request.getSize() == null){
+        if (request.getSize() == null) {
             throw new AppException(ErrorCode.INVALID_PRODUCT_SIZE);
         }
-        if(request.getImageThumbnail() == null || request.getImageThumbnail().isEmpty()){
+        if (request.getImageThumbnail() == null || request.getImageThumbnail().isEmpty()) {
             throw new AppException(ErrorCode.INVALID_PRODUCT_IMAGE);
         }
-        if(request.getImagesUrls() == null || request.getImagesUrls().isEmpty()){
+        if (request.getImagesUrls() == null || request.getImagesUrls().isEmpty()) {
             throw new AppException(ErrorCode.INVALID_PRODUCT_IMAGE);
         }
     }
 
     private void validateUpdatedProduct(ProductUpdateRequest request) {
-        if(request.getProductName().isEmpty() || request.getProductName().isBlank() ||
+        if (request.getProductName().isEmpty() || request.getProductName().isBlank() ||
                 containsSpecialCharacter(request.getProductName())) {
             throw new AppException(ErrorCode.INVALID_PRODUCT_NAME);
         }
-        if(request.getPrice() <= 0 || request.getPrice() == null){
+        if (request.getPrice() <= 0 || request.getPrice() == null) {
             throw new AppException(ErrorCode.INVALID_PRODUCT_PRICE);
         }
-        if(request.getCategory() == null){
+        if (request.getCategory() == null) {
             throw new AppException(ErrorCode.INVALID_PRODUCT_CATEGORY);
         }
-        if(request.getDescription().isEmpty() || request.getDescription().isBlank() ||
+        if (request.getDescription().isEmpty() || request.getDescription().isBlank() ||
                 containsSpecialCharacter(request.getDescription())) {
             throw new AppException(ErrorCode.INVALID_PRODUCT_DESCRIPTION);
         }
-        if(request.getSize() == null){
+        if (request.getSize() == null) {
             throw new AppException(ErrorCode.INVALID_PRODUCT_SIZE);
         }
-        if(request.getImageThumbnail() == null || request.getImageThumbnail().isEmpty()){
+        if (request.getImageThumbnail() == null || request.getImageThumbnail().isEmpty()) {
             throw new AppException(ErrorCode.INVALID_PRODUCT_IMAGE);
         }
-        if(request.getImagesUrls() == null || request.getImagesUrls().isEmpty()){
+        if (request.getImagesUrls() == null || request.getImagesUrls().isEmpty()) {
             throw new AppException(ErrorCode.INVALID_PRODUCT_IMAGE);
         }
     }
@@ -109,7 +109,6 @@ public class ProductService {
             validateNewProduct(request);
 
             Product product = modelMapper.map(request, Product.class);
-            product.setPrice(request.getPrice() * 1.5); // tuong duong voi price + price * 50%
             product.setIsDeleted(false);
             product.setStatus(EnumStatus.ACTIVE);
 
@@ -138,6 +137,10 @@ public class ProductService {
                 }
                 imageRepository.saveAll(images);
             }
+
+            product.setPrice(calculateProductPrice(product));
+            productRepository.save(product);
+
             // Re-fetch the updated product to ensure all relationships and timestamps are correctly loaded
             product = productRepository.findProductById(product.getId()).orElse(product);
 
@@ -163,7 +166,6 @@ public class ProductService {
             validateUpdatedProduct(request);
 
             Product product = modelMapper.map(request, Product.class);
-            product.setPrice(request.getPrice() * 1.5); // tuong duong voi price + price * 50%
             product.setIsDeleted(false);
             product.setStatus(EnumStatus.ACTIVE);
 
@@ -194,6 +196,8 @@ public class ProductService {
                 }
                 imageRepository.saveAll(images);
             }
+
+            product.setPrice(calculateProductPrice(product));
             productRepository.save(product);
 
             // Re-fetch the updated product to ensure all relationships and timestamps are correctly loaded
@@ -320,4 +324,23 @@ public class ProductService {
                 .build();
     }
 
+    private double calculateProductPrice(Product product) {
+        double basePrice = product.getPrice();
+
+        double fabricPrice = product.getFabric() != null ? product.getFabric().getPrice() : 0.0;
+
+        double typePrintPrice = product.getTypePrint() != null ? product.getTypePrint().getPrice() : 0.0;
+
+        double calculatedPrice = basePrice + fabricPrice + typePrintPrice;
+
+//        if (product.getDiscount() != null) {
+//            calculatedPrice -= product.getDiscount();
+//        }
+
+        // Apply tax or markup (e.g., 10% tax)
+        double taxRate = 0.1;
+        calculatedPrice += calculatedPrice * taxRate;
+
+        return Math.max(calculatedPrice, 0.0);
+    }
 }

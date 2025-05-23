@@ -34,8 +34,7 @@ public enum ErrorCode {
     CATEGORY_NOT_FOUND(1022, "Category not found", HttpStatus.BAD_REQUEST),
     CATEGORY_HAS_PRODUCTS(1023, "Category has products", HttpStatus.BAD_REQUEST),
     ORDER_NOT_FOUND(1022, "Order not found", HttpStatus.BAD_REQUEST),
-    CATEGORY_NOT_FOUND(1023,"Category not found", HttpStatus.BAD_REQUEST),
-    TYPEPRINT_NOT_FOUNT(1024,"TypePrint not found", HttpStatus.BAD_REQUEST),
+    TYPEPRINT_NOT_FOUND(1024,"TypePrint not found", HttpStatus.BAD_REQUEST),
 
 
 

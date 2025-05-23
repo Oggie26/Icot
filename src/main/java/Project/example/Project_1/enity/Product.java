@@ -60,4 +60,9 @@ public class Product extends AbstractEntity{
     @JoinColumn(name = "fabric_id")
     Fabric fabric;
 
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JsonIgnore
+    @JoinColumn(name = "typeprint_id", nullable = true)
+    private TypePrint typePrint;
+
 }

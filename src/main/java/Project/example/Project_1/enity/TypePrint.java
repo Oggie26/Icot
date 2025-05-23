@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
+
 @Entity
 @Getter
 @Setter
@@ -27,5 +29,6 @@ public class TypePrint extends AbstractEntity {
     @JsonIgnore
     BookOrder bookOrder;
 
-
+    @OneToMany(mappedBy = "typePrint", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<Product> products;
 }
