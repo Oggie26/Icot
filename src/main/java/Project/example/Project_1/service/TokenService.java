@@ -1,12 +1,17 @@
 package Project.example.Project_1.service;
 
 import Project.example.Project_1.enity.User;
+import Project.example.Project_1.enums.ErrorCode;
+import Project.example.Project_1.exception.AppException;
 import Project.example.Project_1.repository.UserRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import javax.crypto.SecretKey;
 import java.util.Date;
@@ -15,6 +20,7 @@ import java.util.function.Function;
 public class TokenService {
     @Autowired
     UserRepository userRepository;
+
 
     private final String SECRET_KEY = "HT4bb6d1dfbafb64a681139d1586b6f1160d18159afd57c8c79136d7490630407c";
 
@@ -51,7 +57,7 @@ public class TokenService {
     // get userName form CLAIM
     public User extractAccount (String token){
         String username = extractClaim(token,Claims::getSubject);
-        return userRepository.findByUsername(username);
+        return userRepository.findByUsername(username).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
     }
 
 

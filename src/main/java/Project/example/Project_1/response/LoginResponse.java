@@ -14,7 +14,5 @@ import lombok.NoArgsConstructor;
 @Builder
 public class LoginResponse {
     String token;
-    @Enumerated(EnumType.STRING)
-    EnumRole role;
     String fullName;
 }
