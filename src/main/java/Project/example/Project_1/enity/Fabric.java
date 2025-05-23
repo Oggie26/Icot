@@ -6,6 +6,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
+
 @Entity
 @Getter
 @Setter
@@ -28,9 +30,8 @@ public class Fabric extends AbstractEntity {
     @Enumerated(EnumType.STRING)
     EnumStatus status;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "fabric", fetch = FetchType.EAGER)
     @JsonIgnore
-    @JoinColumn(name = "product_id")
-    Product product;
+    List<Product> products;
 
 }
