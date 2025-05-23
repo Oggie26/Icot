@@ -45,22 +45,22 @@ public class PaymentController {
 //        paymentData.setExpiredAt(System.currentTimeMillis() + 3600000); // 1 giờ sau
 //    }
 
-    @PostMapping("/create")
-    public ResponseEntity<?> createPayment(@RequestParam long orderCode, @RequestParam int amount) {
-        try {
-            // Gọi service để build request + tính signature
-            PaymentRequest request = payOsService.buildPaymentRequest(orderCode, amount);
-
-            // Gửi lên PayOS
-            CheckoutResponseData response = payOS.createPaymentLink(request);
-            Map<String, String> result = new HashMap<>();
-            result.put("checkoutUrl", response.getCheckoutUrl());
-            result.put("qrCode", response.getQrCode());
-            return ResponseEntity.ok(result);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("❌ Lỗi tạo thanh toán: " + e.getMessage());
-        }
-    }
+//    @PostMapping("/create")
+//    public ResponseEntity<?> createPayment(@RequestParam long orderCode, @RequestParam int amount) {
+//        try {
+//            // Gọi service để build request + tính signature
+//            PaymentRequest request = payOsService.buildPaymentRequest(orderCode, amount);
+//
+//            // Gửi lên PayOS
+//            CheckoutResponseData response = payOS.createPaymentLink(request);
+//            Map<String, String> result = new HashMap<>();
+//            result.put("checkoutUrl", response.getCheckoutUrl());
+//            result.put("qrCode", response.getQrCode());
+//            return ResponseEntity.ok(result);
+//        } catch (Exception e) {
+//            return ResponseEntity.badRequest().body("❌ Lỗi tạo thanh toán: " + e.getMessage());
+//        }
+//    }
 
 
     @PostMapping("/webhook")

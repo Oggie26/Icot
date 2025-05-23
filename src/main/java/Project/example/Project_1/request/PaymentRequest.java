@@ -7,7 +7,7 @@ import java.util.List;
 
 @Getter
 @Setter
-public class PaymentRequest extends PaymentData {
+public class PaymentRequest {
     private long orderCode;
     private int amount;
     private String description;
