@@ -8,6 +8,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -31,10 +32,10 @@ public class Order extends  AbstractEntity{
     String username;
 
     @Column(name = "order_date")
-    LocalDateTime orderDate;
+    Date orderDate;
 
     @Column(name = "updated_at")
-    LocalDateTime updatedAt;
+    Date updatedAt;
 
     @Column(name = "updated_by")
     String updatedBy;

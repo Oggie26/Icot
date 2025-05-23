@@ -30,6 +30,7 @@ public enum ErrorCode {
     FABRIC_NOT_FOUND(1019, "Fabric not found", HttpStatus.BAD_REQUEST),
     BLOG_NAME_EXISTED(1020, "Blog name existed", HttpStatus.BAD_REQUEST),
     BLOG_NOT_EXIST(1021, "Blog not existed", HttpStatus.BAD_REQUEST),
+    ORDER_NOT_FOUND(1022, "Order not found", HttpStatus.BAD_REQUEST),
 
 
 
