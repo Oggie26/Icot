@@ -68,6 +68,8 @@ public class BookOrderService {
         bookOrder.setFabric(fabric);
         bookOrder.setIsDeleted(false);
         bookOrder.setTypePrint(typePrint);
+        ProcessOrder  processOrder = new ProcessOrder();
+        processOrder.setUser(user);
         Double totalPrice = (((fabric.getPrice() + typePrint.getPrice()) / 0.3 ) * bookOrder.getQuantity());
         bookOrder.setTotalPrice(totalPrice);
         bookOrderRepository.save(bookOrder);

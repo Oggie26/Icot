@@ -1,6 +1,7 @@
 package Project.example.Project_1.enity;
 
 
+import Project.example.Project_1.enums.EnumOrderType;
 import Project.example.Project_1.enums.EnumProcess;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -23,6 +24,7 @@ public class ProcessOrder extends  AbstractEntity {
     EnumProcess process;
 
     @Enumerated(EnumType.STRING)
+    EnumOrderType type;
 
     @ManyToOne
     @JoinColumn(name = "order_id")
