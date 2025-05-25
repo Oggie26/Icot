@@ -30,6 +30,11 @@ public class ProcessOrder extends  AbstractEntity {
     Order order;
 
     @ManyToOne
+    @JoinColumn(name = "bookOrder_id")
+    @JsonIgnore
+    BookOrder bookOrder;
+
+    @ManyToOne
     @JoinColumn(name = "user_id")
     User user;
 }

@@ -65,4 +65,7 @@ public class BookOrder extends AbstractEntity {
     @JsonIgnore
     User user;
 
+    @OneToMany(mappedBy = "bookOrder")
+    @JsonIgnore
+    List<ProcessOrder> processOrders;
 }
