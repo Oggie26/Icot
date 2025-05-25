@@ -1,6 +1,7 @@
 package Project.example.Project_1.service;
 
 import Project.example.Project_1.enity.*;
+import Project.example.Project_1.enums.EnumOrderType;
 import Project.example.Project_1.enums.ErrorCode;
 import Project.example.Project_1.exception.AppException;
 import Project.example.Project_1.repository.*;
@@ -33,6 +34,9 @@ public class BookOrderService {
 
     @Autowired
     FabricRepository fabricRepository;
+
+    @Autowired
+
 
     @Autowired
     TypePrintRepository typePrintRepository;
@@ -68,8 +72,10 @@ public class BookOrderService {
         bookOrder.setFabric(fabric);
         bookOrder.setIsDeleted(false);
         bookOrder.setTypePrint(typePrint);
-        ProcessOrder  processOrder = new ProcessOrder();
+        ProcessOrder processOrder = new ProcessOrder();
+        processOrder.setType(EnumOrderType.BOOKORDER);
         processOrder.setUser(user);
+        pr
         Double totalPrice = (((fabric.getPrice() + typePrint.getPrice()) / 0.3 ) * bookOrder.getQuantity());
         bookOrder.setTotalPrice(totalPrice);
         bookOrderRepository.save(bookOrder);
