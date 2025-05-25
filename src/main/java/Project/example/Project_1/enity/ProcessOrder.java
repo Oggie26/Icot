@@ -1,6 +1,7 @@
 package Project.example.Project_1.enity;
 
 
+import Project.example.Project_1.enums.EnumBookOrder;
 import Project.example.Project_1.enums.EnumOrderType;
 import Project.example.Project_1.enums.EnumProcess;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -22,6 +23,9 @@ public class ProcessOrder extends  AbstractEntity {
 
     @Enumerated(EnumType.STRING)
     EnumProcess process;
+
+    @Enumerated(EnumType.STRING)
+    EnumBookOrder processBookOrder;
 
     @Enumerated(EnumType.STRING)
     EnumOrderType type;

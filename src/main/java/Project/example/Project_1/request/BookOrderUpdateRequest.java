@@ -1,6 +1,7 @@
 package Project.example.Project_1.request;
 
 import Project.example.Project_1.enums.EnumSize;
+import Project.example.Project_1.enums.EnumStatus;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import lombok.AllArgsConstructor;

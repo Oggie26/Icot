@@ -1,6 +1,7 @@
 package Project.example.Project_1.enity;
 
 import Project.example.Project_1.enums.EnumSize;
+import Project.example.Project_1.enums.EnumStatus;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

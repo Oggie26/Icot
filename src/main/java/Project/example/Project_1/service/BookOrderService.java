@@ -1,6 +1,7 @@
 package Project.example.Project_1.service;
 
 import Project.example.Project_1.enity.*;
+import Project.example.Project_1.enums.EnumBookOrder;
 import Project.example.Project_1.enums.EnumOrderType;
 import Project.example.Project_1.enums.ErrorCode;
 import Project.example.Project_1.exception.AppException;
@@ -74,8 +75,10 @@ public class BookOrderService {
         bookOrder.setTypePrint(typePrint);
         ProcessOrder processOrder = new ProcessOrder();
         processOrder.setType(EnumOrderType.BOOKORDER);
+        processOrder.setProcessBookOrder(EnumBookOrder.PENDING);
         processOrder.setUser(user);
         processOrder.setBookOrder(bookOrder);
+        processOrder.setIsDeleted(false);
         processOrderRepository.save(processOrder);
         Double totalPrice = (((fabric.getPrice() + typePrint.getPrice()) / 0.3 ) * bookOrder.getQuantity());
         bookOrder.setTotalPrice(totalPrice);
@@ -224,11 +227,13 @@ public class BookOrderService {
                 bookOrderPage.getTotalPages(),
                 bookOrderPage.getTotalElements()
         );
-
     }
-
-
-
-
-
+    public BookOrder AsignTask(BookOrder bookOrder){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new AppException(ErrorCode.UNAUTHENTICATED);
+        }
+        String username = authentication.getName();
+        return null;
+    }
 }
