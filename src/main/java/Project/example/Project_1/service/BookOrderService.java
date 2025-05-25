@@ -36,10 +36,10 @@ public class BookOrderService {
     FabricRepository fabricRepository;
 
     @Autowired
-
+    TypePrintRepository typePrintRepository;
 
     @Autowired
-    TypePrintRepository typePrintRepository;
+    ProcessOrderRepository processOrderRepository;
 
     @Autowired
     BookOrderRepository bookOrderRepository;
@@ -75,7 +75,8 @@ public class BookOrderService {
         ProcessOrder processOrder = new ProcessOrder();
         processOrder.setType(EnumOrderType.BOOKORDER);
         processOrder.setUser(user);
-        pr
+        processOrder.setBookOrder(bookOrder);
+        processOrderRepository.save(processOrder);
         Double totalPrice = (((fabric.getPrice() + typePrint.getPrice()) / 0.3 ) * bookOrder.getQuantity());
         bookOrder.setTotalPrice(totalPrice);
         bookOrderRepository.save(bookOrder);
