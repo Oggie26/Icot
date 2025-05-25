@@ -22,6 +22,8 @@ public class ProcessOrder extends  AbstractEntity {
     @Enumerated(EnumType.STRING)
     EnumProcess process;
 
+    @Enumerated(EnumType.STRING)
+
     @ManyToOne
     @JoinColumn(name = "order_id")
     @JsonIgnore
