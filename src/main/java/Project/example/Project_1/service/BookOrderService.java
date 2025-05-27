@@ -234,14 +234,14 @@ public class BookOrderService {
                 bookOrderPage.getTotalElements()
         );
     }
-    public BookOrder AsignTask(ChangeStatus request, EnumBookOrder status){
+    public BookOrder changeStatus(ChangeStatus request, Long bookOrderId){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
             throw new AppException(ErrorCode.UNAUTHENTICATED);
         }
         String username = authentication.getName();
 
-        BookOrder bookOrder = bookOrderRepository.findByIdAndIsDeletedFalse(request.getBookId())
+        BookOrder bookOrder = bookOrderRepository.findByIdAndIsDeletedFalse(bookOrderId)
                 .orElseThrow(()-> new AppException(ErrorCode.BOOKORDER_NOT_FOUND));
 
         Design design = designRepository.findByIdAndIsDeletedFalse(request.getDesignId())
@@ -266,9 +266,9 @@ public class BookOrderService {
                 .time(LocalDate.now())
                 .processBookOrder(bookOrder.getStatus())
                 .build();
-        bookOrder.setStatus(status);
+        bookOrder.setStatus(request.getStatus());
         processOrderRepository.save(processOrder);
         bookOrderRepository.save(bookOrder);
-        return null;
+        return bookOrder;
     }
 }

@@ -11,10 +11,11 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ChangeStatus {
-    @NotNull
-    Long bookId;
     Long designId;
     String designName;
+    @NotNull
     String response;
+    @Enumerated(EnumType.STRING)
+    EnumBookOrder status;
 }
 

@@ -1,8 +1,10 @@
 package Project.example.Project_1.controller;
 
 import Project.example.Project_1.enity.BookOrder;
+import Project.example.Project_1.enums.EnumBookOrder;
 import Project.example.Project_1.request.BookOrderCreateRequest;
 import Project.example.Project_1.request.BookOrderUpdateRequest;
+import Project.example.Project_1.request.ChangeStatus;
 import Project.example.Project_1.response.ApiResponse;
 import Project.example.Project_1.response.BookOrderResponse;
 import Project.example.Project_1.response.PageResponse;
@@ -97,6 +99,17 @@ public class BookOrderController {
                 .code(HttpStatus.OK.value())
                 .message("Lấy tất cả BookOrder của user thành công")
                 .result(bookOrderService.getMyBookOrder())
+                .build();
+    }
+
+    @PutMapping("/{bookingOrderId}")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Change a status to do Booking Order", description = "API retrieve Booking Order ")
+    public ApiResponse<BookOrder> changeStatus(@RequestBody @Valid ChangeStatus status, @PathVariable Long bookOrderId) {
+        return ApiResponse.<BookOrder>builder()
+                .code(HttpStatus.OK.value())
+                .message("Change a status successfully ")
+                .result(bookOrderService.changeStatus(status, bookOrderId))
                 .build();
     }
 
