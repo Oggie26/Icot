@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.lang.reflect.Type;
 import java.util.List;
 
 @Entity
@@ -59,5 +60,10 @@ public class Product extends AbstractEntity{
     @JsonIgnore
     @JoinColumn(name = "fabric_id")
     Fabric fabric;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JsonIgnore
+    @JoinColumn(name = "typePrint")
+    TypePrint typePrint;
 
 }

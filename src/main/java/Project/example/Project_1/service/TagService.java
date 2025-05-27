@@ -9,6 +9,8 @@ import Project.example.Project_1.repository.TagRepository;
 import Project.example.Project_1.request.TagCreationRequest;
 import Project.example.Project_1.request.TagUpdateRequest;
 import Project.example.Project_1.response.TagResponse;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,9 +23,17 @@ public class TagService {
     TagRepository tagRepository;
 
     @Transactional
-    public TagResponse createTag(TagCreationRequest tagCreationRequest){
-        Tag tag = tagRepository.findByNameAndIsDeletedFalse(tagCreationRequest.getName())
-                .orElseThrow(() -> new AppException(ErrorCode.TAG_NAME_NOT_FOUND ));
+    public TagResponse createTag(TagCreationRequest request){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new AppException(ErrorCode.UNAUTHENTICATED);
+        }
+        if(tagRepository.findByNameAndIsDeletedFalse(request.getName()).isPresent()){
+            throw new AppException(ErrorCode.TAG_NAME_NOT_FOUND );
+        }
+        Tag tag = new Tag();
+        tag.setDescription(request.getDescription());
+        tag.setName(request.getName());
         tag.setIsDeleted(false);
         tag.setStatus(EnumStatus.ACTIVE);
         tagRepository.save(tag);
@@ -35,9 +45,13 @@ public class TagService {
     }
 
     @Transactional
-    public TagResponse update(TagUpdateRequest tagUpdateRequest, Long tagId){
+    public TagResponse update(TagUpdateRequest request, Long tagId){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new AppException(ErrorCode.UNAUTHENTICATED);
+        }
         Tag tag = tagRepository.findById(tagId).orElseThrow(() -> new AppException(ErrorCode.TAG_NOT_FOUND));
-        tagRepository.findByNameAndIsDeletedFalse(tagUpdateRequest.getName())
+        tagRepository.findByNameAndIsDeletedFalse(request.getName())
                 .filter(existingTag -> !existingTag.getId().equals(tagId))
                 .ifPresent(existingTag -> {
                     throw new AppException(ErrorCode.TAG_NAME_ALREADY_EXISTS);
@@ -54,6 +68,10 @@ public class TagService {
 
     @Transactional
     public void deleteTag(Long tagId){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new AppException(ErrorCode.UNAUTHENTICATED);
+        }
         Tag tag = tagRepository.findById(tagId).orElseThrow(() -> new AppException(ErrorCode.TAG_NOT_FOUND));
         tag.setIsDeleted(true);
         tagRepository.save(tag);

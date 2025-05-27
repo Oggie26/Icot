@@ -1,7 +1,6 @@
 package Project.example.Project_1.repository;
 
 import Project.example.Project_1.enity.BookOrder;
-import Project.example.Project_1.enity.Fabric;
 import Project.example.Project_1.enity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;

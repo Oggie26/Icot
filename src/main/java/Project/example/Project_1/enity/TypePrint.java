@@ -1,8 +1,11 @@
 package Project.example.Project_1.enity;
 
+import Project.example.Project_1.enums.EnumStatus;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.List;
 
 @Entity
 @Getter
@@ -22,10 +25,16 @@ public class TypePrint extends AbstractEntity {
     @Column
     Double price;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "bookOrder_id")
+    @Enumerated(EnumType.STRING)
+    EnumStatus status;
+
+    @OneToMany(mappedBy = "typePrint", fetch = FetchType.EAGER)
     @JsonIgnore
-    BookOrder bookOrder;
+    List<BookOrder> bookOrders;
+
+    @OneToMany(mappedBy = "typePrint", fetch = FetchType.EAGER)
+    @JsonIgnore
+    List<Product> products;
 
 
 }

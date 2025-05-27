@@ -49,6 +49,9 @@ public class Design extends AbstractEntity  {
     @JsonIgnore
     BookOrder bookOrder;
 
+    @ManyToOne
+    User user;
+
 
 
 }

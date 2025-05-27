@@ -11,4 +11,5 @@ import lombok.NoArgsConstructor;
 @Data
 public class TagCreationRequest {
     String name;
+    String description;
 }

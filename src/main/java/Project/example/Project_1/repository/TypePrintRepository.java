@@ -8,4 +8,5 @@ import java.util.Optional;
 public interface TypePrintRepository extends JpaRepository<TypePrint, Long> {
 
     Optional<TypePrint> findByIdAndIsDeletedFalse(long id);
+    Optional<TypePrint> findByPrintNameAndIsDeletedFalse (String printName);
 }
