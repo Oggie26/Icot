@@ -41,6 +41,10 @@ public class OrderItem {
     @Column(name = "is_feedback")
     Boolean isFeedback;
 
+    @ManyToOne
+    @JoinColumn(name = "book_order_id")
+    private BookOrder bookOrder;
+
     public Double calculateTotalPrice() {
         return this.price * this.quantity;
     }

@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 @RestController
-@RequestMapping("/blog")
+@RequestMapping("/api/blog")
 @RequiredArgsConstructor
 @Tag(name = "Blog Controller")
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)

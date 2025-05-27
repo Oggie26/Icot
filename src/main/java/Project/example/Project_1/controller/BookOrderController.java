@@ -2,6 +2,7 @@ package Project.example.Project_1.controller;
 
 import Project.example.Project_1.enity.BookOrder;
 import Project.example.Project_1.enums.EnumBookOrder;
+import Project.example.Project_1.repository.BookOrderRepository;
 import Project.example.Project_1.request.BookOrderCreateRequest;
 import Project.example.Project_1.request.BookOrderUpdateRequest;
 import Project.example.Project_1.request.ChangeStatus;
@@ -22,7 +23,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/bookOrder")
+@RequestMapping("/api/bookOrder")
 @RequiredArgsConstructor
 @Tag(name = "BookOrder Controller")
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -30,6 +31,9 @@ public class BookOrderController {
 
     @Autowired
     BookOrderService bookOrderService;
+
+    @Autowired
+    BookOrderRepository bookOrderRepository;
 
     //SEARCH
     @GetMapping("/search")
@@ -91,7 +95,7 @@ public class BookOrderController {
     }
 
     // GET ALL của User (trạng thái ACTIVE)
-    @GetMapping("/all")
+    @GetMapping("/history")
     @Operation(summary = "Lấy tất cả BookOrder đang ACTIVE")
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse<List<BookOrder>> getMyBookOrders() {
@@ -110,6 +114,21 @@ public class BookOrderController {
                 .code(HttpStatus.OK.value())
                 .message("Change a status successfully ")
                 .result(bookOrderService.changeStatus(status, bookOrderId))
+                .build();
+    }
+
+    @GetMapping("")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Get all  Booking Order", description = "API retrieve Booking Order ")
+    public ApiResponse<List<BookOrder>> getAllBookOrders() {
+        List<BookOrder> list = bookOrderRepository.findAll()
+                .stream()
+                .filter(bookOrder -> !bookOrder.getIsDeleted())
+                .toList();
+        return ApiResponse.<List<BookOrder>>builder()
+                .code(HttpStatus.OK.value())
+                .message("Get all successfully ")
+                .result(list)
                 .build();
     }
 

@@ -9,6 +9,7 @@ import Project.example.Project_1.repository.OtpRepository;
 import Project.example.Project_1.repository.UserRepository;
 import Project.example.Project_1.util.OtpUtil;
 import jakarta.transaction.Transactional;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -16,9 +17,11 @@ import java.util.Optional;
 
 @Service
 public class OptService {
-
+    @Autowired
     UserRepository userRepository;
+    @Autowired
     OtpRepository otpRepository;
+    @Autowired
     PostmarkService postmarkService;
 
     @Transactional

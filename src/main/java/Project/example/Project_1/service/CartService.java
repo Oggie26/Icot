@@ -16,6 +16,7 @@ import Project.example.Project_1.response.CartResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -28,9 +29,13 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Slf4j
 public class CartService {
+    @Autowired
     CartRepository cartRepository;
+    @Autowired
     ProductRepository productRepository;
+    @Autowired
     UserRepository userRepository;
+    @Autowired
     CartItemRepository cartItemRepository;
 
 

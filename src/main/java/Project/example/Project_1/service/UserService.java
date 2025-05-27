@@ -349,7 +349,14 @@ public class UserService {
     }
 
     public PageResponse<GetUserResponse> searchUsers(UserSearchRequest request, int page, int size) {
-        if (!isAdmin()) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new AppException(ErrorCode.UNAUTHENTICATED);
+        }
+        String username = authentication.getName();
+        User check = userRepository.findUserByUsername(username)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        if(check.getRole().equals(EnumRole.CUSTOMER)){
             throw new AppException(ErrorCode.UNAUTHENTICATED);
         }
 

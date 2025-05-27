@@ -55,19 +55,19 @@ public class PaymentController {
                 .build();
     }
 
-    @PostMapping("/paymentBookOrder/{bookOrderId}")
-    @ResponseStatus(HttpStatus.OK)
-    @Operation(summary = "Payment", description = "API get payment ")
-    public ApiResponse<PaymentOrderResponse> paymentBookOrder(@PathVariable @Valid Long bookOrderId ,
-                                                          HttpServletRequest http) throws Exception {
-        String clientIp = getClientIp(http);
-        PaymentBookOrder bookOrder = payOsService.paymentBookOrder(bookOrderId,clientIp);
-        return ApiResponse.<PaymentBookOrder>builder()
-                .code(HttpStatus.OK.value())
-                .message("Payment successfully")
-                .result(bookOrder)
-                .build();
-    }
+//    @PostMapping("/paymentBookOrder/{bookOrderId}")
+//    @ResponseStatus(HttpStatus.OK)
+//    @Operation(summary = "Payment", description = "API get payment ")
+//    public ApiResponse<PaymentOrderResponse> paymentBookOrder(@PathVariable @Valid Long bookOrderId ,
+//                                                          HttpServletRequest http) throws Exception {
+//        String clientIp = getClientIp(http);
+//        PaymentBookOrder bookOrder = payOsService.paymentBookOrder(bookOrderId,clientIp);
+//        return ApiResponse.<PaymentBookOrder>builder()
+//                .code(HttpStatus.OK.value())
+//                .message("Payment successfully")
+//                .result(bookOrder)
+//                .build();
+//    }
 
     private String getClientIp(HttpServletRequest request) {
         String clientIp = request.getHeader("X-Forwarded-For");

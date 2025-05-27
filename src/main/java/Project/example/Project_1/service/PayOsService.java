@@ -143,26 +143,35 @@ public class PayOsService {
     }
 
 //    public String createPaymentLinkByBookOrder(Long bookOrderId, String isAddress) throws Exception {
-//        // Fetch the book order from repository
+//        // Step 1: Fetch the BookOrder
 //        BookOrder bookOrder = bookOrderRepository.findById(bookOrderId)
 //                .orElseThrow(() -> new AppException(ErrorCode.BOOKORDER_NOT_FOUND));
 //
-//        // Convert total price to int (assuming amount is in VND and safe to cast)
-//        int amount = (int) Math.round(bookOrder.getTotalPrice());
+//        // Step 2: Convert total price to int (in smallest currency unit if required)
+//        double totalPrice = bookOrder.getTotalPrice();
+//        if (totalPrice <= 0) {
+//            throw new AppException(ErrorCode.INVALID_TOTAL_PRICE);
+//        }
+//        int amount = (int) Math.round(totalPrice);
 //
-//        // Build list of items from order
-//        List<PaymentItem> items = bookOrder.getOrderItems().stream()
-//                .map(item -> PaymentItem.builder()
-//                        .name(item.getBook().getTitle())
-//                        .quantity(1)
-//                        .price((int) Math.round(item.getPrice()))  // fix Double to int
+//        // Step 3: Prepare Payment Items (ensure orderItems exist)
+//        List<OrderItem> orderItems = bookOrder.getOrderItems();
+//        if (orderItems == null || orderItems.isEmpty()) {
+//            throw new AppException(ErrorCode.ORDER_ITEMS_NOT_FOUND);
+//        }
+//
+//        List<PaymentItem> items = orderItems.stream()
+//                .map(orderItem -> PaymentItem.builder()
+//                        .name(orderItem.getBook().getTitle())
+//                        .quantity(orderItem.getQuantity())
+//                        .price((int) Math.round(orderItem.getPrice()))
 //                        .build())
 //                .collect(Collectors.toList());
 //
-//        // Set expiration time (1 hour from now, in seconds)
+//        // Step 4: Set payment link expiration (1 hour from now in seconds)
 //        int expiredAt = (int) (System.currentTimeMillis() / 1000L + 3600);
 //
-//        // Build payment request data
+//        // Step 5: Build PaymentData (convert orderCode to String if required by PayOS)
 //        PaymentData paymentData = PaymentData.builder()
 //                .orderCode(Long.valueOf(String.valueOf(bookOrder.getId())))
 //                .amount(amount)
@@ -173,10 +182,18 @@ public class PayOsService {
 //                .expiredAt(expiredAt)
 //                .build();
 //
+//        // Step 6: Call PayOS and get the payment link
 //        CheckoutResponseData response = payOS.createPaymentLink(paymentData);
+//
+//        // Step 7: Return the checkout URL
+//        if (response == null || response.getCheckoutUrl() == null) {
+//            throw new AppException(ErrorCode.PAYMENT_LINK_CREATION_FAILED);
+//        }
 //
 //        return response.getCheckoutUrl();
 //    }
+
+
 
     private User getAuthenticatedUser() {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();

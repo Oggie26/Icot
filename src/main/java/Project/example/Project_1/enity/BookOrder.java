@@ -83,4 +83,7 @@ public class BookOrder extends AbstractEntity {
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "design_id")
     private Design design;
+
+    @OneToMany(mappedBy = "bookOrder", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<OrderItem> orderItems;
 }

@@ -12,4 +12,3 @@ public class PaymentItem {
     private int quantity;
     private int price;
 }
-

@@ -18,4 +18,3 @@ public class PaymentData {
     private List<PaymentItem> items;
     private int expiredAt;
 }
-
