@@ -3,24 +3,26 @@ package Project.example.Project_1.service;
 import Project.example.Project_1.enity.*;
 import Project.example.Project_1.enums.EnumBookOrder;
 import Project.example.Project_1.enums.EnumOrderType;
+import Project.example.Project_1.enums.EnumStatus;
 import Project.example.Project_1.enums.ErrorCode;
 import Project.example.Project_1.exception.AppException;
 import Project.example.Project_1.repository.*;
 import Project.example.Project_1.request.BookOrderCreateRequest;
 import Project.example.Project_1.request.BookOrderUpdateRequest;
+import Project.example.Project_1.request.ChangeStatus;
 import Project.example.Project_1.response.BookOrderResponse;
-import Project.example.Project_1.response.FabricResponse;
 import Project.example.Project_1.response.PageResponse;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -44,6 +46,9 @@ public class BookOrderService {
 
     @Autowired
     BookOrderRepository bookOrderRepository;
+
+    @Autowired
+    DesignRepository designRepository;
 
     @Transactional
     public BookOrderResponse bookOrder(BookOrderCreateRequest request){
@@ -79,6 +84,7 @@ public class BookOrderService {
         processOrder.setUser(user);
         processOrder.setBookOrder(bookOrder);
         processOrder.setIsDeleted(false);
+        bookOrder.setStatus(EnumBookOrder.PENDING);
         processOrderRepository.save(processOrder);
         Double totalPrice = (((fabric.getPrice() + typePrint.getPrice()) / 0.3 ) * bookOrder.getQuantity());
         bookOrder.setTotalPrice(totalPrice);
@@ -217,7 +223,7 @@ public class BookOrderService {
                         .category(order.getCategory())
                         .fabric(order.getFabric())
                         .typePrint(order.getTypePrint())
-                        .user(order.getUser()) // ⚠ Nếu trả về FE thì nên dùng @JsonIgnore trong User hoặc DTO
+                        .user(order.getUser())
                         .build())
                 .collect(Collectors.toList());
 
@@ -228,12 +234,41 @@ public class BookOrderService {
                 bookOrderPage.getTotalElements()
         );
     }
-    public BookOrder AsignTask(BookOrder bookOrder){
+    public BookOrder AsignTask(ChangeStatus request, EnumBookOrder status){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
             throw new AppException(ErrorCode.UNAUTHENTICATED);
         }
         String username = authentication.getName();
+
+        BookOrder bookOrder = bookOrderRepository.findByIdAndIsDeletedFalse(request.getBookId())
+                .orElseThrow(()-> new AppException(ErrorCode.BOOKORDER_NOT_FOUND));
+
+        Design design = designRepository.findByIdAndIsDeletedFalse(request.getDesignId())
+                .orElseThrow(() -> new AppException(ErrorCode.DESIGN_NOT_FOUND));
+
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new AppException(ErrorCode.UNAUTHENTICATED));
+
+        if(bookOrder.getStatus().equals(EnumBookOrder.PAYMENT)){
+            bookOrder.setDesignName(request.getDesignName());
+        }
+
+        if (bookOrder.getStatus().equals(EnumBookOrder.CUSTOMER_REJECTED)){
+            bookOrder.setResponse(request.getResponse());
+        }
+        if(bookOrder.getStatus().equals(EnumBookOrder.ASSIGNED_TASK)){
+            bookOrder.setDesign(design);
+        }
+
+        ProcessOrder processOrder = ProcessOrder.builder()
+                .user(user)
+                .time(LocalDate.now())
+                .processBookOrder(bookOrder.getStatus())
+                .build();
+        bookOrder.setStatus(status);
+        processOrderRepository.save(processOrder);
+        bookOrderRepository.save(bookOrder);
         return null;
     }
 }

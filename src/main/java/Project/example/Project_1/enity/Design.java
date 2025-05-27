@@ -1,6 +1,7 @@
 package Project.example.Project_1.enity;
 
 import Project.example.Project_1.enums.EnumStatus;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.domain.Auditable;
@@ -31,6 +32,9 @@ public class Design extends AbstractEntity  {
     String fileUrl;
 
     @Column
+    String designName;
+
+    @Column
     String fileName;
 
     @ManyToMany
@@ -40,6 +44,11 @@ public class Design extends AbstractEntity  {
             inverseJoinColumns = @JoinColumn(name = "tag_id")
     )
     private List<Tag> tags = new ArrayList<>();
+
+    @OneToOne(mappedBy = "design")
+    @JsonIgnore
+    BookOrder bookOrder;
+
 
 
 }

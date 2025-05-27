@@ -8,6 +8,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 @Builder
 @Getter
 @Setter
@@ -29,6 +32,9 @@ public class ProcessOrder extends  AbstractEntity {
 
     @Enumerated(EnumType.STRING)
     EnumOrderType type;
+
+    @Column
+    LocalDate time;
 
     @ManyToOne
     @JoinColumn(name = "order_id")

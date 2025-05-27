@@ -1,5 +1,6 @@
 package Project.example.Project_1.enity;
 
+import Project.example.Project_1.enums.EnumBookOrder;
 import Project.example.Project_1.enums.EnumSize;
 import Project.example.Project_1.enums.EnumStatus;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -37,6 +38,15 @@ public class BookOrder extends AbstractEntity {
     @Column
     Double totalPrice;
 
+    @Column
+    String designName;
+
+    @Column(name = "response", columnDefinition = "TEXT")
+    String response;
+
+    @Enumerated(EnumType.STRING)
+    EnumBookOrder status;
+
     //Category
     @ManyToOne(fetch = FetchType.EAGER)
     @JsonIgnore
@@ -69,4 +79,8 @@ public class BookOrder extends AbstractEntity {
     @OneToMany(mappedBy = "bookOrder")
     @JsonIgnore
     List<ProcessOrder> processOrders;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "design_id")
+    private Design design;
 }
