@@ -2,6 +2,7 @@ package Project.example.Project_1.controller;
 
 import Project.example.Project_1.request.PaymentRequest;
 import Project.example.Project_1.response.ApiResponse;
+import Project.example.Project_1.response.PaymentBookOrder;
 import Project.example.Project_1.response.PaymentOrderResponse;
 import Project.example.Project_1.service.PayOsService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -39,17 +40,32 @@ public class PaymentController {
 
     @Autowired
     PayOsService  payOsService;
+
     @PostMapping("/payment")
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Payment", description = "API get payment ")
-    public ApiResponse<PaymentOrderResponse> paymentBookingOrder(@RequestParam @Valid Long orderId ,
+    public ApiResponse<PaymentOrderResponse> paymentOrder(@RequestParam @Valid Long orderId ,
                                                                  HttpServletRequest http) throws Exception {
         String clientIp = getClientIp(http);
-        PaymentOrderResponse order = payOsService.paymentBookingOrder(orderId,clientIp);
+        PaymentOrderResponse order = payOsService.paymentOrder(orderId,clientIp);
         return ApiResponse.<PaymentOrderResponse>builder()
                 .code(HttpStatus.OK.value())
                 .message("Payment successfully")
                 .result(order)
+                .build();
+    }
+
+    @PostMapping("/paymentBookOrder/{bookOrderId}")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Payment", description = "API get payment ")
+    public ApiResponse<PaymentOrderResponse> paymentBookOrder(@PathVariable @Valid Long bookOrderId ,
+                                                          HttpServletRequest http) throws Exception {
+        String clientIp = getClientIp(http);
+        PaymentBookOrder bookOrder = payOsService.paymentBookOrder(bookOrderId,clientIp);
+        return ApiResponse.<PaymentBookOrder>builder()
+                .code(HttpStatus.OK.value())
+                .message("Payment successfully")
+                .result(bookOrder)
                 .build();
     }
 

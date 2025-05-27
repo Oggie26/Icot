@@ -1,15 +1,20 @@
 package Project.example.Project_1.service;
 
+import Project.example.Project_1.enity.BookOrder;
 import Project.example.Project_1.enity.Order;
 import Project.example.Project_1.enity.OrderItem;
 import Project.example.Project_1.enity.User;
+import Project.example.Project_1.enums.EnumBookOrder;
 import Project.example.Project_1.enums.EnumProcess;
 import Project.example.Project_1.enums.ErrorCode;
 import Project.example.Project_1.exception.AppException;
+import Project.example.Project_1.repository.BookOrderRepository;
 import Project.example.Project_1.repository.OrderItemRepository;
 import Project.example.Project_1.repository.OrderRepository;
 import Project.example.Project_1.repository.UserRepository;
+import Project.example.Project_1.request.PaymentItem;
 import Project.example.Project_1.request.PaymentRequest;
+import Project.example.Project_1.response.PaymentBookOrder;
 import Project.example.Project_1.response.PaymentOrderResponse;
 import Project.example.Project_1.util.SignatureUtil;
 import jakarta.transaction.Transactional;
@@ -43,6 +48,9 @@ public class PayOsService {
 
     @Autowired
     UserRepository userRepository;
+
+    @Autowired
+    BookOrderRepository bookOrderRepository;
 
     public PaymentRequest buildPaymentRequest(long orderCode, int amount) {
         String description = "Thanh toán đơn hàng #" + orderCode;
@@ -98,7 +106,7 @@ public class PayOsService {
     }
 
     @Transactional
-    public PaymentOrderResponse paymentBookingOrder(Long orderId, String isAddress) throws Exception {
+    public PaymentOrderResponse paymentOrder(Long orderId, String isAddress) throws Exception {
         User user = getAuthenticatedUser();
 
         Order order = orderRepository.findById(orderId)
@@ -115,6 +123,60 @@ public class PayOsService {
                 .status(EnumProcess.CONFIRMED)
                 .build();
     }
+
+    public PaymentBookOrder paymentBookOrder(Long bookOrderId, String isAddress) throws Exception {
+        User user = getAuthenticatedUser();
+
+        BookOrder bookOrder = bookOrderRepository.findById(bookOrderId)
+                .orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_FOUND));
+        Double price = bookOrder.getTotalPrice();
+        Double amount = Double.valueOf(price);
+        String url = createPaymentLinkByOrderCode(bookOrderId, isAddress);
+        bookOrderRepository.save(bookOrder);
+
+        return PaymentBookOrder.builder()
+                .dateTime(LocalDateTime.now())
+                .price(amount)
+                .bookOrderId(bookOrderId)
+                .status(EnumBookOrder.PAYMENT)
+                .build();
+    }
+
+//    public String createPaymentLinkByBookOrder(Long bookOrderId, String isAddress) throws Exception {
+//        // Fetch the book order from repository
+//        BookOrder bookOrder = bookOrderRepository.findById(bookOrderId)
+//                .orElseThrow(() -> new AppException(ErrorCode.BOOKORDER_NOT_FOUND));
+//
+//        // Convert total price to int (assuming amount is in VND and safe to cast)
+//        int amount = (int) Math.round(bookOrder.getTotalPrice());
+//
+//        // Build list of items from order
+//        List<PaymentItem> items = bookOrder.getOrderItems().stream()
+//                .map(item -> PaymentItem.builder()
+//                        .name(item.getBook().getTitle())
+//                        .quantity(1)
+//                        .price((int) Math.round(item.getPrice()))  // fix Double to int
+//                        .build())
+//                .collect(Collectors.toList());
+//
+//        // Set expiration time (1 hour from now, in seconds)
+//        int expiredAt = (int) (System.currentTimeMillis() / 1000L + 3600);
+//
+//        // Build payment request data
+//        PaymentData paymentData = PaymentData.builder()
+//                .orderCode(Long.valueOf(String.valueOf(bookOrder.getId())))
+//                .amount(amount)
+//                .description("Thanh toán đơn hàng #" + bookOrder.getId())
+//                .returnUrl("https://localhost:3000/success")
+//                .cancelUrl("https://localhost:3000/cancel")
+//                .items(items)
+//                .expiredAt(expiredAt)
+//                .build();
+//
+//        CheckoutResponseData response = payOS.createPaymentLink(paymentData);
+//
+//        return response.getCheckoutUrl();
+//    }
 
     private User getAuthenticatedUser() {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
