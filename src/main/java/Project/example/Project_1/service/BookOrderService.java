@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -50,6 +51,9 @@ public class BookOrderService {
     @Autowired
     DesignRepository designRepository;
 
+    @Autowired
+    ImageCusRepository imageCusRepository;
+
     @Transactional
     public BookOrderResponse bookOrder(BookOrderCreateRequest request){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -65,7 +69,7 @@ public class BookOrderService {
         Fabric fabric = fabricRepository.findByIdAndIsDeletedFalse(request.getFabricId())
                 .orElseThrow(() -> new AppException(ErrorCode.FABRIC_NOT_FOUND));
 
-        TypePrint typePrint = typePrintRepository.findByIdAndIsDeletedFalse(request.getTypePrint())
+        TypePrint typePrint = typePrintRepository.findByIdAndIsDeletedFalse(request.getTypePrintId())
                 .orElseThrow(() -> new AppException(ErrorCode.TYPEPRINT_NOT_FOUNT));
 
         BookOrder bookOrder = new BookOrder();
@@ -85,9 +89,28 @@ public class BookOrderService {
         processOrder.setBookOrder(bookOrder);
         processOrder.setIsDeleted(false);
         bookOrder.setStatus(EnumBookOrder.PENDING);
-        processOrderRepository.save(processOrder);
         Double totalPrice = (((fabric.getPrice() + typePrint.getPrice()) / 0.3 ) * bookOrder.getQuantity());
         bookOrder.setTotalPrice(totalPrice);
+
+
+        List<ImageCus> imageList = new ArrayList<>();
+        if (request.getImage() != null && !request.getImage().isEmpty()) {
+            imageList = request.getImage().stream()
+                    .map(imageSkinRequest -> {
+                        ImageCus imageCus = new ImageCus();
+                        imageCus.setImage(imageSkinRequest.getImage());
+                        imageCus.setUser(user);
+                        imageCus.setIsDeleted(false);
+                        return imageCus;
+                    })
+                    .collect(Collectors.toList());
+        }
+
+        for (ImageCus imageSkin : imageList) {
+            imageSkin.setBookOrder(bookOrder);
+        }
+        processOrderRepository.save(processOrder);
+        imageCusRepository.saveAll(imageList);
         bookOrderRepository.save(bookOrder);
         return BookOrderResponse.builder()
                 .id(bookOrder.getId())
@@ -100,6 +123,7 @@ public class BookOrderService {
                 .description(bookOrder.getDescription())
                 .typePrint(typePrint)
                 .user(user)
+                .imageSkins(imageList)
                 .build();
     }
 
@@ -137,6 +161,7 @@ public class BookOrderService {
         Double totalPrice = (((fabric.getPrice() + typePrint.getPrice()) / 0.3 ) * bookOrder.getQuantity());
         bookOrder.setTotalPrice(totalPrice);
         bookOrderRepository.save(bookOrder);
+
         return BookOrderResponse.builder()
                 .id(bookOrder.getId())
                 .size(bookOrder.getSize())
@@ -223,6 +248,7 @@ public class BookOrderService {
                         .category(order.getCategory())
                         .fabric(order.getFabric())
                         .typePrint(order.getTypePrint())
+                        .imageSkins(order.getImageCus())
                         .user(order.getUser())
                         .build())
                 .collect(Collectors.toList());

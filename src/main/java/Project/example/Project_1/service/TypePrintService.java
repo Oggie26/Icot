@@ -28,8 +28,11 @@ public class TypePrintService {
             throw new AppException(ErrorCode.UNAUTHENTICATED);
         }
 
-        TypePrint typePrint = typePrintRepository.findByPrintNameAndIsDeletedFalse(request.getName())
-                        .orElseThrow(() -> new AppException(ErrorCode.TYPEPRINT_NAME_NOT_FOUNT));
+        if(typePrintRepository.findByPrintNameAndIsDeletedFalse(request.getName()).isPresent()){
+            throw new AppException((ErrorCode.TYPEPRINT_EXISTED));
+        }
+
+        TypePrint typePrint = new TypePrint();
         typePrint.setPrintName(request.getName());
         typePrint.setPrice(request.getPrice());
         typePrint.setIsDeleted(false);
@@ -39,6 +42,7 @@ public class TypePrintService {
                 .id(typePrint.getId())
                 .name(typePrint.getPrintName())
                 .price(typePrint.getPrice())
+                .status(typePrint.getStatus())
                 .build();
     }
 
@@ -52,8 +56,8 @@ public class TypePrintService {
         TypePrint typePrint = typePrintRepository.findByIdAndIsDeletedFalse(id)
                         .orElseThrow(() -> new AppException(ErrorCode.TYPEPRINT_NOT_FOUNT));
 
-        if(typePrintRepository.findByPrintNameAndIsDeletedFalse(typePrint.getPrintName()).isPresent()){
-            throw new AppException((ErrorCode.TYPEPRINT_NAME_NOT_FOUNT));
+        if(typePrintRepository.findByPrintNameAndIsDeletedFalse(request.getName()).isPresent()){
+            throw new AppException((ErrorCode.TYPEPRINT_EXISTED));
         }
 
         typePrint.setPrintName(request.getName());

@@ -36,6 +36,8 @@ public enum ErrorCode {
     BOOKORDER_NOT_FOUND(1025,"BookOrder not found", HttpStatus.BAD_REQUEST),
     DESIGN_NOT_FOUND(1026,"Design not found", HttpStatus.BAD_REQUEST),
     TYPEPRINT_NAME_NOT_FOUNT(1027,"TypePrint_Name not found",HttpStatus.BAD_REQUEST),
+    TYPEPRINT_EXISTED(1028,"TypePRint_Name ton tai", HttpStatus.BAD_REQUEST),
+    CATEGORY_EXISTED(1029,"Category ton tai", HttpStatus.BAD_REQUEST),
 
 
 

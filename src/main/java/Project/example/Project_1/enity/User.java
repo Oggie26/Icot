@@ -86,6 +86,10 @@ public class User extends AbstractEntity implements UserDetails {
     )
     List<Voucher> vouchers;
 
+    @OneToMany(mappedBy = "user")
+    @JsonIgnore
+    List<ImageCus> imageCus;
+
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

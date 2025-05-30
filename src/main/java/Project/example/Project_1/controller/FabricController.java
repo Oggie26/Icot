@@ -108,7 +108,7 @@ public class FabricController {
         List<FabricResponse> responses = fabricService.getAllFabrics().stream()
                 .map(fabric -> FabricResponse.builder()
                         .id(fabric.getId())
-                        .fabriceName(fabric.getFabricName())
+                        .fabricName(fabric.getFabricName())
                         .price(fabric.getPrice())
                         .status(fabric.getStatus())
                         .build())

@@ -41,7 +41,7 @@ public class PaymentController {
     @Autowired
     PayOsService  payOsService;
 
-    @PostMapping("/payment")
+    @PostMapping()
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Payment", description = "API get payment ")
     public ApiResponse<PaymentOrderResponse> paymentOrder(@RequestParam @Valid Long orderId ,

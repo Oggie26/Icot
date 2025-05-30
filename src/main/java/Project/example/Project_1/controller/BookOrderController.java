@@ -11,11 +11,10 @@ import Project.example.Project_1.response.BookOrderResponse;
 import Project.example.Project_1.response.PageResponse;
 import Project.example.Project_1.service.BookOrderService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -26,7 +25,8 @@ import java.util.List;
 @RequestMapping("/api/bookOrder")
 @RequiredArgsConstructor
 @Tag(name = "BookOrder Controller")
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@SecurityRequirement(name = "api")
+@CrossOrigin("*")
 public class BookOrderController {
 
     @Autowired
@@ -37,7 +37,7 @@ public class BookOrderController {
 
     //SEARCH
     @GetMapping("/search")
-    @Operation(summary = "Tìm kiếm theo tên", description = "API Tìm kiếm theo tên FabricName")
+    @Operation(summary = "Tìm kiếm theo tên", description = "API Tìm kiếm theo tên BookOrder")
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse<PageResponse<BookOrderResponse>> searchFabric(
             @RequestParam(defaultValue = "") String key,
@@ -45,7 +45,7 @@ public class BookOrderController {
             @RequestParam(defaultValue = "10") int size) {
         return ApiResponse.<PageResponse<BookOrderResponse>>builder()
                 .code(HttpStatus.OK.value())
-                .message("Tìm kiếm theo tên FabricName thành công")
+                .message("Tìm kiếm theo tên BookOrder thành công")
                 .result(bookOrderService.searchBookOrderByPhone(key, page, size))
                 .build();
     }
@@ -106,7 +106,7 @@ public class BookOrderController {
                 .build();
     }
 
-    @PutMapping("/{bookingOrderId}")
+    @PutMapping("/{bookOrderId}")
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Change a status to do Booking Order", description = "API retrieve Booking Order ")
     public ApiResponse<BookOrder> changeStatus(@RequestBody @Valid ChangeStatus status, @PathVariable Long bookOrderId) {
@@ -117,9 +117,9 @@ public class BookOrderController {
                 .build();
     }
 
-    @GetMapping("")
+    @GetMapping()
     @ResponseStatus(HttpStatus.OK)
-    @Operation(summary = "Get all  Booking Order", description = "API retrieve Booking Order ")
+    @Operation(summary = "Get all  BookOrder", description = "API retrieve Booking Order ")
     public ApiResponse<List<BookOrder>> getAllBookOrders() {
         List<BookOrder> list = bookOrderRepository.findAll()
                 .stream()

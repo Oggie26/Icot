@@ -1,13 +1,13 @@
 package Project.example.Project_1.response;
 
-import Project.example.Project_1.enity.Category;
-import Project.example.Project_1.enity.Fabric;
-import Project.example.Project_1.enity.TypePrint;
-import Project.example.Project_1.enity.User;
+import Project.example.Project_1.enity.*;
 import Project.example.Project_1.enums.EnumSize;
+import Project.example.Project_1.request.ImageCusRequest;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import lombok.*;
+
+import java.util.List;
 
 @Data
 @Getter
@@ -27,4 +27,6 @@ public class BookOrderResponse {
     Fabric fabric;
     User user;
     TypePrint typePrint;
+    List<ImageCus> imageSkins;
+
 }
