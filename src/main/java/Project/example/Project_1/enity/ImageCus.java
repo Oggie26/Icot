@@ -11,16 +11,22 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class ImageCus {
+public class ImageCus extends AbstractEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
 
     @Column
-    String url;
+    String image;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "bookOrder_id")
     @JsonIgnore
     BookOrder bookOrder;
+
+
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    @JsonIgnore
+    User user;
 }

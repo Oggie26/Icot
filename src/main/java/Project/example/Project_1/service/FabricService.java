@@ -47,7 +47,7 @@ public class FabricService {
         return FabricResponse.builder()
                 .id(fabric.getId())
                 .status(EnumStatus.ACTIVE)
-                .fabriceName(fabric.getFabricName())
+                .fabricName(fabric.getFabricName())
                 .price(fabric.getPrice())
                 .price(request.getPrice())
                 .build();
@@ -67,12 +67,13 @@ public class FabricService {
         }
         fabric.setFabricName(request.getFabricName());
         fabric.setPrice(request.getPrice());
+        fabric.setIsDeleted(false);
         fabricRepository.save(fabric);
 
         return FabricResponse.builder()
                 .id(fabric.getId())
                 .status(EnumStatus.ACTIVE)
-                .fabriceName(fabric.getFabricName())
+                .fabricName(fabric.getFabricName())
                 .price(fabric.getPrice())
                 .price(fabric.getPrice())
                 .build();
@@ -117,9 +118,10 @@ public class FabricService {
         Fabric fabric = fabricRepository.findByIdAndIsDeletedFalse(id)
                 .orElseThrow(() -> new AppException(ErrorCode.FABRIC_NOT_FOUND));
         return FabricResponse.builder()
-                .fabriceName(fabric.getFabricName())
+                .id(fabric.getId())
+                .fabricName(fabric.getFabricName())
                 .price(fabric.getPrice())
-                .status(EnumStatus.ACTIVE)
+                .status(fabric.getStatus())
                 .build();
     }
 
@@ -145,7 +147,7 @@ public class FabricService {
         List<FabricResponse> fabricResponses = fabricPage.getContent().stream()
                 .map(fabric -> FabricResponse.builder()
                         .id(fabric.getId())
-                        .fabriceName(fabric.getFabricName())
+                        .fabricName(fabric.getFabricName())
                         .price(fabric.getPrice())
                         .status(fabric.getStatus())
                         .build())

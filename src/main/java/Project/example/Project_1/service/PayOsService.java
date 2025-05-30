@@ -15,13 +15,16 @@ import Project.example.Project_1.repository.UserRepository;
 import Project.example.Project_1.request.PaymentItem;
 import Project.example.Project_1.request.PaymentRequest;
 import Project.example.Project_1.response.PaymentBookOrder;
+import Project.example.Project_1.response.PaymentInitResponse;
 import Project.example.Project_1.response.PaymentOrderResponse;
 import Project.example.Project_1.util.SignatureUtil;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.*;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 import vn.payos.PayOS;
 import vn.payos.type.CheckoutResponseData;
 import vn.payos.type.ItemData;
@@ -30,12 +33,26 @@ import vn.payos.type.PaymentData;
 import java.io.UnsupportedEncodingException;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
 public class PayOsService {
+
     @Value("${payos.checksumKey}")
     private String checksumKey;
+
+    @Value("${payos.returnUrl}")
+    private String returnUrl;
+
+    @Value("${payos.cancelUrl}")
+    private String cancelUrl;
+
+    @Value("${payos.apiKey}")
+    private String payosApiKey;
+
+    @Value("${payos.client-id}")
+    private String payosClientId;
 
     @Autowired
     PayOS payOS;
@@ -52,13 +69,15 @@ public class PayOsService {
     @Autowired
     BookOrderRepository bookOrderRepository;
 
+    @Autowired
+    RestTemplate restTemplate;
+
     public PaymentRequest buildPaymentRequest(long orderCode, int amount) {
         String description = "Thanh toán đơn hàng #" + orderCode;
-        String returnUrl = "https://localhost:3000/return";
-        String cancelUrl = "https://localhost:3000/cancel";
 
+        // Tạo rawData theo định dạng PayOS yêu cầu (giữ đúng thứ tự)
         String rawData = orderCode + "" + amount + description + returnUrl + cancelUrl;
-        String signature = SignatureUtil.hmacSHA256(rawData, checksumKey); // checksumKey là biến cấu hình
+        String signature = SignatureUtil.hmacSHA256(rawData, checksumKey);
 
         PaymentRequest req = new PaymentRequest();
         req.setOrderCode(orderCode);
@@ -67,9 +86,46 @@ public class PayOsService {
         req.setReturnUrl(returnUrl);
         req.setCancelUrl(cancelUrl);
         req.setSignature(signature);
-        req.setExpiredAt(System.currentTimeMillis() + 3600_000);
+        req.setExpiredAt(System.currentTimeMillis() / 1000 + 3600); // 1 hour in seconds
 
         return req;
+    }
+
+    public PaymentInitResponse createPayment(long orderCode, int amount) {
+        try {
+            // Tạo ItemData (tùy chọn, nếu bạn muốn thêm chi tiết sản phẩm)
+            ItemData itemData = ItemData.builder()
+                    .name("Sản phẩm đơn hàng #" + orderCode)
+                    .quantity(1)
+                    .price(amount)
+                    .build();
+
+            // Tạo PaymentData cho PayOS SDK
+            PaymentData paymentData = PaymentData.builder()
+                    .orderCode(orderCode)
+                    .amount(amount)
+                    .description("Thanh toán đơn hàng #" + orderCode)
+                    .returnUrl(returnUrl)
+                    .cancelUrl(cancelUrl)
+                    .item(itemData)
+                    .build();
+
+            // Gọi PayOS SDK để tạo link thanh toán
+            CheckoutResponseData payOSResponse = payOS.createPaymentLink(paymentData);
+
+            // Chuyển đổi sang PaymentInitResponse
+            PaymentInitResponse response = new PaymentInitResponse();
+            response.setCheckoutUrl(payOSResponse.getCheckoutUrl());
+            response.setOrderCode(payOSResponse.getOrderCode());
+            response.setAmount(payOSResponse.getAmount());
+            response.setStatus(payOSResponse.getStatus());
+            response.setPaymentLinkId(payOSResponse.getPaymentLinkId());
+
+            return response;
+        } catch (Exception ex) {
+            System.err.println("Lỗi khi gọi PayOS: " + ex.getMessage());
+            throw new RuntimeException("Gọi PayOS thất bại", ex);
+        }
     }
 
 
@@ -98,7 +154,7 @@ public class PayOsService {
                 .returnUrl("https://localhost:3000/success")
                 .cancelUrl("https://localhost:3000/cancel")
                 .items(items)
-                .expiredAt((int) (System.currentTimeMillis() + 3600_000))
+                .expiredAt((long) (System.currentTimeMillis() + 3600_000))
                 .build();
 
         CheckoutResponseData response = payOS.createPaymentLink(paymentData);
@@ -140,6 +196,15 @@ public class PayOsService {
                 .bookOrderId(bookOrderId)
                 .status(EnumBookOrder.PAYMENT)
                 .build();
+    }
+
+    public Map<String, Object> getPaymentStatus(long orderCode) {
+        try {
+            return (Map<String, Object>) payOS.getPaymentLinkInformation(orderCode);
+        } catch (Exception ex) {
+            System.err.println("Lỗi khi lấy thông tin payment link: " + ex.getMessage());
+            throw new RuntimeException("Lấy thông tin payment link thất bại: " + ex.getMessage(), ex);
+        }
     }
 
 //    public String createPaymentLinkByBookOrder(Long bookOrderId, String isAddress) throws Exception {

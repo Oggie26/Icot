@@ -30,13 +30,14 @@ public class TagService {
             throw new AppException(ErrorCode.UNAUTHENTICATED);
         }
         if(tagRepository.findByNameAndIsDeletedFalse(request.getName()).isPresent()){
-            throw new AppException(ErrorCode.TAG_NAME_NOT_FOUND );
+            throw new AppException(ErrorCode.TAG_NAME_ALREADY_EXISTS );
         }
         Tag tag = new Tag();
         tag.setDescription(request.getDescription());
         tag.setName(request.getName());
         tag.setIsDeleted(false);
         tag.setStatus(EnumStatus.ACTIVE);
+        tag.setIsDeleted(false);
         tagRepository.save(tag);
         return TagResponse.builder()
                 .name(tag.getName())

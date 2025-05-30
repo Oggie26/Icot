@@ -9,11 +9,9 @@ import Project.example.Project_1.response.FabricResponse;
 import Project.example.Project_1.response.PageResponse;
 import Project.example.Project_1.service.BlogService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -21,9 +19,10 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 @RestController
 @RequestMapping("/api/blog")
-@RequiredArgsConstructor
 @Tag(name = "Blog Controller")
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@CrossOrigin("*")
+@SecurityRequirement(name = "api")
+
 public class BlogController {
     @Autowired
     BlogService service;
@@ -55,7 +54,7 @@ public class BlogController {
     @Operation(summary = "Create a Blog for ADMIN, MANAGER", description = "API create Blog ")
     public ApiResponse<BlogResponse> createBlog(@RequestBody @Valid BlogCreateRequest request) throws Throwable {
         return ApiResponse.<BlogResponse>builder()
-                .code(HttpStatus.OK.value())
+                .code(HttpStatus.CREATED.value())
                 .message("Create Blog successfully")
                 .result(service.createBlog(request))
                 .build();
@@ -75,7 +74,7 @@ public class BlogController {
     @PatchMapping("/{blogId}")
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Change status Blog for ADMIN, MANAGER", description = "API change a status Blog ")
-    public ApiResponse<Void> updateBlog(@RequestParam EnumStatus status, @PathVariable Long blogId) {
+    public ApiResponse<Void> disableBlog(@RequestParam EnumStatus status, @PathVariable Long blogId) {
         service.changeStatus(blogId, status);
         return ApiResponse.<Void>builder()
                 .code(HttpStatus.OK.value())
