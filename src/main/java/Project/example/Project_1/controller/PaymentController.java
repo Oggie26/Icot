@@ -1,8 +1,10 @@
 package Project.example.Project_1.controller;
 
+import Project.example.Project_1.request.PaymentInitRequest;
 import Project.example.Project_1.request.PaymentRequest;
 import Project.example.Project_1.response.ApiResponse;
 import Project.example.Project_1.response.PaymentBookOrder;
+import Project.example.Project_1.response.PaymentInitResponse;
 import Project.example.Project_1.response.PaymentOrderResponse;
 import Project.example.Project_1.service.PayOsService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -55,6 +57,20 @@ public class PaymentController {
                 .build();
     }
 
+    @PostMapping("/payOs")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Tạo thanh toán và trả về link PayOS")
+    public ApiResponse<PaymentInitResponse> initPayment(@Valid @RequestBody PaymentInitRequest request) {
+        PaymentInitResponse response = payOsService.createPayment(request.getOrderCode(), request.getAmount());
+        return ApiResponse.<PaymentInitResponse>builder()
+                .code(HttpStatus.OK.value())
+                .message("Khởi tạo thanh toán thành công")
+                .result(response)
+                .build();
+    }
+
+
+
 //    @PostMapping("/paymentBookOrder/{bookOrderId}")
 //    @ResponseStatus(HttpStatus.OK)
 //    @Operation(summary = "Payment", description = "API get payment ")
@@ -75,6 +91,18 @@ public class PaymentController {
             clientIp = request.getRemoteAddr();
         }
         return clientIp;
+    }
+
+    @PostMapping("/init")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Khởi tạo thanh toán", description = "Tạo thông tin thanh toán cho đơn hàng")
+    public ApiResponse<PaymentRequest> initPayment(@Valid @RequestBody PaymentRequest request) {
+        PaymentRequest paymentRequest = payOsService.buildPaymentRequest(request.getOrderCode(), request.getAmount());
+        return ApiResponse.<PaymentRequest>builder()
+                .code(HttpStatus.OK.value())
+                .message("Khởi tạo thanh toán thành công")
+                .result(paymentRequest)
+                .build();
     }
 
 
