@@ -33,6 +33,7 @@ import vn.payos.type.PaymentData;
 import java.io.UnsupportedEncodingException;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -195,6 +196,15 @@ public class PayOsService {
                 .bookOrderId(bookOrderId)
                 .status(EnumBookOrder.PAYMENT)
                 .build();
+    }
+
+    public Map<String, Object> getPaymentStatus(long orderCode) {
+        try {
+            return (Map<String, Object>) payOS.getPaymentLinkInformation(orderCode);
+        } catch (Exception ex) {
+            System.err.println("Lỗi khi lấy thông tin payment link: " + ex.getMessage());
+            throw new RuntimeException("Lấy thông tin payment link thất bại: " + ex.getMessage(), ex);
+        }
     }
 
 //    public String createPaymentLinkByBookOrder(Long bookOrderId, String isAddress) throws Exception {
