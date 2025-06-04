@@ -44,7 +44,6 @@ public class Order extends  AbstractEntity{
     @Column(name = "order_status", length = 50)
     EnumProcess status;
 
-
     @Enumerated(EnumType.STRING)
     EnumPayment paymentStatus;
 
