@@ -267,8 +267,8 @@ public class ProductService {
                     .toList();
         }
 
-        for (Image image : imageList) {
-            image.setProduct(product);
+        for (Size size : sizeList) {
+            size.setProduct(product);
         }
         product.setIsDeleted(false);
         imageRepository.saveAll(imageList);
@@ -280,7 +280,7 @@ public class ProductService {
                 .productName(product.getProductName())
                 .createdAt(product.getCreatedAt())
                 .price(product.getPrice())
-                .sizes(product.getSizes())
+                .sizes(sizeList.stream().toList())
                 .imageThumbnail(product.getImageThumbnail())
                 .images(product.getImages())
                 .feedbacks(product.getFeedbacks())
@@ -288,7 +288,7 @@ public class ProductService {
                 .status(product.getStatus())
                 .sizes(product.getSizes())
                 .fabric(product.getFabric())
-                .images(product.getImages())
+                .images(imageList.stream().toList())
                 .typePrint(product.getTypePrint())
                 .description(product.getDescription())
                 .build();
