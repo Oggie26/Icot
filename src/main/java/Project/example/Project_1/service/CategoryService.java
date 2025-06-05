@@ -13,7 +13,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -28,10 +27,10 @@ public class CategoryService {
     public CategoryResponse createCategory(CategoryRequest request){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
-            throw new AppException(ErrorCode.UNAUTHENTICATED);
+            throw new AppException(ErrorCode.UNAUTHENTICATED, "Thiếu ID của Design");
         }
         if(categoryRepository.findByCategoryNameAndIsDeletedFalse(request.getCategoryName()).isPresent()){
-            throw new AppException(ErrorCode.CATEGORY_EXISTED);
+            throw new AppException(ErrorCode.CATEGORY_EXISTED, "Thiếu ID của Design");
         }
         Category category = Category.builder()
                 .categoryName(request.getCategoryName())
@@ -52,13 +51,13 @@ public class CategoryService {
     public CategoryResponse updateCategory(CategoryRequest request){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
-            throw new AppException(ErrorCode.UNAUTHENTICATED);
+            throw new AppException(ErrorCode.UNAUTHENTICATED, "Thiếu ID của Design");
         }
         Category category = categoryRepository.findByIdAndIsDeletedFalse(request.getId())
-                .orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_FOUND));
+                .orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_FOUND, "Thiếu ID của Design"));
 
         if(categoryRepository.findByCategoryNameAndIsDeletedFalse(request.getCategoryName()).isPresent()){
-            throw new AppException(ErrorCode.CATEGORY_EXISTED);
+            throw new AppException(ErrorCode.CATEGORY_EXISTED, "Thiếu ID của Design");
         }
         category.setCategoryName(request.getCategoryName());
         category.setDescription(request.getDescription());
@@ -75,10 +74,10 @@ public class CategoryService {
     public void disableCategory(Long id){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
-            throw new AppException(ErrorCode.UNAUTHENTICATED);
+            throw new AppException(ErrorCode.UNAUTHENTICATED, "Thiếu ID của Design");
         }
         Category category = categoryRepository.findByIdAndIsDeletedFalse(id)
-                .orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_FOUND));
+                .orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_FOUND, "Thiếu ID của Design"));
         if (category.getStatus().equals(EnumStatus.ACTIVE)){
             category.setStatus(EnumStatus.INACTIVE);
         }else{
@@ -90,10 +89,10 @@ public class CategoryService {
     public void deleteCategory(Long id){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
-            throw new AppException(ErrorCode.UNAUTHENTICATED);
+            throw new AppException(ErrorCode.UNAUTHENTICATED, "Thiếu ID của Design");
         }
         Category category = categoryRepository.findByIdAndIsDeletedFalse(id)
-                .orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_FOUND));
+                .orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_FOUND, "Thiếu ID của Design"));
         category.setIsDeleted(true);
         category.setStatus(EnumStatus.INACTIVE);
         categoryRepository.save(category);
@@ -108,7 +107,7 @@ public class CategoryService {
 
     public CategoryResponse getById(Long id){
         Category category = categoryRepository.findByIdAndIsDeletedFalse(id)
-                .orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_FOUND));
+                .orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_FOUND, "Thiếu ID của Design"));
         return CategoryResponse.builder()
                 .id(category.getId())
                 .description(category.getDescription())

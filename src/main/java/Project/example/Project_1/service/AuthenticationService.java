@@ -11,7 +11,6 @@ import Project.example.Project_1.request.LoginRequest;
 import Project.example.Project_1.request.RegisterRequest;
 import Project.example.Project_1.response.LoginResponse;
 import Project.example.Project_1.response.RegisterResponse;
-import Project.example.Project_1.response.UserResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -57,12 +56,12 @@ public class AuthenticationService implements UserDetailsService {
     @Transactional
     public LoginResponse login(LoginRequest request) {
         User user = userRepository.findUserByUsername(request.getUsername())
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED, "Thiếu ID của Design"));
         if(user == null){
-            throw new AppException(ErrorCode.USER_NOT_EXISTED);
+            throw new AppException(ErrorCode.USER_NOT_EXISTED, "Thiếu ID của Design");
         }
         if (user.getStatus().equals(EnumStatus.BLOCKED))
-            throw new AppException(ErrorCode.ACCOUNT_BLOCKED);
+            throw new AppException(ErrorCode.ACCOUNT_BLOCKED, "Thiếu ID của Design");
         String token = tokenService.generateToken(user);
         // Trả về Token
         return LoginResponse.builder()
@@ -75,10 +74,10 @@ public class AuthenticationService implements UserDetailsService {
     @Transactional()
     public RegisterResponse register(RegisterRequest request) {
         if (userRepository.findUserByUsername(request.getUsername()).isPresent()) {
-            throw new AppException(ErrorCode.USERNAME_EXISTED);
+            throw new AppException(ErrorCode.USERNAME_EXISTED, "Thiếu ID của Design");
         }
         if (userRepository.findUserByEmailAndIsDeletedFalse(request.getEmail()).isPresent()) {
-            throw new AppException(ErrorCode.EMAIL_EXISTED);
+            throw new AppException(ErrorCode.EMAIL_EXISTED, "Thiếu ID của Design");
         }
 
         User user = User.builder()

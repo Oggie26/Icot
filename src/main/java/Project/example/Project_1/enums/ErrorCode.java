@@ -61,6 +61,8 @@ public enum ErrorCode {
     INVALID_PRODUCT_CATEGORY(1115, "Invalid Product category", HttpStatus.BAD_REQUEST),
     INVALID_BLOG_NAME(1116, "Invalid Blog name", HttpStatus.BAD_REQUEST),
     INVALID_TOTAL_PRICE(1117, "Invalid Total Price", HttpStatus.BAD_REQUEST),
+    INVALID_STATUS(1118, "Invalid Status", HttpStatus.BAD_REQUEST),
+    INVALID_REQUEST(1119, "Invalid Request", HttpStatus.BAD_REQUEST),
 
     //12xx
     UNAUTHENTICATED(1201, "Unauthenticated", HttpStatus.UNAUTHORIZED),

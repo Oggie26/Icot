@@ -56,7 +56,7 @@ public class OptService {
     @Transactional
     public void resendOtp(String userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED, "Thiếu ID của Design"));
 
         // Vô hiệu hóa OTP cũ (nếu có)
         Optional<Otp> existingOtp = otpRepository.findByUser(user);
@@ -72,7 +72,7 @@ public class OptService {
         try {
             postmarkService.sendVerificationEmailWithOTP(user.getEmail(), user.getUsername(), newOtp.getOtp());
         } catch (Exception e) {
-            throw new AppException(ErrorCode.EMAIL_SEND_FAILED);
+            throw new AppException(ErrorCode.EMAIL_SEND_FAILED, "Thiếu ID của Design");
         }
 
         // Lưu OTP mới vào cơ sở dữ liệu
@@ -82,7 +82,7 @@ public class OptService {
     @Transactional
     public void resendOtpByEmail(String email) {
         User user = userRepository.findUserByEmailAndIsDeletedFalse(email)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED, "Thiếu ID của Design"));
 
         // Vô hiệu hóa OTP cũ (nếu có)
         Optional<Otp> existingOtp = otpRepository.findByUser(user);
@@ -98,7 +98,7 @@ public class OptService {
         try {
             postmarkService.sendVerificationEmailWithOTP(user.getEmail(), user.getUsername(), newOtp.getOtp());
         } catch (Exception e) {
-            throw new AppException(ErrorCode.EMAIL_SEND_FAILED);
+            throw new AppException(ErrorCode.EMAIL_SEND_FAILED, "Thiếu ID của Design");
         }
 
         // Lưu OTP mới vào cơ sở dữ liệu
@@ -107,19 +107,19 @@ public class OptService {
 
     public void verifyOtp(String userId, String otpCode) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED, "Thiếu ID của Design"));
 
         // Kiểm tra OTP hợp lệ
         Optional<Otp> otpOptional = otpRepository.findByUserAndOtp(user, otpCode);
         if (otpOptional.isEmpty()) {
-            throw new AppException(ErrorCode.INVALID_OTP); // Nếu không tìm thấy OTP trùng khớp
+            throw new AppException(ErrorCode.INVALID_OTP, "Thiếu ID của Design"); // Nếu không tìm thấy OTP trùng khớp
         }
 
         Otp otp = otpOptional.get();
 
         // Kiểm tra thời gian hết hạn của OTP
         if (otp.getExpirationTime().before(new Date())) {
-            throw new AppException(ErrorCode.OTP_EXPIRED); // OTP đã hết hạn
+            throw new AppException(ErrorCode.OTP_EXPIRED, "Thiếu ID của Design"); // OTP đã hết hạn
         }
 
         // Nếu OTP hợp lệ và chưa hết hạn, có thể tiến hành xác minh tài khoản

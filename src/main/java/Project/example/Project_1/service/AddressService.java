@@ -9,7 +9,6 @@ import Project.example.Project_1.repository.UserRepository;
 import Project.example.Project_1.request.AddressCreationRequest;
 import Project.example.Project_1.request.AddressUpdateRequest;
 import Project.example.Project_1.response.AddressResponse;
-import jakarta.persistence.Entity;
 import jakarta.transaction.Transactional;
 import lombok.*;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -53,7 +52,7 @@ public class AddressService {
     public void updateAddress(Long addressId, AddressUpdateRequest request) {
         User user = getAuthenticatedUser();
         Address newaddress = addressRepository.findById(addressId)
-                .orElseThrow(() -> new AppException(ErrorCode.ADDRESS_NOT_FOUND));
+                .orElseThrow(() -> new AppException(ErrorCode.ADDRESS_NOT_FOUND, "Thiếu ID của Design"));
         if (request.getIsDefault()) {
             // Lấy tất cả các địa chỉ của người dùng
             List<Address> existingAddresses = addressRepository.findByUser(user);
@@ -75,7 +74,7 @@ public class AddressService {
     @Transactional
     public void deleteAddress(Long addressId) {
         Address address = addressRepository.findById(addressId)
-                .orElseThrow(() -> new AppException(ErrorCode.ADDRESS_NOT_FOUND));
+                .orElseThrow(() -> new AppException(ErrorCode.ADDRESS_NOT_FOUND, "Thiếu ID của Design"));
         addressRepository.delete(address);
     }
 
@@ -93,7 +92,7 @@ public class AddressService {
     @Transactional
     public AddressResponse setDefaultAddress(Long addressId) {
         Address address = addressRepository.findById(addressId)
-                .orElseThrow(() -> new AppException(ErrorCode.ADDRESS_NOT_FOUND));
+                .orElseThrow(() -> new AppException(ErrorCode.ADDRESS_NOT_FOUND, "Thiếu ID của Design"));
         // Set all other addresses to non-default
         addressRepository.findByUser(getAuthenticatedUser()).forEach(addr -> addr.setIsDefault(false));
         address.setIsDefault(true);

@@ -1,9 +1,6 @@
 package Project.example.Project_1.service;
 
-import Project.example.Project_1.config.PageMapper;
 import Project.example.Project_1.enity.*;
-import Project.example.Project_1.enums.EnumBookOrder;
-import Project.example.Project_1.enums.EnumOrderType;
 import Project.example.Project_1.enums.EnumStatus;
 import Project.example.Project_1.enums.ErrorCode;
 import Project.example.Project_1.exception.AppException;
@@ -11,23 +8,13 @@ import Project.example.Project_1.repository.*;
 import Project.example.Project_1.request.ProductCreateRequest;
 import Project.example.Project_1.request.ProductUpdateRequest;
 import Project.example.Project_1.response.ProductResponse;
-import Project.example.Project_1.response.PageResponse;
-import Project.example.Project_1.response.ProductSearchRequest;
-import jakarta.persistence.criteria.Predicate;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class ProductService {
@@ -206,22 +193,22 @@ public class ProductService {
     public ProductResponse createProduct(ProductCreateRequest request){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
-            throw new AppException(ErrorCode.UNAUTHENTICATED);
+            throw new AppException(ErrorCode.UNAUTHENTICATED, "Thiếu ID của Design");
         }
         if(productRepository.findByProductName(request.getProductName()).isPresent()){
-            throw new AppException(ErrorCode.PRODUCT_NAME_EXISTED);
+            throw new AppException(ErrorCode.PRODUCT_NAME_EXISTED, "Thiếu ID của Design");
         }
         if(request.getPrice() < 0){
-            throw new AppException(ErrorCode.INVALID_PRODUCT_PRICE);
+            throw new AppException(ErrorCode.INVALID_PRODUCT_PRICE, "Thiếu ID của Design");
         }
         Category category = categoryRepository.findByIdAndIsDeletedFalse(request.getCategoryId())
-                .orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_FOUND));
+                .orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_FOUND, "Thiếu ID của Design"));
 
         Fabric fabric = fabricRepository.findByIdAndIsDeletedFalse(request.getFabricId())
-                .orElseThrow( () -> new AppException(ErrorCode.FABRIC_NOT_FOUND));
+                .orElseThrow( () -> new AppException(ErrorCode.FABRIC_NOT_FOUND, "Thiếu ID của Design"));
 
         TypePrint typePrint = typePrintRepository.findByIdAndIsDeletedFalse(request.getTypePrintId())
-                .orElseThrow(() -> new AppException(ErrorCode.TYPEPRINT_NOT_FOUNT));
+                .orElseThrow(() -> new AppException(ErrorCode.TYPEPRINT_NOT_FOUNT, "Thiếu ID của Design"));
 
         Product product = Product.builder()
                 .productName(request.getProductName())
@@ -305,10 +292,10 @@ public class ProductService {
     public void disableProduct(String id){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
-            throw new AppException(ErrorCode.UNAUTHENTICATED);
+            throw new AppException(ErrorCode.UNAUTHENTICATED, "Thiếu ID của Design");
         }
         Product product = productRepository.findByIdAndIsDeletedFalse(id)
-                        .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
+                        .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_FOUND, "Thiếu ID của Design"));
         product.setStatus(EnumStatus.INACTIVE);
         productRepository.save(product);
     }
@@ -316,10 +303,10 @@ public class ProductService {
     public void deleteProduct(String id){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
-            throw new AppException(ErrorCode.UNAUTHENTICATED);
+            throw new AppException(ErrorCode.UNAUTHENTICATED, "Thiếu ID của Design");
         }
         Product product = productRepository.findByIdAndIsDeletedFalse(id)
-                .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
+                .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_FOUND, "Thiếu ID của Design"));
         product.setIsDeleted(false);
         productRepository.save(product);
     }
@@ -327,31 +314,31 @@ public class ProductService {
     public ProductResponse updateProduct(ProductUpdateRequest request) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
-            throw new AppException(ErrorCode.UNAUTHENTICATED);
+            throw new AppException(ErrorCode.UNAUTHENTICATED, "Thiếu ID của Design");
         }
 
         if (request.getPrice() < 0) {
-            throw new AppException(ErrorCode.INVALID_PRODUCT_PRICE);
+            throw new AppException(ErrorCode.INVALID_PRODUCT_PRICE, "Thiếu ID của Design");
         }
 
         Product product = productRepository.findByIdAndIsDeletedFalse(request.getId())
-                .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
+                .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_FOUND, "Thiếu ID của Design"));
 
         // Kiểm tra nếu tên sản phẩm đã tồn tại (và không trùng với chính sản phẩm hiện tại)
         productRepository.findByProductName(request.getProductName()).ifPresent(existingProduct -> {
             if (!existingProduct.getId().equals(product.getId())) {
-                throw new AppException(ErrorCode.PRODUCT_NAME_EXISTED);
+                throw new AppException(ErrorCode.PRODUCT_NAME_EXISTED, "Thiếu ID của Design");
             }
         });
 
         Category category = categoryRepository.findByIdAndIsDeletedFalse(request.getCategoryId())
-                .orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_FOUND));
+                .orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_FOUND, "Thiếu ID của Design"));
 
         Fabric fabric = fabricRepository.findByIdAndIsDeletedFalse(request.getFabricId())
-                .orElseThrow(() -> new AppException(ErrorCode.FABRIC_NOT_FOUND));
+                .orElseThrow(() -> new AppException(ErrorCode.FABRIC_NOT_FOUND, "Thiếu ID của Design"));
 
         TypePrint typePrint = typePrintRepository.findByIdAndIsDeletedFalse(request.getTypePrintId())
-                .orElseThrow(() -> new AppException(ErrorCode.TYPEPRINT_NOT_FOUNT));
+                .orElseThrow(() -> new AppException(ErrorCode.TYPEPRINT_NOT_FOUNT, "Thiếu ID của Design"));
 
         // Cập nhật thông tin sản phẩm
         product.setProductName(request.getProductName());
@@ -410,10 +397,10 @@ public class ProductService {
     public Product getById(String id){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
-            throw new AppException(ErrorCode.UNAUTHENTICATED);
+            throw new AppException(ErrorCode.UNAUTHENTICATED, "Thiếu ID của Design");
         }
         Product product = productRepository.findByIdAndIsDeletedFalse(id)
-                .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
+                .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_FOUND, "Thiếu ID của Design"));
         return product;
     }
 

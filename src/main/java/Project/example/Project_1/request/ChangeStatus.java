@@ -15,7 +15,6 @@ public class ChangeStatus {
     String designName;
     @NotNull
     String response;
-    @Enumerated(EnumType.STRING)
-    EnumBookOrder status;
+
 }
 

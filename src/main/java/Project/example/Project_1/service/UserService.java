@@ -44,126 +44,36 @@ public class UserService {
     @Autowired
     PasswordEncoder passwordEncoder;
 
-//    public User disableUser(String id){
-//        User user = userRepository.findUserById(id);
-//        user.setStatus(EnumStatus.BLOCKED);
-//        return userRepository.save(user);
-//    }
-//
-//    public User deleteUser(String id){
-//        User user = userRepository.findUserById(id);
-//        user.setStatus(EnumStatus.BLOCKED);
-//        return userRepository.save(user);
-//    }
 
     private boolean isAdmin() {
         Optional<User> currentUser = authenticationService.getCurrentAccount();
-        if (currentUser.isEmpty()) throw new AppException(ErrorCode.UNAUTHENTICATED);
+        if (currentUser.isEmpty()) throw new AppException(ErrorCode.UNAUTHENTICATED, "Thiếu ID của Design");
         return currentUser.get().getRole().equals(EnumRole.ADMIN);
     }
 
-    /*@Transactional
-    public UserResponse addNewUser(UserRequest userRequest) {
-        if (userRepository.findUserByEmail(userRequest.getEmail()).isPresent()) {
-            throw new AppException(ErrorCode.EMAIL_EXISTED);
-        }
-        if (userRepository.findUserByPhone(userRequest.getPhone()) != null) {
-            throw new AppException(ErrorCode.PHONE_EXISTED);
-        }
-        User user = new User();
-        modelMapper.map(userRequest, user);
-
-        *//*boolean isAdmin = authenticationService.getCurrentAccount()
-                .map(User::getRole)
-                .map(role -> role == EnumRole.ADMIN)
-                .orElse(false);*//*
-        if(isAdmin())
-            user.setRole(userRequest.getRole());
-        else
-            user.setRole(EnumRole.CUSTOMER);
-        user.setPoint(0);
-        user.setStatus(EnumStatus.ACTIVE);
-        try{
-            userRepository.save(user);
-            return modelMapper.map(user, UserResponse.class);
-        }
-        catch(Exception e){
-            e.printStackTrace();
-            throw new EntityNotFoundException("Error when saving a new user to db");
-        }
-    }
-
-    @Transactional
-    public UserResponse updateUser(String id, UserRequest userRequest) {
-        User user = userRepository.findUserById(id);
-        if (user == null) {
-            throw new AppException(ErrorCode.USER_NOT_FOUND);
-        }
-        // check duplicated email
-        if (userRequest.getEmail() != null && !userRequest.getEmail().equals(user.getEmail())) {
-            boolean emailExists = userRepository.existsByEmailAndIdNot(userRequest.getEmail(), user.getId());
-            if (emailExists) {
-                throw new AppException(ErrorCode.EMAIL_EXISTED);
-            }
-            user.setEmail(userRequest.getEmail());
-        }
-
-        // check duplicate phone
-        if (userRequest.getPhone() != null && !userRequest.getPhone().equals(user.getPhone())) {
-            boolean phoneExists = userRepository.existsByPhoneAndIdNot(userRequest.getPhone(), user.getId());
-            if (phoneExists) {
-                throw new AppException(ErrorCode.PHONE_EXISTED);
-            }
-            user.setPhone(userRequest.getPhone());
-        }
-
-
-        modelMapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
-        modelMapper.map(userRequest, user);
-
-        if (isAdmin() && userRequest.getRole() != null) {
-            user.setRole(userRequest.getRole());
-        }
-
-        if (userRequest.getStatus() != null) {
-            user.setStatus(userRequest.getStatus());
-        }
-
-        if (userRequest.getPoint() >= 0) {
-            user.setPoint(userRequest.getPoint());
-        }
-
-        try {
-            userRepository.save(user);
-            return modelMapper.map(user, UserResponse.class);
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new EntityNotFoundException("Error when saving updated user to db");
-        }
-    }*/
 
 
     public User getUserById(String id){
-        User user = userRepository.findUserById(id).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        User user = userRepository.findUserById(id).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND, "Thiếu ID của Design"));
         return modelMapper.map(user, User.class);
     }
 
     public GetUserResponse getUserByUsername(String username) {
         if(isAdmin()){
             Optional<User> user = userRepository.findUserByUsername(username);
-            if (user.isEmpty()) throw new AppException(ErrorCode.USER_NOT_FOUND);
+            if (user.isEmpty()) throw new AppException(ErrorCode.USER_NOT_FOUND, "Thiếu ID của Design");
             return modelMapper.map(user, GetUserResponse.class);
         }
         else{
             Optional<User> currentUser = authenticationService.getCurrentAccount();
-            if (currentUser.isEmpty()) throw new AppException(ErrorCode.USER_NOT_FOUND);
+            if (currentUser.isEmpty()) throw new AppException(ErrorCode.USER_NOT_FOUND, "Thiếu ID của Design");
             return modelMapper.map(currentUser, GetUserResponse.class);
         }
     }
 
     public PageResponse<GetUserResponse> getAllUsers(int page, int size) {
         if(!isAdmin()){
-            throw new AppException(ErrorCode.UNAUTHENTICATED);
+            throw new AppException(ErrorCode.UNAUTHENTICATED, "Thiếu ID của Design");
         }
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
         Page<User> users = userRepository.findAll(pageable);
@@ -174,15 +84,16 @@ public class UserService {
     @Transactional
     public UserStaffResponse createUser(UserCreateRequest userCreateRequest) {
         if (userRepository.findUserByEmailAndIsDeletedFalse(userCreateRequest.getEmail()).isPresent()) {
-            throw new AppException(ErrorCode.EMAIL_EXISTED);
+            throw new AppException(ErrorCode.EMAIL_EXISTED, "Thiếu ID của Design");
         }
 
         if (userRepository.findUserByPhoneAndIsDeletedFalse(userCreateRequest.getPhone()).isPresent()) {
-            throw new AppException(ErrorCode.PHONE_EXISTED);
+            throw new AppException(ErrorCode.PHONE_EXISTED, "Thiếu ID của Design");
         }
 
         User user = User.builder()
                 .email(userCreateRequest.getEmail())
+                .username(userCreateRequest.getUsername())
                 .password(passwordEncoder.encode(userCreateRequest.getPassword()))
                 .avatar(userCreateRequest.getAvatar())
                 .point(0)
@@ -196,7 +107,7 @@ public class UserService {
                 .email(userCreateRequest.getEmail())
                 .fullName(userCreateRequest.getFullName())
                 .build();
-
+        user.setIsDeleted(false);
         userRepository.save(user);
 
         return UserStaffResponse.builder()
@@ -214,18 +125,18 @@ public class UserService {
     @Transactional
     public UserStaffResponse updateUser(String userId, UserUpdateRequest userUpdateRequest) {
         User user = userRepository.findByIdAndIsDeletedFalse(userId)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND, "Thiếu ID của Design"));
 
         userRepository.findUserByEmailAndIsDeletedFalse(userUpdateRequest.getEmail())
                 .filter(existingUser -> !existingUser.getId().equals(userId))
                 .ifPresent(existingUser -> {
-                    throw new AppException(ErrorCode.EMAIL_EXISTED);
+                    throw new AppException(ErrorCode.EMAIL_EXISTED, "Thiếu ID của Design");
                 });
 
         userRepository.findUserByPhoneAndIsDeletedFalse(userUpdateRequest.getPhone())
                 .filter(existingUser -> !existingUser.getId().equals(userId))
                 .ifPresent(existingUser -> {
-                    throw new AppException(ErrorCode.PHONE_EXISTED);
+                    throw new AppException(ErrorCode.PHONE_EXISTED, "Thiếu ID của Design");
                 });
 
         user.setEmail(userUpdateRequest.getEmail());
@@ -236,6 +147,7 @@ public class UserService {
         user.setBirthday(userUpdateRequest.getBirthday());
         user.setRole(userUpdateRequest.getRole());
         user.setStatus(user.getStatus() != null ? user.getStatus() : EnumStatus.INACTIVE);
+        user.setIsDeleted(false);
         userRepository.save(user);
 
         return UserStaffResponse.builder()
@@ -254,7 +166,7 @@ public class UserService {
 
     public void deleteUser(String userId) {
         User user = userRepository.findByIdAndIsDeletedFalse(userId)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND, "Thiếu ID của Design"));
         user.setIsDeleted(true);
         user.setStatus(EnumStatus.DELETED);
         userRepository.save(user);
@@ -262,14 +174,14 @@ public class UserService {
 
     public void disableUser (String  userId) {
         User user = userRepository.findByIdAndIsDeletedFalse(userId)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND, "Thiếu ID của Design"));
         user.setStatus(EnumStatus.BLOCKED);
         userRepository.save(user);
     }
 
     public UserStaffResponse getUser(String userId) {
         User user = userRepository.findByIdAndIsDeletedFalse(userId)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND, "Thiếu ID của Design"));
         return UserStaffResponse.builder()
                 .id(user.getId())
                 .fullName(user.getFullName())
@@ -326,11 +238,11 @@ public class UserService {
         // Lấy thông tin người dùng từ SecurityContext
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
-            throw new AppException(ErrorCode.UNAUTHENTICATED);
+            throw new AppException(ErrorCode.UNAUTHENTICATED, "Thiếu ID của Design");
         }
         String username = authentication.getName();
         User user = userRepository.findUserByUsername(username)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND, "Thiếu ID của Design"));
 
         // Trả về response
         return UserStaffResponse.builder()
@@ -351,13 +263,13 @@ public class UserService {
     public PageResponse<GetUserResponse> searchUsers(UserSearchRequest request, int page, int size) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
-            throw new AppException(ErrorCode.UNAUTHENTICATED);
+            throw new AppException(ErrorCode.UNAUTHENTICATED, "Thiếu ID của Design");
         }
         String username = authentication.getName();
         User check = userRepository.findUserByUsername(username)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND, "Thiếu ID của Design"));
         if(check.getRole().equals(EnumRole.CUSTOMER)){
-            throw new AppException(ErrorCode.UNAUTHENTICATED);
+            throw new AppException(ErrorCode.UNAUTHENTICATED, "Thiếu ID của Design");
         }
 
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());

@@ -47,6 +47,9 @@ public class BookOrder extends AbstractEntity {
     @Enumerated(EnumType.STRING)
     EnumBookOrder status;
 
+    @Column
+    String customerName;
+
     //Category
     @ManyToOne(fetch = FetchType.EAGER)
     @JsonIgnore

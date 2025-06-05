@@ -25,11 +25,11 @@ public class TypePrintService {
     public TypePrintResponse createTypePrint(TypePrintRequest request){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
-            throw new AppException(ErrorCode.UNAUTHENTICATED);
+            throw new AppException(ErrorCode.UNAUTHENTICATED, "Thiếu ID của Design");
         }
 
         if(typePrintRepository.findByPrintNameAndIsDeletedFalse(request.getName()).isPresent()){
-            throw new AppException((ErrorCode.TYPEPRINT_EXISTED));
+            throw new AppException((ErrorCode.TYPEPRINT_EXISTED), "Thiếu ID của Design");
         }
 
         TypePrint typePrint = new TypePrint();
@@ -50,14 +50,14 @@ public class TypePrintService {
     public TypePrintResponse updateTypePrint(TypePrintRequest request, Long id){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
-            throw new AppException(ErrorCode.UNAUTHENTICATED);
+            throw new AppException(ErrorCode.UNAUTHENTICATED, "Thiếu ID của Design");
         }
 
         TypePrint typePrint = typePrintRepository.findByIdAndIsDeletedFalse(id)
-                        .orElseThrow(() -> new AppException(ErrorCode.TYPEPRINT_NOT_FOUNT));
+                        .orElseThrow(() -> new AppException(ErrorCode.TYPEPRINT_NOT_FOUNT, "Thiếu ID của Design"));
 
         if(typePrintRepository.findByPrintNameAndIsDeletedFalse(request.getName()).isPresent()){
-            throw new AppException((ErrorCode.TYPEPRINT_EXISTED));
+            throw new AppException((ErrorCode.TYPEPRINT_EXISTED), "Thiếu ID của Design");
         }
 
         typePrint.setPrintName(request.getName());
@@ -75,7 +75,7 @@ public class TypePrintService {
     public TypePrintResponse getTypePrintById(Long id){
 
         TypePrint typePrint = typePrintRepository.findByIdAndIsDeletedFalse(id)
-                .orElseThrow(() -> new AppException(ErrorCode.TYPEPRINT_NOT_FOUNT));
+                .orElseThrow(() -> new AppException(ErrorCode.TYPEPRINT_NOT_FOUNT, "Thiếu ID của Design"));
 
         return TypePrintResponse.builder()
                 .id(typePrint.getId())
@@ -88,11 +88,11 @@ public class TypePrintService {
     public void disableTypePrint (Long id){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
-            throw new AppException(ErrorCode.UNAUTHENTICATED);
+            throw new AppException(ErrorCode.UNAUTHENTICATED, "Thiếu ID của Design");
         }
 
         TypePrint typePrint = typePrintRepository.findByIdAndIsDeletedFalse(id)
-                .orElseThrow(() -> new AppException(ErrorCode.TYPEPRINT_NOT_FOUNT));
+                .orElseThrow(() -> new AppException(ErrorCode.TYPEPRINT_NOT_FOUNT, "Thiếu ID của Design"));
         typePrint.setStatus(EnumStatus.INACTIVE);
         typePrintRepository.save(typePrint);
     }
@@ -100,11 +100,11 @@ public class TypePrintService {
     public void deleteTypePrint(Long id){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
-            throw new AppException(ErrorCode.UNAUTHENTICATED);
+            throw new AppException(ErrorCode.UNAUTHENTICATED, "Thiếu ID của Design");
         }
 
         TypePrint typePrint = typePrintRepository.findByIdAndIsDeletedFalse(id)
-                .orElseThrow(() -> new AppException(ErrorCode.TYPEPRINT_NOT_FOUNT));
+                .orElseThrow(() -> new AppException(ErrorCode.TYPEPRINT_NOT_FOUNT, "Thiếu ID của Design"));
         typePrint.setStatus(EnumStatus.INACTIVE);
         typePrint.setIsDeleted(true);
         typePrintRepository.save(typePrint);

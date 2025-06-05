@@ -22,7 +22,7 @@ public interface UserRepository extends JpaRepository<User, String>, JpaSpecific
 
     default User findByUsernameOrThrow(String username) {
         return findUserByUsername(username)
-                .orElseThrow(() -> new AppException(ErrorCode.UNAUTHENTICATED));
+                .orElseThrow(() -> new AppException(ErrorCode.UNAUTHENTICATED, "Thiếu ID của Design"));
     }
 //    Optional<User> findUserById(String id);
 

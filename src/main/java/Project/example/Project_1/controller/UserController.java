@@ -1,6 +1,8 @@
 package Project.example.Project_1.controller;
 
 import Project.example.Project_1.enity.User;
+import Project.example.Project_1.enums.EnumRole;
+import Project.example.Project_1.repository.UserRepository;
 import Project.example.Project_1.request.UserCreateRequest;
 import Project.example.Project_1.request.UserSearchRequest;
 import Project.example.Project_1.request.UserUpdateRequest;
@@ -29,6 +31,9 @@ public class UserController {
 
     @Autowired
     UserService userService;
+
+    @Autowired
+    UserRepository userRepository;
 
     @PostMapping
     @Operation(summary = "Tạo người dùng mới")
@@ -79,6 +84,20 @@ public class UserController {
                 .code(HttpStatus.OK.value())
                 .message("Lấy thông tin người dùng thành công")
                 .result(userService.getUser(userId))
+                .build();
+    }
+
+    @GetMapping("/designers")
+    @Operation(summary = "All Designer")
+    public ApiResponse<List<User>> getUser() {
+        List<User> list = userRepository.findAll()
+                .stream()
+                .filter(role -> role.getRole().equals(EnumRole.DESIGNER))
+                .toList();
+        return ApiResponse.<List<User>>builder()
+                .code(HttpStatus.OK.value())
+                .message("Lấy danh sach designer ")
+                .result(list)
                 .build();
     }
 

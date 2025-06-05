@@ -9,9 +9,6 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import javax.crypto.SecretKey;
 import java.util.Date;
@@ -57,7 +54,7 @@ public class TokenService {
     // get userName form CLAIM
     public User extractAccount (String token){
         String username = extractClaim(token,Claims::getSubject);
-        return userRepository.findByUsername(username).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        return userRepository.findByUsername(username).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED, "Thiếu ID của Design"));
     }
 
 

@@ -31,11 +31,11 @@ public class FabricService {
     public FabricResponse createFabric (FabricCreationRequest request){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
-            throw new AppException(ErrorCode.UNAUTHENTICATED);
+            throw new AppException(ErrorCode.UNAUTHENTICATED, "Thiếu ID của Design");
         }
         boolean checkName = fabricRepository.findByFabricName(request.getFabricName()).isPresent();
         if(checkName){
-            throw new AppException(ErrorCode.FABRIC_NAME_EXISTED);
+            throw new AppException(ErrorCode.FABRIC_NAME_EXISTED, "Thiếu ID của Design");
         }
         Fabric fabric = Fabric.builder()
                 .fabricName(request.getFabricName())
@@ -57,13 +57,13 @@ public class FabricService {
     public FabricResponse updateFabric (FabricUpdateRequest request) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
-            throw new AppException(ErrorCode.UNAUTHENTICATED);
+            throw new AppException(ErrorCode.UNAUTHENTICATED, "Thiếu ID của Design");
         }
         Fabric fabric = fabricRepository.findByIdAndIsDeletedFalse(request.getId())
-                .orElseThrow(() -> new AppException(ErrorCode.FABRIC_NOT_FOUND));
+                .orElseThrow(() -> new AppException(ErrorCode.FABRIC_NOT_FOUND, "Thiếu ID của Design"));
         boolean checkName = fabricRepository.findByFabricName(fabric.getFabricName()).isPresent();
         if (checkName) {
-            throw new AppException(ErrorCode.FABRIC_NAME_EXISTED);
+            throw new AppException(ErrorCode.FABRIC_NAME_EXISTED, "Thiếu ID của Design");
         }
         fabric.setFabricName(request.getFabricName());
         fabric.setPrice(request.getPrice());
@@ -82,10 +82,10 @@ public class FabricService {
     public void deleteFabric (Long id){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
-            throw new AppException(ErrorCode.UNAUTHENTICATED);
+            throw new AppException(ErrorCode.UNAUTHENTICATED, "Thiếu ID của Design");
         }
         Fabric fabric = fabricRepository.findByIdAndIsDeletedFalse(id)
-                .orElseThrow(() -> new AppException(ErrorCode.FABRIC_NOT_FOUND));
+                .orElseThrow(() -> new AppException(ErrorCode.FABRIC_NOT_FOUND, "Thiếu ID của Design"));
         fabric.setIsDeleted(true);
         fabric.setStatus(EnumStatus.DELETED);
         fabricRepository.save(fabric);
@@ -94,10 +94,10 @@ public class FabricService {
     public void changeStatus (Long id) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
-            throw new AppException(ErrorCode.UNAUTHENTICATED);
+            throw new AppException(ErrorCode.UNAUTHENTICATED, "Thiếu ID của Design");
         }
         Fabric fabric = fabricRepository.findByIdAndIsDeletedFalse(id)
-                .orElseThrow(() -> new AppException(ErrorCode.FABRIC_NOT_FOUND));
+                .orElseThrow(() -> new AppException(ErrorCode.FABRIC_NOT_FOUND, "Thiếu ID của Design"));
         if (fabric.getStatus().equals(EnumStatus.ACTIVE)) {
             fabric.setStatus(EnumStatus.INACTIVE);
         } else {
@@ -116,7 +116,7 @@ public class FabricService {
 
     public FabricResponse getFabricById(Long id) {
         Fabric fabric = fabricRepository.findByIdAndIsDeletedFalse(id)
-                .orElseThrow(() -> new AppException(ErrorCode.FABRIC_NOT_FOUND));
+                .orElseThrow(() -> new AppException(ErrorCode.FABRIC_NOT_FOUND, "Thiếu ID của Design"));
         return FabricResponse.builder()
                 .id(fabric.getId())
                 .fabricName(fabric.getFabricName())

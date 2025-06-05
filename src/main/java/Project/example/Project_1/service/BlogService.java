@@ -46,17 +46,17 @@ public class BlogService  {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
-            throw new AppException(ErrorCode.UNAUTHENTICATED);
+            throw new AppException(ErrorCode.UNAUTHENTICATED, "Thiếu ID của Design");
         }
         String username = authentication.getName();
         User user =  userRepository.findByUsername(username)
-                .orElseThrow(() -> new AppException(ErrorCode.RESOURCE_NOT_FOUND));
+                .orElseThrow(() -> new AppException(ErrorCode.RESOURCE_NOT_FOUND, "Thiếu ID của Design"));
 
         if(blogRepository.findBlogByBlogNameAndIsDeletedFalse(request.getBlogName()).isPresent()){
-            throw new AppException(ErrorCode.BLOG_NAME_EXISTED);
+            throw new AppException(ErrorCode.BLOG_NAME_EXISTED, "Thiếu ID của Design");
         }
         if (request.getBlogName() == null || request.getBlogName().isEmpty()) {
-            throw new AppException(ErrorCode.INVALID_BLOG_NAME);
+            throw new AppException(ErrorCode.INVALID_BLOG_NAME, "Thiếu ID của Design");
         }
 
         Blog blog = Blog.builder()
@@ -86,24 +86,24 @@ public class BlogService  {
     public BlogResponse updateBlog(BlogUpdateRequest request, Long blogId) throws Throwable {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
-            throw new AppException(ErrorCode.UNAUTHENTICATED);
+            throw new AppException(ErrorCode.UNAUTHENTICATED, "Thiếu ID của Design");
         }
         String username = authentication.getName();
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new AppException(ErrorCode.UNAUTHENTICATED));
+                .orElseThrow(() -> new AppException(ErrorCode.UNAUTHENTICATED, "Thiếu ID của Design"));
 
         Blog existingBlog = blogRepository.findById(blogId)
-                .orElseThrow(() -> new AppException(ErrorCode.BLOG_NOT_EXIST));
+                .orElseThrow(() -> new AppException(ErrorCode.BLOG_NOT_EXIST, "Thiếu ID của Design"));
 
         if (request.getBlogName() == null || request.getBlogName().isEmpty()) {
-            throw new AppException(ErrorCode.INVALID_BLOG_NAME);
+            throw new AppException(ErrorCode.INVALID_BLOG_NAME, "Thiếu ID của Design");
         }
         boolean blogNameExists = blogRepository.findBlogByBlogNameAndIsDeletedFalse(request.getBlogName())
                 .filter(blog -> !blog.getId().equals(blogId))  // Exclude current blog from check
                 .isPresent();
 
         if (blogNameExists) {
-            throw new AppException(ErrorCode.BLOG_NAME_EXISTED);
+            throw new AppException(ErrorCode.BLOG_NAME_EXISTED, "Thiếu ID của Design");
         }
 
         existingBlog.setBlogName(request.getBlogName());
@@ -133,13 +133,13 @@ public class BlogService  {
     public Blog deleteBlog(Long id) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
-            throw new AppException(ErrorCode.UNAUTHENTICATED);
+            throw new AppException(ErrorCode.UNAUTHENTICATED, "Thiếu ID của Design");
         }
         String username = authentication.getName();
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new AppException(ErrorCode.UNAUTHENTICATED));
+                .orElseThrow(() -> new AppException(ErrorCode.UNAUTHENTICATED, "Thiếu ID của Design"));
         Blog blog = blogRepository.findById(id)
-                .orElseThrow(() -> new AppException(ErrorCode.BLOG_NOT_EXIST));
+                .orElseThrow(() -> new AppException(ErrorCode.BLOG_NOT_EXIST, "Thiếu ID của Design"));
         blog.setIsDeleted(true);
         blog.setStatus(EnumStatus.INACTIVE);
         return blogRepository.save(blog);
@@ -147,7 +147,7 @@ public class BlogService  {
 
     public BlogResponse getBlogById(Long id) {
         Blog blog = blogRepository.findById(id)
-                .orElseThrow(() -> new AppException(ErrorCode.BLOG_NOT_EXIST));
+                .orElseThrow(() -> new AppException(ErrorCode.BLOG_NOT_EXIST, "Thiếu ID của Design"));
         return BlogResponse.builder()
                 .date(blog.getDate().toLocalDate())
                 .blogName(blog.getBlogName())
@@ -207,7 +207,7 @@ public class BlogService  {
 
     public void changeStatus(Long id, EnumStatus status) {
         Blog blog = blogRepository.findById(id)
-                .orElseThrow(() -> new AppException(ErrorCode.BLOG_NOT_EXIST));
+                .orElseThrow(() -> new AppException(ErrorCode.BLOG_NOT_EXIST, "Thiếu ID của Design"));
         if(blog.getStatus() == EnumStatus.ACTIVE){
             blog.setStatus(EnumStatus.INACTIVE);
         }else{

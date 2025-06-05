@@ -12,7 +12,6 @@ import Project.example.Project_1.repository.BookOrderRepository;
 import Project.example.Project_1.repository.OrderItemRepository;
 import Project.example.Project_1.repository.OrderRepository;
 import Project.example.Project_1.repository.UserRepository;
-import Project.example.Project_1.request.PaymentItem;
 import Project.example.Project_1.request.PaymentRequest;
 import Project.example.Project_1.response.PaymentBookOrder;
 import Project.example.Project_1.response.PaymentInitResponse;
@@ -21,7 +20,6 @@ import Project.example.Project_1.util.SignatureUtil;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.*;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -30,7 +28,6 @@ import vn.payos.type.CheckoutResponseData;
 import vn.payos.type.ItemData;
 import vn.payos.type.PaymentData;
 
-import java.io.UnsupportedEncodingException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -166,7 +163,7 @@ public class PayOsService {
         User user = getAuthenticatedUser();
 
         Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_FOUND));
+                .orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_FOUND, "Thiếu ID của Design"));
         Double price = order.getTotalAmount();
         Double amount = Double.valueOf(price);
         String url = createPaymentLinkByOrderCode(orderId, isAddress);
@@ -184,7 +181,7 @@ public class PayOsService {
         User user = getAuthenticatedUser();
 
         BookOrder bookOrder = bookOrderRepository.findById(bookOrderId)
-                .orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_FOUND));
+                .orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_FOUND, "Thiếu ID của Design"));
         Double price = bookOrder.getTotalPrice();
         Double amount = Double.valueOf(price);
         String url = createPaymentLinkByOrderCode(bookOrderId, isAddress);

@@ -13,6 +13,6 @@ public interface BookOrderRepository extends JpaRepository<BookOrder, Long> {
     Optional<BookOrder> findByIdAndIsDeletedFalse(Long id);
     List<BookOrder> findBookOrderByUser(User user);
     Page<BookOrder> findByUser_PhoneContainingIgnoreCase(String fabricName, PageRequest pageable);
-
+    Optional<BookOrder> findBookOrderByUserIdAndIsDeletedFalse(String userId);
 
 }
