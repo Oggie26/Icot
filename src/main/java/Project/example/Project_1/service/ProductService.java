@@ -235,6 +235,7 @@ public class ProductService {
                 .typePrint(typePrint)
                 .build();
 
+        productRepository.save(product);
 
         List<Image> imageList = new ArrayList<>();
         if (request.getImages() != null && !request.getImages().isEmpty()) {
@@ -272,7 +273,6 @@ public class ProductService {
         product.setIsDeleted(false);
         imageRepository.saveAll(imageList);
         sizeRepository.saveAll(sizeList);
-        productRepository.save(product);
 
 
         return  ProductResponse.builder()
@@ -285,9 +285,136 @@ public class ProductService {
                 .images(product.getImages())
                 .feedbacks(product.getFeedbacks())
                 .category(product.getCategory())
+                .status(product.getStatus())
+                .sizes(product.getSizes())
+                .fabric(product.getFabric())
+                .images(product.getImages())
                 .typePrint(product.getTypePrint())
                 .description(product.getDescription())
                 .build();
+    }
+
+    public List<Product> getProducts(){
+        List<Product> products= productRepository.findAll()
+                .stream()
+                .filter(product -> !product.getIsDeleted())
+                .toList();
+        return products;
+    }
+
+    public void disableProduct(String id){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new AppException(ErrorCode.UNAUTHENTICATED);
+        }
+        Product product = productRepository.findByIdAndIsDeletedFalse(id)
+                        .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
+        product.setStatus(EnumStatus.INACTIVE);
+        productRepository.save(product);
+    }
+
+    public void deleteProduct(String id){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new AppException(ErrorCode.UNAUTHENTICATED);
+        }
+        Product product = productRepository.findByIdAndIsDeletedFalse(id)
+                .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
+        product.setIsDeleted(false);
+        productRepository.save(product);
+    }
+
+    public ProductResponse updateProduct(ProductUpdateRequest request) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new AppException(ErrorCode.UNAUTHENTICATED);
+        }
+
+        if (request.getPrice() < 0) {
+            throw new AppException(ErrorCode.INVALID_PRODUCT_PRICE);
+        }
+
+        Product product = productRepository.findByIdAndIsDeletedFalse(request.getId())
+                .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
+
+        // Kiểm tra nếu tên sản phẩm đã tồn tại (và không trùng với chính sản phẩm hiện tại)
+        productRepository.findByProductName(request.getProductName()).ifPresent(existingProduct -> {
+            if (!existingProduct.getId().equals(product.getId())) {
+                throw new AppException(ErrorCode.PRODUCT_NAME_EXISTED);
+            }
+        });
+
+        Category category = categoryRepository.findByIdAndIsDeletedFalse(request.getCategoryId())
+                .orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_FOUND));
+
+        Fabric fabric = fabricRepository.findByIdAndIsDeletedFalse(request.getFabricId())
+                .orElseThrow(() -> new AppException(ErrorCode.FABRIC_NOT_FOUND));
+
+        TypePrint typePrint = typePrintRepository.findByIdAndIsDeletedFalse(request.getTypePrintId())
+                .orElseThrow(() -> new AppException(ErrorCode.TYPEPRINT_NOT_FOUNT));
+
+        // Cập nhật thông tin sản phẩm
+        product.setProductName(request.getProductName());
+        product.setPrice(request.getPrice());
+        product.setDescription(request.getDescription());
+        product.setColor(request.getColor());
+        product.setImageThumbnail(request.getImageThumbnail());
+        product.setCategory(category);
+        product.setFabric(fabric);
+        product.setTypePrint(typePrint);
+        product.setIsDeleted(false);
+
+        // Cập nhật lại danh sách hình ảnh
+        List<Image> newImages = request.getImages() != null ? request.getImages().stream()
+                .map(imageReq -> {
+                    Image image = new Image();
+                    image.setImage(imageReq.getImage());
+                    image.setProduct(product);
+                    image.setIsDeleted(false);
+                    return image;
+                })
+                .toList() : new ArrayList<>();
+
+        imageRepository.saveAll(newImages);
+
+        // Cập nhật lại danh sách kích thước
+        List<Size> newSizes = request.getSizes() != null ? request.getSizes().stream()
+                .map(sizeReq -> {
+                    Size size = new Size();
+                    size.setSize(sizeReq.getSize());
+                    size.setProduct(product);
+                    return size;
+                })
+                .toList() : new ArrayList<>();
+
+        sizeRepository.saveAll(newSizes);
+
+        // Lưu sản phẩm
+        productRepository.save(product);
+
+        return ProductResponse.builder()
+                .id(product.getId())
+                .productName(product.getProductName())
+                .createdAt(product.getCreatedAt())
+                .price(product.getPrice())
+                .sizes(product.getSizes())
+                .imageThumbnail(product.getImageThumbnail())
+                .images(product.getImages())
+                .feedbacks(product.getFeedbacks())
+                .category(product.getCategory())
+                .typePrint(product.getTypePrint())
+                .description(product.getDescription())
+                .build();
+    }
+
+    public Product getById(String id){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new AppException(ErrorCode.UNAUTHENTICATED);
+        }
+        Product product = productRepository.findByIdAndIsDeletedFalse(id)
+                .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
+        return product;
     }
 
 

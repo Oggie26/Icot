@@ -10,12 +10,15 @@ import java.util.List;
 
 @Data
 public class ProductUpdateRequest {
+    String id;
     String productName;
     Double price;
     String description;
     String imageThumbnail;
-    EnumSize size;
-    Category category;
-    List<Image> images;
-    Fabric fabric;
+    List<SizeRequest> sizes;
+    Long categoryId;
+    String color;
+    Long fabricId;
+    Long typePrintId;
+    List<ImageRequest> images;
 }

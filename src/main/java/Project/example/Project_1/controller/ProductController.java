@@ -42,41 +42,50 @@ public class ProductController {
                 .build();
     }
 
-    // Cập nhật sản phẩm
-//    @PutMapping("/{productId}")
-//    @Operation(summary = "Cập nhật sản phẩm")
-//    public ApiResponse<ProductResponse> updateProduct(
-//            @PathVariable String productId,
-//            @RequestBody ProductUpdateRequest request) {
-//        return ApiResponse.<ProductResponse>builder()
-//                .code(HttpStatus.OK.value())
-//                .message("Cập nhật sản phẩm thành công")
-//                .result(productService.updateProduct(productId, request))
-//                .build();
-//    }
-//
-//    // Xóa sản phẩm (mềm)
-//    @DeleteMapping("/{productId}")
-//    @Operation(summary = "Xóa sản phẩm")
-//    @ResponseStatus(HttpStatus.NO_CONTENT)
-//    public ApiResponse<Void> deleteProduct(@PathVariable String productId) {
-//        productService.deleteProduct(productId);
-//        return ApiResponse.<Void>builder()
-//                .code(HttpStatus.NO_CONTENT.value())
-//                .message("Xóa sản phẩm thành công")
-//                .build();
-//    }
+    @PutMapping()
+    @Operation(summary = "Cập nhật sản phẩm")
+    public ApiResponse<ProductResponse> updateProduct(
+            @RequestBody ProductUpdateRequest request) {
+        return ApiResponse.<ProductResponse>builder()
+                .code(HttpStatus.OK.value())
+                .message("Cập nhật sản phẩm thành công")
+                .result(productService.updateProduct(request))
+                .build();
+    }
+
+    // Xóa sản phẩm (mềm)
+    @DeleteMapping("/{productId}")
+    @Operation(summary = "Xóa sản phẩm")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public ApiResponse<Void> deleteProduct(@PathVariable String productId) {
+        productService.deleteProduct(productId);
+        return ApiResponse.<Void>builder()
+                .code(HttpStatus.NO_CONTENT.value())
+                .message("Xóa sản phẩm thành công")
+                .build();
+    }
+
+    @PatchMapping("/{productId}")
+    @Operation(summary = "Thay đổi trạng thái sản phẩm")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public ApiResponse<Void> disableProduct(@PathVariable String productId) {
+        productService.disableProduct(productId);
+        return ApiResponse.<Void>builder()
+                .code(HttpStatus.NO_CONTENT.value())
+                .message("Thay đổi trạng thái thành công")
+                .build();
+    }
 //
 //    // Lấy thông tin chi tiết sản phẩm
-//    @GetMapping("/{productId}")
-//    @Operation(summary = "Lấy thông tin chi tiết sản phẩm")
-//    public ApiResponse<ProductResponse> getProductById(@PathVariable String productId) {
-//        return ApiResponse.<ProductResponse>builder()
-//                .code(HttpStatus.OK.value())
-//                .message("Lấy thông tin sản phẩm thành công")
-//                .result(productService.getProductById(productId))
-//                .build();
-//    }
+    @GetMapping("/{productId}")
+    @Operation(summary = "Lấy thông tin chi tiết sản phẩm")
+    public ApiResponse<Product> getProductById(@PathVariable String productId) {
+        return ApiResponse.<Product>builder()
+                .code(HttpStatus.OK.value())
+                .message("Lấy thông tin sản phẩm thành công")
+                .result(productService.getById(productId))
+                .build();
+    }
 //
 //    // Tìm kiếm sản phẩm (có phân trang)
 //    @GetMapping("/search")
