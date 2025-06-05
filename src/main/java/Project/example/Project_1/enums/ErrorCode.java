@@ -38,6 +38,7 @@ public enum ErrorCode {
     TYPEPRINT_NAME_NOT_FOUNT(1027,"TypePrint_Name not found",HttpStatus.BAD_REQUEST),
     TYPEPRINT_EXISTED(1028,"TypePRint_Name ton tai", HttpStatus.BAD_REQUEST),
     CATEGORY_EXISTED(1029,"Category ton tai", HttpStatus.BAD_REQUEST),
+    PRODUCT_NAME_EXISTED(1030,"Product name ton tai", HttpStatus.BAD_REQUEST),
 
 
 

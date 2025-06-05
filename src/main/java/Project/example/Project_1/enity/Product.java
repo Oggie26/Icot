@@ -33,8 +33,9 @@ public class Product extends AbstractEntity{
     @Column
     String imageThumbnail;
 
-    @Enumerated(EnumType.STRING)
-    EnumSize size;
+    @OneToMany(mappedBy = "product", fetch = FetchType.EAGER)
+    @JsonIgnore
+    List<Size> sizes;
 
     @Column
     String color;

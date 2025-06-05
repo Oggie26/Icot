@@ -43,53 +43,53 @@ public class ProductController {
     }
 
     // Cập nhật sản phẩm
-    @PutMapping("/{productId}")
-    @Operation(summary = "Cập nhật sản phẩm")
-    public ApiResponse<ProductResponse> updateProduct(
-            @PathVariable String productId,
-            @RequestBody ProductUpdateRequest request) {
-        return ApiResponse.<ProductResponse>builder()
-                .code(HttpStatus.OK.value())
-                .message("Cập nhật sản phẩm thành công")
-                .result(productService.updateProduct(productId, request))
-                .build();
-    }
-
-    // Xóa sản phẩm (mềm)
-    @DeleteMapping("/{productId}")
-    @Operation(summary = "Xóa sản phẩm")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public ApiResponse<Void> deleteProduct(@PathVariable String productId) {
-        productService.deleteProduct(productId);
-        return ApiResponse.<Void>builder()
-                .code(HttpStatus.NO_CONTENT.value())
-                .message("Xóa sản phẩm thành công")
-                .build();
-    }
-
-    // Lấy thông tin chi tiết sản phẩm
-    @GetMapping("/{productId}")
-    @Operation(summary = "Lấy thông tin chi tiết sản phẩm")
-    public ApiResponse<ProductResponse> getProductById(@PathVariable String productId) {
-        return ApiResponse.<ProductResponse>builder()
-                .code(HttpStatus.OK.value())
-                .message("Lấy thông tin sản phẩm thành công")
-                .result(productService.getProductById(productId))
-                .build();
-    }
-
-    // Tìm kiếm sản phẩm (có phân trang)
-    @GetMapping("/search")
-    @Operation(summary = "Tìm kiếm sản phẩm")
-    public ApiResponse<PageResponse<ProductResponse>> searchProducts(
-            @Parameter(description = "Yêu cầu tìm kiếm sản phẩm") ProductSearchRequest request,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
-        return ApiResponse.<PageResponse<ProductResponse>>builder()
-                .code(HttpStatus.OK.value())
-                .message("Tìm kiếm sản phẩm thành công")
-                .result(productService.searchProducts(request, page, size))
-                .build();
-    }
+//    @PutMapping("/{productId}")
+//    @Operation(summary = "Cập nhật sản phẩm")
+//    public ApiResponse<ProductResponse> updateProduct(
+//            @PathVariable String productId,
+//            @RequestBody ProductUpdateRequest request) {
+//        return ApiResponse.<ProductResponse>builder()
+//                .code(HttpStatus.OK.value())
+//                .message("Cập nhật sản phẩm thành công")
+//                .result(productService.updateProduct(productId, request))
+//                .build();
+//    }
+//
+//    // Xóa sản phẩm (mềm)
+//    @DeleteMapping("/{productId}")
+//    @Operation(summary = "Xóa sản phẩm")
+//    @ResponseStatus(HttpStatus.NO_CONTENT)
+//    public ApiResponse<Void> deleteProduct(@PathVariable String productId) {
+//        productService.deleteProduct(productId);
+//        return ApiResponse.<Void>builder()
+//                .code(HttpStatus.NO_CONTENT.value())
+//                .message("Xóa sản phẩm thành công")
+//                .build();
+//    }
+//
+//    // Lấy thông tin chi tiết sản phẩm
+//    @GetMapping("/{productId}")
+//    @Operation(summary = "Lấy thông tin chi tiết sản phẩm")
+//    public ApiResponse<ProductResponse> getProductById(@PathVariable String productId) {
+//        return ApiResponse.<ProductResponse>builder()
+//                .code(HttpStatus.OK.value())
+//                .message("Lấy thông tin sản phẩm thành công")
+//                .result(productService.getProductById(productId))
+//                .build();
+//    }
+//
+//    // Tìm kiếm sản phẩm (có phân trang)
+//    @GetMapping("/search")
+//    @Operation(summary = "Tìm kiếm sản phẩm")
+//    public ApiResponse<PageResponse<ProductResponse>> searchProducts(
+//            @Parameter(description = "Yêu cầu tìm kiếm sản phẩm") ProductSearchRequest request,
+//            @RequestParam(defaultValue = "0") int page,
+//            @RequestParam(defaultValue = "10") int size) {
+//        return ApiResponse.<PageResponse<ProductResponse>>builder()
+//                .code(HttpStatus.OK.value())
+//                .message("Tìm kiếm sản phẩm thành công")
+//                .result(productService.searchProducts(request, page, size))
+//                .build();
+//    }
 
 }
