@@ -27,10 +27,10 @@ public class TagService {
     public TagResponse createTag(TagCreationRequest request){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
-            throw new AppException(ErrorCode.UNAUTHENTICATED, "Thiếu ID của Design");
+            throw new AppException(ErrorCode.UNAUTHENTICATED);
         }
         if(tagRepository.findByNameAndIsDeletedFalse(request.getName()).isPresent()){
-            throw new AppException(ErrorCode.TAG_NAME_ALREADY_EXISTS, "Thiếu ID của Design");
+            throw new AppException(ErrorCode.TAG_NAME_ALREADY_EXISTS);
         }
         Tag tag = new Tag();
         tag.setDescription(request.getDescription());
@@ -50,13 +50,13 @@ public class TagService {
     public TagResponse update(TagUpdateRequest request, Long tagId){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
-            throw new AppException(ErrorCode.UNAUTHENTICATED, "Thiếu ID của Design");
+            throw new AppException(ErrorCode.UNAUTHENTICATED);
         }
-        Tag tag = tagRepository.findById(tagId).orElseThrow(() -> new AppException(ErrorCode.TAG_NOT_FOUND, "Thiếu ID của Design"));
+        Tag tag = tagRepository.findById(tagId).orElseThrow(() -> new AppException(ErrorCode.TAG_NOT_FOUND));
         tagRepository.findByNameAndIsDeletedFalse(request.getName())
                 .filter(existingTag -> !existingTag.getId().equals(tagId))
                 .ifPresent(existingTag -> {
-                    throw new AppException(ErrorCode.TAG_NAME_ALREADY_EXISTS, "Thiếu ID của Design");
+                    throw new AppException(ErrorCode.TAG_NAME_ALREADY_EXISTS);
                 });
         tag.setIsDeleted(false);
         tag.setStatus(EnumStatus.ACTIVE);
@@ -72,15 +72,15 @@ public class TagService {
     public void deleteTag(Long tagId){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
-            throw new AppException(ErrorCode.UNAUTHENTICATED, "Thiếu ID của Design");
+            throw new AppException(ErrorCode.UNAUTHENTICATED);
         }
-        Tag tag = tagRepository.findById(tagId).orElseThrow(() -> new AppException(ErrorCode.TAG_NOT_FOUND, "Thiếu ID của Design"));
+        Tag tag = tagRepository.findById(tagId).orElseThrow(() -> new AppException(ErrorCode.TAG_NOT_FOUND));
         tag.setIsDeleted(true);
         tagRepository.save(tag);
     }
 
     public TagResponse getTag(Long tagId){
-        Tag tag = tagRepository.findByIdAndIsDeletedFalse(tagId).orElseThrow(() -> new AppException(ErrorCode.TAG_NOT_FOUND, "Thiếu ID của Design"));
+        Tag tag = tagRepository.findByIdAndIsDeletedFalse(tagId).orElseThrow(() -> new AppException(ErrorCode.TAG_NOT_FOUND));
         return TagResponse.builder()
                 .name(tag.getName())
                 .description(tag.getDescription())

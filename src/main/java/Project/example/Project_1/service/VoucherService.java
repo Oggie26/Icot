@@ -46,12 +46,12 @@ public class VoucherService {
     @Transactional
     public VoucherResponse updateVoucher(Long voucherId, VoucherUpdateRequest request) {
         Voucher voucher = voucherRepository.findByIdAndIsDeletedFalse(voucherId)
-                .orElseThrow(() -> new AppException(ErrorCode.VOUCHER_NOT_FOUND, "Thiếu ID của Design"));
+                .orElseThrow(() -> new AppException(ErrorCode.VOUCHER_NOT_FOUND));
 
         voucherRepository.findByCodeAndIsDeletedFalse((request.getCode()))
                 .filter(existing -> !existing.getId().equals(voucherId))
                 .ifPresent(existing -> {
-                    throw new AppException(ErrorCode.VOUCHER_CODE_ALREADY_EXISTS, "Thiếu ID của Design");
+                    throw new AppException(ErrorCode.VOUCHER_CODE_ALREADY_EXISTS);
                 });
 
         // Cập nhật thông tin
@@ -71,21 +71,21 @@ public class VoucherService {
 
     @Transactional
     public void deleteVoucher(Long voucherId) {
-        Voucher voucher = voucherRepository.findByIdAndIsDeletedFalse(voucherId).orElseThrow(() -> new AppException(ErrorCode.VOUCHER_NOT_FOUND, "Thiếu ID của Design"));
+        Voucher voucher = voucherRepository.findByIdAndIsDeletedFalse(voucherId).orElseThrow(() -> new AppException(ErrorCode.VOUCHER_NOT_FOUND));
         voucherRepository.delete(voucher);
     }
 
     @Transactional
     public void exchangeVoucher(Long voucherId) {
         User user = getAuthenticatedUser();
-        Voucher voucher = voucherRepository.findById(voucherId).orElseThrow(() -> new AppException(ErrorCode.VOUCHER_NOT_FOUND, "Thiếu ID của Design"));
+        Voucher voucher = voucherRepository.findById(voucherId).orElseThrow(() -> new AppException(ErrorCode.VOUCHER_NOT_FOUND));
         user.getVouchers().forEach(v -> {
             if (v.getId().equals(voucher.getId())) {
-                throw new AppException(ErrorCode.INVALID_EXCHANGE_VOUCHER, "Thiếu ID của Design");
+                throw new AppException(ErrorCode.INVALID_EXCHANGE_VOUCHER);
             }
         });
         if (user.getPoint() < voucher.getPoint()) {
-            throw new AppException(ErrorCode.NOT_ENOUGH_POINT, "Thiếu ID của Design");
+            throw new AppException(ErrorCode.NOT_ENOUGH_POINT);
         }
         user.setPoint(user.getPoint() - voucher.getPoint());
         user.addVoucher(voucher);
@@ -93,7 +93,7 @@ public class VoucherService {
     }
 
     public VoucherResponse getVoucher(Long id) {
-        return toVoucherResponse(voucherRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.VOUCHER_NOT_FOUND, "Thiếu ID của Design")));
+        return toVoucherResponse(voucherRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.VOUCHER_NOT_FOUND)));
     }
 
     private VoucherResponse toVoucherResponse(Voucher voucher){

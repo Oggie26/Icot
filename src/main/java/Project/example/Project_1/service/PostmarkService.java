@@ -68,10 +68,10 @@ public class PostmarkService {
             ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
             if (response.getStatusCode().is2xxSuccessful()) {
             } else {
-                throw new AppException(ErrorCode.EMAIL_SEND_FAILED, "Thiếu ID của Design");
+                throw new AppException(ErrorCode.EMAIL_SEND_FAILED);
             }
         } catch (Exception e) {
-            throw new AppException(ErrorCode.EMAIL_SEND_FAILED, "Thiếu ID của Design");
+            throw new AppException(ErrorCode.EMAIL_SEND_FAILED);
         }
     }
 }

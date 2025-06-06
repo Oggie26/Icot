@@ -11,6 +11,8 @@ import Project.example.Project_1.request.AddressUpdateRequest;
 import Project.example.Project_1.response.AddressResponse;
 import jakarta.transaction.Transactional;
 import lombok.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -21,12 +23,20 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class AddressService {
 
+    @Autowired
     AddressRepository addressRepository;
+    @Autowired
     UserRepository userRepository;
 
     @Transactional
     public void addAddress(AddressCreationRequest request) {
-        User user = getAuthenticatedUser();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new AppException(ErrorCode.UNAUTHENTICATED);
+        }
+        String username = authentication.getName();
+        User user =  userRepository.findByUsername(username)
+                .orElseThrow(() -> new AppException(ErrorCode.RESOURCE_NOT_FOUND));
         if (request.getIsDefault()) {
             // Lấy tất cả các địa chỉ của người dùng
             List<Address> existingAddresses = addressRepository.findByUser(user);
@@ -52,7 +62,7 @@ public class AddressService {
     public void updateAddress(Long addressId, AddressUpdateRequest request) {
         User user = getAuthenticatedUser();
         Address newaddress = addressRepository.findById(addressId)
-                .orElseThrow(() -> new AppException(ErrorCode.ADDRESS_NOT_FOUND, "Thiếu ID của Design"));
+                .orElseThrow(() -> new AppException(ErrorCode.ADDRESS_NOT_FOUND));
         if (request.getIsDefault()) {
             // Lấy tất cả các địa chỉ của người dùng
             List<Address> existingAddresses = addressRepository.findByUser(user);
@@ -74,7 +84,7 @@ public class AddressService {
     @Transactional
     public void deleteAddress(Long addressId) {
         Address address = addressRepository.findById(addressId)
-                .orElseThrow(() -> new AppException(ErrorCode.ADDRESS_NOT_FOUND, "Thiếu ID của Design"));
+                .orElseThrow(() -> new AppException(ErrorCode.ADDRESS_NOT_FOUND));
         addressRepository.delete(address);
     }
 
@@ -92,7 +102,7 @@ public class AddressService {
     @Transactional
     public AddressResponse setDefaultAddress(Long addressId) {
         Address address = addressRepository.findById(addressId)
-                .orElseThrow(() -> new AppException(ErrorCode.ADDRESS_NOT_FOUND, "Thiếu ID của Design"));
+                .orElseThrow(() -> new AppException(ErrorCode.ADDRESS_NOT_FOUND));
         // Set all other addresses to non-default
         addressRepository.findByUser(getAuthenticatedUser()).forEach(addr -> addr.setIsDefault(false));
         address.setIsDefault(true);

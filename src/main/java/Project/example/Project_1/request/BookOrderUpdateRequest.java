@@ -26,4 +26,6 @@ public class BookOrderUpdateRequest {
     Long categoryId;
     Long fabricId;
     Long TypePrint;
+    Long addressId;
+
 }

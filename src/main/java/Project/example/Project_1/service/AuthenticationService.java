@@ -56,12 +56,12 @@ public class AuthenticationService implements UserDetailsService {
     @Transactional
     public LoginResponse login(LoginRequest request) {
         User user = userRepository.findUserByUsername(request.getUsername())
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED, "Thiếu ID của Design"));
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
         if(user == null){
-            throw new AppException(ErrorCode.USER_NOT_EXISTED, "Thiếu ID của Design");
+            throw new AppException(ErrorCode.USER_NOT_EXISTED);
         }
         if (user.getStatus().equals(EnumStatus.BLOCKED))
-            throw new AppException(ErrorCode.ACCOUNT_BLOCKED, "Thiếu ID của Design");
+            throw new AppException(ErrorCode.ACCOUNT_BLOCKED);
         String token = tokenService.generateToken(user);
         // Trả về Token
         return LoginResponse.builder()
@@ -74,10 +74,10 @@ public class AuthenticationService implements UserDetailsService {
     @Transactional()
     public RegisterResponse register(RegisterRequest request) {
         if (userRepository.findUserByUsername(request.getUsername()).isPresent()) {
-            throw new AppException(ErrorCode.USERNAME_EXISTED, "Thiếu ID của Design");
+            throw new AppException(ErrorCode.USERNAME_EXISTED);
         }
         if (userRepository.findUserByEmailAndIsDeletedFalse(request.getEmail()).isPresent()) {
-            throw new AppException(ErrorCode.EMAIL_EXISTED, "Thiếu ID của Design");
+            throw new AppException(ErrorCode.EMAIL_EXISTED);
         }
 
         User user = User.builder()

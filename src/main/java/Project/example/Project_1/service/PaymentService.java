@@ -26,7 +26,7 @@ public class PaymentService {
 
     public PaymentOrderResponse paymentCode (Long id){
         Order order = orderRepository.findById(id)
-                .orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_FOUND, "Thiếu ID của Design"));
+                .orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_FOUND));
 
         order.setPaymentMethod(EnumPaymentMethod.COD);
         order.setStatus(EnumProcess.DELIVERED);

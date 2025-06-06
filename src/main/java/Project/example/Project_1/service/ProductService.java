@@ -193,22 +193,22 @@ public class ProductService {
     public ProductResponse createProduct(ProductCreateRequest request){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
-            throw new AppException(ErrorCode.UNAUTHENTICATED, "Thiếu ID của Design");
+            throw new AppException(ErrorCode.UNAUTHENTICATED);
         }
         if(productRepository.findByProductName(request.getProductName()).isPresent()){
-            throw new AppException(ErrorCode.PRODUCT_NAME_EXISTED, "Thiếu ID của Design");
+            throw new AppException(ErrorCode.PRODUCT_NAME_EXISTED);
         }
         if(request.getPrice() < 0){
-            throw new AppException(ErrorCode.INVALID_PRODUCT_PRICE, "Thiếu ID của Design");
+            throw new AppException(ErrorCode.INVALID_PRODUCT_PRICE);
         }
         Category category = categoryRepository.findByIdAndIsDeletedFalse(request.getCategoryId())
-                .orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_FOUND, "Thiếu ID của Design"));
+                .orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_FOUND));
 
         Fabric fabric = fabricRepository.findByIdAndIsDeletedFalse(request.getFabricId())
-                .orElseThrow( () -> new AppException(ErrorCode.FABRIC_NOT_FOUND, "Thiếu ID của Design"));
+                .orElseThrow( () -> new AppException(ErrorCode.FABRIC_NOT_FOUND));
 
         TypePrint typePrint = typePrintRepository.findByIdAndIsDeletedFalse(request.getTypePrintId())
-                .orElseThrow(() -> new AppException(ErrorCode.TYPEPRINT_NOT_FOUNT, "Thiếu ID của Design"));
+                .orElseThrow(() -> new AppException(ErrorCode.TYPEPRINT_NOT_FOUNT));
 
         Product product = Product.builder()
                 .productName(request.getProductName())
@@ -292,10 +292,10 @@ public class ProductService {
     public void disableProduct(String id){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
-            throw new AppException(ErrorCode.UNAUTHENTICATED, "Thiếu ID của Design");
+            throw new AppException(ErrorCode.UNAUTHENTICATED);
         }
         Product product = productRepository.findByIdAndIsDeletedFalse(id)
-                        .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_FOUND, "Thiếu ID của Design"));
+                        .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
         product.setStatus(EnumStatus.INACTIVE);
         productRepository.save(product);
     }
@@ -303,10 +303,10 @@ public class ProductService {
     public void deleteProduct(String id){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
-            throw new AppException(ErrorCode.UNAUTHENTICATED, "Thiếu ID của Design");
+            throw new AppException(ErrorCode.UNAUTHENTICATED);
         }
         Product product = productRepository.findByIdAndIsDeletedFalse(id)
-                .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_FOUND, "Thiếu ID của Design"));
+                .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
         product.setIsDeleted(false);
         productRepository.save(product);
     }
@@ -314,31 +314,31 @@ public class ProductService {
     public ProductResponse updateProduct(ProductUpdateRequest request) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
-            throw new AppException(ErrorCode.UNAUTHENTICATED, "Thiếu ID của Design");
+            throw new AppException(ErrorCode.UNAUTHENTICATED);
         }
 
         if (request.getPrice() < 0) {
-            throw new AppException(ErrorCode.INVALID_PRODUCT_PRICE, "Thiếu ID của Design");
+            throw new AppException(ErrorCode.INVALID_PRODUCT_PRICE);
         }
 
         Product product = productRepository.findByIdAndIsDeletedFalse(request.getId())
-                .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_FOUND, "Thiếu ID của Design"));
+                .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
 
         // Kiểm tra nếu tên sản phẩm đã tồn tại (và không trùng với chính sản phẩm hiện tại)
         productRepository.findByProductName(request.getProductName()).ifPresent(existingProduct -> {
             if (!existingProduct.getId().equals(product.getId())) {
-                throw new AppException(ErrorCode.PRODUCT_NAME_EXISTED, "Thiếu ID của Design");
+                throw new AppException(ErrorCode.PRODUCT_NAME_EXISTED);
             }
         });
 
         Category category = categoryRepository.findByIdAndIsDeletedFalse(request.getCategoryId())
-                .orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_FOUND, "Thiếu ID của Design"));
+                .orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_FOUND));
 
         Fabric fabric = fabricRepository.findByIdAndIsDeletedFalse(request.getFabricId())
-                .orElseThrow(() -> new AppException(ErrorCode.FABRIC_NOT_FOUND, "Thiếu ID của Design"));
+                .orElseThrow(() -> new AppException(ErrorCode.FABRIC_NOT_FOUND));
 
         TypePrint typePrint = typePrintRepository.findByIdAndIsDeletedFalse(request.getTypePrintId())
-                .orElseThrow(() -> new AppException(ErrorCode.TYPEPRINT_NOT_FOUNT, "Thiếu ID của Design"));
+                .orElseThrow(() -> new AppException(ErrorCode.TYPEPRINT_NOT_FOUNT));
 
         // Cập nhật thông tin sản phẩm
         product.setProductName(request.getProductName());
@@ -397,10 +397,10 @@ public class ProductService {
     public Product getById(String id){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
-            throw new AppException(ErrorCode.UNAUTHENTICATED, "Thiếu ID của Design");
+            throw new AppException(ErrorCode.UNAUTHENTICATED);
         }
         Product product = productRepository.findByIdAndIsDeletedFalse(id)
-                .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_FOUND, "Thiếu ID của Design"));
+                .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
         return product;
     }
 

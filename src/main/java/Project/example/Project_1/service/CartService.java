@@ -62,7 +62,7 @@ public class CartService {
         Cart cart = getOrCreateCartEntity(user);
         List<Product> products = productRepository.findAllById(productIds);
         if (products.size() != productIds.size()) {
-            throw new AppException(ErrorCode.PRODUCT_NOT_FOUND, "Thiếu ID của Design");
+            throw new AppException(ErrorCode.PRODUCT_NOT_FOUND);
         }
         List<CartItem> itemsToRemove = cart.getItems().stream()
                 .filter(cartItem -> productIds.contains(cartItem.getProduct().getId()))
@@ -90,11 +90,11 @@ public class CartService {
                 .stream()
                 .filter(item -> item.getProduct().getId().equals(productId))
                 .findFirst()
-                .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_FOUND, "Thiếu ID của Design"));
+                .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
         if (quantity > 0) {
             cartItem.setQuantity(quantity);
         } else {
-            throw new AppException(ErrorCode.INVALID_QUANTITY, "Thiếu ID của Design");
+            throw new AppException(ErrorCode.INVALID_QUANTITY);
         }
         cart.updateTotalPrice();
         cartRepository.save(cart);
@@ -107,9 +107,9 @@ public class CartService {
 
     private Product getProductById(String productId) {
          Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_FOUND, "Thiếu ID của Design"));
+                .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
          if (product.getStatus().equals(EnumStatus.INACTIVE) || product.getIsDeleted()) {
-             throw new AppException(ErrorCode.PRODUCT_INACTIVE, "Thiếu ID của Design");
+             throw new AppException(ErrorCode.PRODUCT_INACTIVE);
          }
         return product;
     }

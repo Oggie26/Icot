@@ -29,5 +29,6 @@ public class BookOrderResponse {
     TypePrint typePrint;
     List<ImageCus> imageSkins;
     String customerName;
+    Address address;
 
 }

@@ -25,5 +25,6 @@ public class BookOrderCreateRequest {
     Long fabricId;
     Long TypePrintId;
     List<ImageCusRequest> image;
+    Long addressId;
 
 }

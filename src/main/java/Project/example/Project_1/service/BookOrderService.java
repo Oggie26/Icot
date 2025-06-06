@@ -52,23 +52,29 @@ public class BookOrderService {
     @Autowired
     ImageCusRepository imageCusRepository;
 
+    @Autowired
+    AddressRepository addressRepository;
+
     @Transactional
     public BookOrderResponse bookOrder(BookOrderCreateRequest request){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
-            throw new AppException(ErrorCode.UNAUTHENTICATED, "Thiếu ID của Design");
+            throw new AppException(ErrorCode.UNAUTHENTICATED);
         }
         String username = authentication.getName();
         User user =  userRepository.findByUsername(username)
-                .orElseThrow(() -> new AppException(ErrorCode.RESOURCE_NOT_FOUND, "Thiếu ID của Design"));
+                .orElseThrow(() -> new AppException(ErrorCode.RESOURCE_NOT_FOUND));
         Category category = categoryRepository.findByIdAndIsDeletedFalse(request.getCategoryId())
-                .orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_FOUND, "Thiếu ID của Design"));
+                .orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_FOUND));
 
         Fabric fabric = fabricRepository.findByIdAndIsDeletedFalse(request.getFabricId())
-                .orElseThrow(() -> new AppException(ErrorCode.FABRIC_NOT_FOUND, "Thiếu ID của Design"));
+                .orElseThrow(() -> new AppException(ErrorCode.FABRIC_NOT_FOUND));
 
         TypePrint typePrint = typePrintRepository.findByIdAndIsDeletedFalse(request.getTypePrintId())
-                .orElseThrow(() -> new AppException(ErrorCode.TYPEPRINT_NOT_FOUNT, "Thiếu ID của Design"));
+                .orElseThrow(() -> new AppException(ErrorCode.TYPEPRINT_NOT_FOUNT));
+
+        Address address = addressRepository.findById(request.getAddressId())
+                .orElseThrow(() -> new AppException(ErrorCode.ADDRESS_NOT_FOUND));
 
         BookOrder bookOrder = new BookOrder();
         bookOrder.setSize(request.getSize());
@@ -76,6 +82,7 @@ public class BookOrderService {
         bookOrder.setColor(request.getColor());
         bookOrder.setDescription(request.getDescription());
         bookOrder.setUser(user);
+        bookOrder.setAddress(address);
         bookOrder.setCategory(category);
         bookOrder.setFabric(fabric);
         bookOrder.setIsDeleted(false);
@@ -122,6 +129,7 @@ public class BookOrderService {
                 .description(bookOrder.getDescription())
                 .typePrint(typePrint)
                 .user(user)
+                .address(bookOrder.getAddress())
                 .customerName(bookOrder.getCustomerName())
                 .imageSkins(imageList)
                 .build();
@@ -131,24 +139,27 @@ public class BookOrderService {
     public BookOrderResponse updateBookOrder(BookOrderUpdateRequest request){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
-            throw new AppException(ErrorCode.UNAUTHENTICATED, "Thiếu ID của Design");
+            throw new AppException(ErrorCode.UNAUTHENTICATED);
         }
         String username = authentication.getName();
 
         User user =  userRepository.findByUsername(username)
-                .orElseThrow(() -> new AppException(ErrorCode.RESOURCE_NOT_FOUND, "Thiếu ID của Design"));
+                .orElseThrow(() -> new AppException(ErrorCode.RESOURCE_NOT_FOUND));
 
         BookOrder bookOrder = bookOrderRepository.findByIdAndIsDeletedFalse(request.getId())
-                .orElseThrow(() -> new AppException(ErrorCode.BOOKORDER_NOT_FOUND, "Thiếu ID của Design"));
+                .orElseThrow(() -> new AppException(ErrorCode.BOOKORDER_NOT_FOUND));
 
         Category category = categoryRepository.findByIdAndIsDeletedFalse(request.getCategoryId())
-                .orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_FOUND, "Thiếu ID của Design"));
+                .orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_FOUND));
 
         Fabric fabric = fabricRepository.findByIdAndIsDeletedFalse(request.getFabricId())
-                .orElseThrow(() -> new AppException(ErrorCode.FABRIC_NOT_FOUND, "Thiếu ID của Design"));
+                .orElseThrow(() -> new AppException(ErrorCode.FABRIC_NOT_FOUND));
 
         TypePrint typePrint = typePrintRepository.findByIdAndIsDeletedFalse(request.getTypePrint())
-                .orElseThrow(() -> new AppException(ErrorCode.TYPEPRINT_NOT_FOUNT, "Thiếu ID của Design"));
+                .orElseThrow(() -> new AppException(ErrorCode.TYPEPRINT_NOT_FOUNT));
+
+        Address address = addressRepository.findById(request.getAddressId())
+                        .orElseThrow(() -> new AppException(ErrorCode.ADDRESS_NOT_FOUND));
 
         bookOrder.setSize(request.getSize());
         bookOrder.setQuantity(request.getQuantity());
@@ -157,6 +168,7 @@ public class BookOrderService {
         bookOrder.setUser(user);
         bookOrder.setCategory(category);
         bookOrder.setFabric(fabric);
+        bookOrder.setAddress(address);
         bookOrder.setTypePrint(typePrint);
         Double totalPrice = (((fabric.getPrice() + typePrint.getPrice()) / 0.3 ) * bookOrder.getQuantity());
         bookOrder.setTotalPrice(totalPrice);
@@ -173,6 +185,7 @@ public class BookOrderService {
                 .description(bookOrder.getDescription())
                 .typePrint(typePrint)
                 .user(user)
+                .address(bookOrder.getAddress())
                 .customerName(bookOrder.getCustomerName())
                 .build();
     }
@@ -180,11 +193,11 @@ public class BookOrderService {
     public void cancelBookOrder(Long id){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
-            throw new AppException(ErrorCode.UNAUTHENTICATED, "Thiếu ID của Design");
+            throw new AppException(ErrorCode.UNAUTHENTICATED);
         }
         String username = authentication.getName();
         BookOrder bookOrder = bookOrderRepository.findByIdAndIsDeletedFalse(id)
-                .orElseThrow(() -> new AppException(ErrorCode.BOOKORDER_NOT_FOUND, "Thiếu ID của Design"));
+                .orElseThrow(() -> new AppException(ErrorCode.BOOKORDER_NOT_FOUND));
         bookOrder.setIsDeleted(true);
         bookOrderRepository.save(bookOrder);
     }
@@ -192,11 +205,11 @@ public class BookOrderService {
     public BookOrderResponse getBookOrderById(Long id){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
-            throw new AppException(ErrorCode.UNAUTHENTICATED, "Thiếu ID của Design");
+            throw new AppException(ErrorCode.UNAUTHENTICATED);
         }
         String username = authentication.getName();
         BookOrder bookOrder = bookOrderRepository.findByIdAndIsDeletedFalse(id)
-                .orElseThrow(() -> new AppException(ErrorCode.BOOKORDER_NOT_FOUND, "Thiếu ID của Design"));
+                .orElseThrow(() -> new AppException(ErrorCode.BOOKORDER_NOT_FOUND));
         return BookOrderResponse.builder()
                 .id(bookOrder.getId())
                 .size(bookOrder.getSize())
@@ -215,11 +228,11 @@ public class BookOrderService {
     public List<BookOrder> getMyBookOrder(){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
-            throw new AppException(ErrorCode.UNAUTHENTICATED, "Thiếu ID của Design");
+            throw new AppException(ErrorCode.UNAUTHENTICATED);
         }
         String username = authentication.getName();
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND, "Thiếu ID của Design"));
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
         List<BookOrder> bookOrders = bookOrderRepository.findBookOrderByUser(user)
                 .stream()
                 .filter(e -> !e.getIsDeleted())
@@ -265,15 +278,15 @@ public class BookOrderService {
     public BookOrder changeStatus(ChangeStatus request, Long bookOrderId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
-            throw new AppException(ErrorCode.UNAUTHENTICATED, "Thiếu ID của Design");
+            throw new AppException(ErrorCode.UNAUTHENTICATED);
         }
 
         String username = authentication.getName();
         BookOrder bookOrder = bookOrderRepository.findByIdAndIsDeletedFalse(bookOrderId)
-                .orElseThrow(() -> new AppException(ErrorCode.BOOKORDER_NOT_FOUND, "Thiếu ID của Design"));
+                .orElseThrow(() -> new AppException(ErrorCode.BOOKORDER_NOT_FOUND));
 
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new AppException(ErrorCode.UNAUTHENTICATED, "Thiếu ID của Design"));
+                .orElseThrow(() -> new AppException(ErrorCode.UNAUTHENTICATED));
 
         EnumBookOrder currentStatus = bookOrder.getStatus();
 
@@ -281,7 +294,7 @@ public class BookOrderService {
             case PAYMENT:
                 // Gán tên designer và chuyển sang ASSIGNED_TASK
                 if (request.getDesignName() == null || request.getDesignName().isEmpty()) {
-                    throw new AppException(ErrorCode.INVALID_REQUEST, "Thiếu tên Designer");
+                    throw new AppException(ErrorCode.INVALID_REQUEST);
                 }
                 bookOrder.setDesignName(request.getDesignName());
                 bookOrder.setStatus(EnumBookOrder.ASSIGNED_TASK);
@@ -290,11 +303,11 @@ public class BookOrderService {
             case ASSIGNED_TASK:
                 // Gán design (nếu chưa có)
                 if (request.getDesignId() == null) {
-                    throw new AppException(ErrorCode.INVALID_REQUEST, "Thiếu ID của Design");
+                    throw new AppException(ErrorCode.INVALID_REQUEST);
                 }
 
                 Design design = designRepository.findByIdAndIsDeletedFalse(request.getDesignId())
-                        .orElseThrow(() -> new AppException(ErrorCode.DESIGN_NOT_FOUND, "Thiếu ID của Design"));
+                        .orElseThrow(() -> new AppException(ErrorCode.DESIGN_NOT_FOUND));
                 bookOrder.setDesign(design);
                 bookOrder.setStatus(EnumBookOrder.CUSTOMER_RECEIVED);
                 break;
@@ -302,14 +315,14 @@ public class BookOrderService {
             case CUSTOMER_REJECTED:
                 // Cho phép phản hồi và quay lại trạng thái ASSIGNED_TASK
                 if (request.getResponse() == null || request.getResponse().isEmpty()) {
-                    throw new AppException(ErrorCode.INVALID_REQUEST, "Thiếu phản hồi từ người dùng");
+                    throw new AppException(ErrorCode.INVALID_REQUEST);
                 }
                 bookOrder.setResponse(request.getResponse());
                 bookOrder.setStatus(EnumBookOrder.ASSIGNED_TASK);
                 break;
 
             default:
-                throw new AppException(ErrorCode.INVALID_STATUS, "Không thể chuyển trạng thái ở bước hiện tại");
+                throw new AppException(ErrorCode.INVALID_STATUS);
         }
 
         // Lưu lịch sử xử lý

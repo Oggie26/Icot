@@ -49,6 +49,10 @@ public class Address
     @JsonIgnore
     List<Order> orders;
 
+    @OneToMany(mappedBy = "address", fetch = FetchType.LAZY)
+    @JsonIgnore
+    List<BookOrder> bookOrders ;
+
     @ManyToOne(fetch = FetchType.EAGER)
     @JsonIgnore
     @JoinColumn(name = "user_id")

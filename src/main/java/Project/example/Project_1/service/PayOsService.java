@@ -163,7 +163,7 @@ public class PayOsService {
         User user = getAuthenticatedUser();
 
         Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_FOUND, "Thiếu ID của Design"));
+                .orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_FOUND));
         Double price = order.getTotalAmount();
         Double amount = Double.valueOf(price);
         String url = createPaymentLinkByOrderCode(orderId, isAddress);
@@ -181,7 +181,7 @@ public class PayOsService {
         User user = getAuthenticatedUser();
 
         BookOrder bookOrder = bookOrderRepository.findById(bookOrderId)
-                .orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_FOUND, "Thiếu ID của Design"));
+                .orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_FOUND));
         Double price = bookOrder.getTotalPrice();
         Double amount = Double.valueOf(price);
         String url = createPaymentLinkByOrderCode(bookOrderId, isAddress);

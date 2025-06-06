@@ -89,4 +89,9 @@ public class BookOrder extends AbstractEntity {
 
     @OneToMany(mappedBy = "bookOrder", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<OrderItem> orderItems;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "address_id")
+    @JsonIgnore
+    Address address;
 }
