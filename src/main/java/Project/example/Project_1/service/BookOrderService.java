@@ -198,7 +198,7 @@ public class BookOrderService {
         String username = authentication.getName();
         BookOrder bookOrder = bookOrderRepository.findByIdAndIsDeletedFalse(id)
                 .orElseThrow(() -> new AppException(ErrorCode.BOOKORDER_NOT_FOUND));
-        bookOrder.setIsDeleted(true);
+        bookOrder.setStatus(EnumBookOrder.CANCELED);
         bookOrderRepository.save(bookOrder);
     }
 

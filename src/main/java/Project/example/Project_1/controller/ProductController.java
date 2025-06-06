@@ -86,6 +86,16 @@ public class ProductController {
                 .result(productService.getById(productId))
                 .build();
     }
+
+    @GetMapping()
+    @Operation(summary = "Lấy tất cả thông tin chi tiết sản phẩm")
+    public ApiResponse<List<Product>> getProduct() {
+        return ApiResponse.<List<Product>>builder()
+                .code(HttpStatus.OK.value())
+                .message("Lấy tất cả thông tin chi tiết sản phẩm")
+                .result(productService.getProducts())
+                .build();
+    }
 //
 //    // Tìm kiếm sản phẩm (có phân trang)
 //    @GetMapping("/search")
