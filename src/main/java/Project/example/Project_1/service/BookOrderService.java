@@ -8,7 +8,6 @@ import Project.example.Project_1.exception.AppException;
 import Project.example.Project_1.repository.*;
 import Project.example.Project_1.request.BookOrderCreateRequest;
 import Project.example.Project_1.request.BookOrderUpdateRequest;
-import Project.example.Project_1.request.CancelRequest;
 import Project.example.Project_1.request.ChangeStatus;
 import Project.example.Project_1.response.BookOrderResponse;
 import Project.example.Project_1.response.PageResponse;
@@ -191,7 +190,7 @@ public class BookOrderService {
                 .build();
     }
 
-    public void cancelBookOrder(Long id, CancelRequest request){
+    public void cancelBookOrder(Long id){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
             throw new AppException(ErrorCode.UNAUTHENTICATED);
@@ -199,8 +198,7 @@ public class BookOrderService {
         String username = authentication.getName();
         BookOrder bookOrder = bookOrderRepository.findByIdAndIsDeletedFalse(id)
                 .orElseThrow(() -> new AppException(ErrorCode.BOOKORDER_NOT_FOUND));
-        bookOrder.setStatus(EnumBookOrder.CANCELED);
-        bookOrder.setResponse(request.getResponse());
+        bookOrder.setIsDeleted(true);
         bookOrderRepository.save(bookOrder);
     }
 
@@ -212,10 +210,6 @@ public class BookOrderService {
         String username = authentication.getName();
         BookOrder bookOrder = bookOrderRepository.findByIdAndIsDeletedFalse(id)
                 .orElseThrow(() -> new AppException(ErrorCode.BOOKORDER_NOT_FOUND));
-
-        Address address = addressRepository.findByBookOrders(bookOrder)
-                .orElseThrow(() -> new AppException(ErrorCode.ADDRESS_NOT_FOUND));
-
         return BookOrderResponse.builder()
                 .id(bookOrder.getId())
                 .size(bookOrder.getSize())
@@ -228,7 +222,6 @@ public class BookOrderService {
                 .description(bookOrder.getDescription())
                 .typePrint(bookOrder.getTypePrint())
                 .user(bookOrder.getUser())
-                .address(address)
                 .build();
     }
 
