@@ -8,6 +8,7 @@ import Project.example.Project_1.exception.AppException;
 import Project.example.Project_1.repository.*;
 import Project.example.Project_1.request.BookOrderCreateRequest;
 import Project.example.Project_1.request.BookOrderUpdateRequest;
+import Project.example.Project_1.request.CancelRequest;
 import Project.example.Project_1.request.ChangeStatus;
 import Project.example.Project_1.response.BookOrderResponse;
 import Project.example.Project_1.response.PageResponse;
@@ -190,7 +191,7 @@ public class BookOrderService {
                 .build();
     }
 
-    public void cancelBookOrder(Long id){
+    public void cancelBookOrder(Long id,CancelRequest cancelRequest){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
             throw new AppException(ErrorCode.UNAUTHENTICATED);
@@ -198,7 +199,8 @@ public class BookOrderService {
         String username = authentication.getName();
         BookOrder bookOrder = bookOrderRepository.findByIdAndIsDeletedFalse(id)
                 .orElseThrow(() -> new AppException(ErrorCode.BOOKORDER_NOT_FOUND));
-        bookOrder.setIsDeleted(true);
+        bookOrder.setStatus(EnumBookOrder.CANCELED);
+        bookOrder.setResponse(cancelRequest.getResponse());
         bookOrderRepository.save(bookOrder);
     }
 
