@@ -1,5 +1,7 @@
 package Project.example.Project_1.controller;
 
+import Project.example.Project_1.enity.Address;
+import Project.example.Project_1.enity.BookOrder;
 import Project.example.Project_1.request.AddressCreationRequest;
 import Project.example.Project_1.request.AddressUpdateRequest;
 import Project.example.Project_1.response.AddressResponse;
@@ -78,6 +80,17 @@ public class AddressController {
                 .code(HttpStatus.OK.value())
                 .message("Cập nhật địa chỉ mặc định thành công")
                 .result(addressDTO)
+                .build();
+    }
+
+    @GetMapping("/{id}")
+    @Operation(summary = "Lấy thông tin address theo đơn", description = "API lấy địa chỉ")
+    @ResponseStatus(HttpStatus.OK)
+    public ApiResponse<Address> getById(@PathVariable Long id) {
+        return ApiResponse.<Address>builder()
+                .code(HttpStatus.OK.value())
+                .message("Cập nhật địa chỉ thành công")
+                .result(addAddressService.getById(id))
                 .build();
     }
 }

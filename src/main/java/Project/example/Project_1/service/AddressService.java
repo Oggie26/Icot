@@ -1,10 +1,12 @@
 package Project.example.Project_1.service;
 
 import Project.example.Project_1.enity.Address;
+import Project.example.Project_1.enity.BookOrder;
 import Project.example.Project_1.enity.User;
 import Project.example.Project_1.enums.ErrorCode;
 import Project.example.Project_1.exception.AppException;
 import Project.example.Project_1.repository.AddressRepository;
+import Project.example.Project_1.repository.BookOrderRepository;
 import Project.example.Project_1.repository.UserRepository;
 import Project.example.Project_1.request.AddressCreationRequest;
 import Project.example.Project_1.request.AddressUpdateRequest;
@@ -27,6 +29,8 @@ public class AddressService {
     AddressRepository addressRepository;
     @Autowired
     UserRepository userRepository;
+    @Autowired
+    BookOrderRepository bookOrderRepository;
 
     @Transactional
     public void addAddress(AddressCreationRequest request) {
@@ -114,5 +118,10 @@ public class AddressService {
     private User getAuthenticatedUser() {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         return userRepository.findByUsernameOrThrow(username);
+    }
+
+    public Address getById(Long id) {
+        return  addressRepository.findById(id)
+                .orElseThrow(() -> new AppException(ErrorCode.ADDRESS_NOT_FOUND));
     }
 }

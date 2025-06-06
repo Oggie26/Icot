@@ -5,6 +5,7 @@ import Project.example.Project_1.enums.EnumBookOrder;
 import Project.example.Project_1.repository.BookOrderRepository;
 import Project.example.Project_1.request.BookOrderCreateRequest;
 import Project.example.Project_1.request.BookOrderUpdateRequest;
+import Project.example.Project_1.request.CancelRequest;
 import Project.example.Project_1.request.ChangeStatus;
 import Project.example.Project_1.response.ApiResponse;
 import Project.example.Project_1.response.BookOrderResponse;
@@ -77,9 +78,9 @@ public class BookOrderController {
     // Cancel BookOrder (soft delete)
     @DeleteMapping("/{id}")
     @Operation(summary = "Xoá BookOrder (soft delete)")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteFabric(@PathVariable Long id) {
-        bookOrderService.cancelBookOrder(id);
+    @ResponseStatus(HttpStatus.OK)
+    public void deleteFabric(@PathVariable Long id, @RequestBody CancelRequest request) {
+        bookOrderService.cancelBookOrder(id, request);
     }
 
     // GET BY ID
