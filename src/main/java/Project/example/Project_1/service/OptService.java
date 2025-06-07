@@ -9,6 +9,7 @@ import Project.example.Project_1.repository.OtpRepository;
 import Project.example.Project_1.repository.UserRepository;
 import Project.example.Project_1.util.OtpUtil;
 import jakarta.transaction.Transactional;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -16,9 +17,11 @@ import java.util.Optional;
 
 @Service
 public class OptService {
-
+    @Autowired
     UserRepository userRepository;
+    @Autowired
     OtpRepository otpRepository;
+    @Autowired
     PostmarkService postmarkService;
 
     @Transactional
@@ -78,7 +81,7 @@ public class OptService {
 
     @Transactional
     public void resendOtpByEmail(String email) {
-        User user = userRepository.findUserByEmail(email)
+        User user = userRepository.findUserByEmailAndIsDeletedFalse(email)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
         // Vô hiệu hóa OTP cũ (nếu có)

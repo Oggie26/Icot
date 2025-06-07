@@ -33,35 +33,49 @@ public class GlobalExceptionHandler {
      * Ex: username không hợp lệ => username không đủ ký tự
      *     gender không hợp lệ => khác kiểu enum
      */
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ApiResponse> handleValidation(MethodArgumentNotValidException exception) {
-        List<ObjectError> errors = exception.getBindingResult().getAllErrors();
-        ErrorCode errorCode = ErrorCode.INVALID_KEY; // default error code
+    @ExceptionHandler(value = MethodArgumentNotValidException.class)
+    public ResponseEntity<ApiResponse> handlingValidation(MethodArgumentNotValidException exception) {
+        String enumKey = exception.getFieldError() != null
+                ? exception.getFieldError().getDefaultMessage()
+                : ErrorCode.INVALID_KEY.name();  // Nếu không có message mặc định, gán mã lỗi mặc định.
+
+        ErrorCode errorCode = ErrorCode.INVALID_KEY;
         Map<String, Object> attributes = null;
 
-        if (!((java.util.List<?>) errors).isEmpty()) {
-            String enumKey = errors.get(0).getDefaultMessage();
-            try {
-                errorCode = ErrorCode.valueOf(enumKey); // convert to enum
-                ConstraintViolation<?> constraintViolation = errors.get(0)
-                        .unwrap(ConstraintViolation.class);
+        try {
+            // Tìm mã lỗi trong enum ErrorCode, nếu không tồn tại thì trả về INVALID_KEY
+            errorCode = ErrorCode.valueOf(enumKey);
+
+            // Lấy lỗi đầu tiên từ danh sách lỗi
+            if (!exception.getBindingResult().getAllErrors().isEmpty()) {
+                var constraintViolation = exception.getBindingResult()
+                        .getAllErrors()
+                        .get(0)
+                        .unwrap(jakarta.validation.ConstraintViolation.class);
+
                 attributes = constraintViolation.getConstraintDescriptor().getAttributes();
                 log.info("Validation attributes: {}", attributes);
-            } catch (IllegalArgumentException | ClassCastException e) {
-                log.warn("Could not map validation error message to enum key: {}", e.getMessage());
             }
+        } catch (IllegalArgumentException e) {
+            // Nếu không tìm thấy mã lỗi hợp lệ, trả về mã lỗi mặc định
+            log.warn("Không tìm thấy ErrorCode tương ứng với key: {}", enumKey);
+        } catch (Exception ex) {
+            log.error("Lỗi khi phân tích validation exception", ex);
         }
 
+        // Tạo ApiResponse với thông điệp và mã lỗi hợp lệ
         ApiResponse apiResponse = new ApiResponse();
-        apiResponse.setCode(errorCode.getCode());
+        apiResponse.setCode(errorCode.getCode());  // Lấy mã lỗi từ ErrorCode
         apiResponse.setMessage(
-                Objects.nonNull(attributes)
-                        ? mapAttribute(errorCode.getMessage(), attributes)
-                        : errorCode.getMessage()
+                (attributes != null)
+                        ? mapAttribute(errorCode.getMessage(), attributes)  // Xử lý message nếu có attributes
+                        : errorCode.getMessage()  // Dùng thông điệp mặc định từ ErrorCode
         );
 
         return ResponseEntity.badRequest().body(apiResponse);
     }
+
+
 
     /**
      * Xử lý lỗi json không hợp lệ

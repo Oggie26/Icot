@@ -26,21 +26,20 @@ public class RegisterRequest {
     @Size(min = 6, message = "INVALID_PASSWORD")
     private String password ;
     @NotNull(message = "Ngày sinh nhật không được null")
-    @JsonFormat(pattern = "dd-MM-yyyy")
     private LocalDate birthday;
     @NotBlank(message = "SĐT không được trống")
-    @ValidPhoneNumber(message = "{phone.invalid}")
+    @ValidPhoneNumber(message = "INVALID_PHONE")
     private String phone;
     @NotBlank(message = "Email không được để trống")
-    @ValidEmail(message = "{email.invalid}")
+    @ValidEmail(message = "INVALID_EMAIL")
     private String email;
     @NotBlank(message = "Giới tính bắt buộc chọn")
     private String gender;
     @NotNull(message = "Name không được null")
     private String fullName;
-    @Enumerated(EnumType.STRING)
-    private EnumStatus status;
-    @Enumerated(EnumType.STRING)
-    private EnumRole role;
+//    @Enumerated(EnumType.STRING)
+//    private EnumStatus status;
+//    @Enumerated(EnumType.STRING)
+//    private EnumRole role;
 
 }
