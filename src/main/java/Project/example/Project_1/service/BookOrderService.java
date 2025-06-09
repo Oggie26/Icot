@@ -223,7 +223,9 @@ public class BookOrderService {
                 .customerName(bookOrder.getCustomerName())
                 .description(bookOrder.getDescription())
                 .typePrint(bookOrder.getTypePrint())
+                .designName(bookOrder.getDesignName())
                 .user(bookOrder.getUser())
+                .createdDate(bookOrder.getCreatedAt())
                 .build();
     }
 
@@ -356,10 +358,13 @@ public class BookOrderService {
                     .description(bookOrder.getDescription())
                     .typePrint(bookOrder.getTypePrint())
                     .user(bookOrder.getUser())
+                    .enumBookOrder(bookOrder.getStatus())
                     .address(bookOrder.getAddress())
                     .customerName(bookOrder.getCustomerName())
                     .imageSkins(bookOrder.getImageCus())
-                    .build();; // Giả sử bạn có constructor hoặc mapper
+                    .createdDate(bookOrder.getCreatedAt())
+                    .designName(bookOrder.getDesignName())
+                    .build();
             listResponse.add(response);
         }
 

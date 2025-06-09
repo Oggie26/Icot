@@ -39,7 +39,7 @@ public enum ErrorCode {
     TYPEPRINT_EXISTED(1028,"TypePRint_Name ton tai", HttpStatus.BAD_REQUEST),
     CATEGORY_EXISTED(1029,"Category ton tai", HttpStatus.BAD_REQUEST),
     PRODUCT_NAME_EXISTED(1030,"Product name ton tai", HttpStatus.BAD_REQUEST),
-
+    CART_NOT_FOUND(1031,"Cart not found", HttpStatus.BAD_REQUEST),
 
 
     //11xx
@@ -63,7 +63,7 @@ public enum ErrorCode {
     INVALID_TOTAL_PRICE(1117, "Invalid Total Price", HttpStatus.BAD_REQUEST),
     INVALID_STATUS(1118, "Invalid Status", HttpStatus.BAD_REQUEST),
     INVALID_REQUEST(1119, "Invalid Request", HttpStatus.BAD_REQUEST),
-
+    INVALID_PAYMENT_METHOD(1120, "Invalid Payment Method", HttpStatus.BAD_REQUEST),
     //12xx
     UNAUTHENTICATED(1201, "Unauthenticated", HttpStatus.UNAUTHORIZED),
     NOT_ENOUGH_POINT(1202, "Not enough point", HttpStatus.BAD_REQUEST),

@@ -32,7 +32,7 @@ public class Order extends  AbstractEntity{
     String username;
 
     @Column(name = "order_date")
-    Date orderDate;
+    LocalDateTime orderDate;
 
     @Column(name = "updated_at")
     Date updatedAt;
