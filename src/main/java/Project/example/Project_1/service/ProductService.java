@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ProductService {
@@ -281,13 +282,35 @@ public class ProductService {
                 .build();
     }
 
-    public List<Product> getProducts(){
-        List<Product> products= productRepository.findAll()
-                .stream()
-                .filter(product -> !product.getIsDeleted())
-                .toList();
-        return products;
+    public List<ProductResponse> getProducts() {
+        List<Product> productList = productRepository.findAll();
+
+        List<ProductResponse> responseList = new ArrayList<>();
+
+        for (Product product : productList) {
+            if (!Boolean.TRUE.equals(product.getIsDeleted())) {
+                ProductResponse response = ProductResponse.builder()
+                        .id(product.getId())
+                        .productName(product.getProductName())
+                        .createdAt(product.getCreatedAt())
+                        .price(product.getPrice())
+                        .sizes(product.getSizes())
+                        .imageThumbnail(product.getImageThumbnail())
+                        .images(product.getImages())
+                        .feedbacks(product.getFeedbacks())
+                        .category(product.getCategory())
+                        .typePrint(product.getTypePrint())
+                        .description(product.getDescription())
+                        .typePrint(product.getTypePrint())
+                        .build();
+                responseList.add(response);
+            }
+        }
+
+        return responseList;
     }
+
+
 
     public void disableProduct(String id){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -394,14 +417,27 @@ public class ProductService {
                 .build();
     }
 
-    public Product getById(String id){
+    public ProductResponse getById(String id){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
             throw new AppException(ErrorCode.UNAUTHENTICATED);
         }
         Product product = productRepository.findByIdAndIsDeletedFalse(id)
                 .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
-        return product;
+        return ProductResponse.builder()
+                .id(product.getId())
+                .productName(product.getProductName())
+                .createdAt(product.getCreatedAt())
+                .price(product.getPrice())
+                .sizes(product.getSizes())
+                .imageThumbnail(product.getImageThumbnail())
+                .images(product.getImages())
+                .feedbacks(product.getFeedbacks())
+                .category(product.getCategory())
+                .typePrint(product.getTypePrint())
+                .description(product.getDescription())
+                .typePrint(product.getTypePrint())
+                .build();
     }
 
 

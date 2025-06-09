@@ -121,15 +121,11 @@ public class BookOrderController {
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Get all  BookOrder", description = "API retrieve Booking Order ")
-    public ApiResponse<List<BookOrder>> getAllBookOrders() {
-        List<BookOrder> list = bookOrderRepository.findAll()
-                .stream()
-                .filter(bookOrder -> !bookOrder.getIsDeleted())
-                .toList();
-        return ApiResponse.<List<BookOrder>>builder()
+    public ApiResponse<List<BookOrderResponse>> getAllBookOrders() {
+        return ApiResponse.<List<BookOrderResponse>>builder()
                 .code(HttpStatus.OK.value())
                 .message("Get all successfully ")
-                .result(list)
+                .result(bookOrderService.getBookOrders())
                 .build();
     }
 

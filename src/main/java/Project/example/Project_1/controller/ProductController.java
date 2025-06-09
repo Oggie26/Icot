@@ -79,8 +79,8 @@ public class ProductController {
 //    // Lấy thông tin chi tiết sản phẩm
     @GetMapping("/{productId}")
     @Operation(summary = "Lấy thông tin chi tiết sản phẩm")
-    public ApiResponse<Product> getProductById(@PathVariable String productId) {
-        return ApiResponse.<Product>builder()
+    public ApiResponse<ProductResponse> getProductById(@PathVariable String productId) {
+        return ApiResponse.<ProductResponse>builder()
                 .code(HttpStatus.OK.value())
                 .message("Lấy thông tin sản phẩm thành công")
                 .result(productService.getById(productId))
@@ -89,8 +89,8 @@ public class ProductController {
 
     @GetMapping()
     @Operation(summary = "Lấy tất cả thông tin chi tiết sản phẩm")
-    public ApiResponse<List<Product>> getProduct() {
-        return ApiResponse.<List<Product>>builder()
+    public ApiResponse<List<ProductResponse>> getProduct() {
+        return ApiResponse.<List<ProductResponse>>builder()
                 .code(HttpStatus.OK.value())
                 .message("Lấy tất cả thông tin chi tiết sản phẩm")
                 .result(productService.getProducts())

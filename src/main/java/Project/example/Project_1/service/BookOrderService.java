@@ -339,4 +339,32 @@ public class BookOrderService {
         return bookOrder;
     }
 
+    public List<BookOrderResponse> getBookOrders() {
+        List<BookOrder> list = bookOrderRepository.findAll();
+
+        List<BookOrderResponse> listResponse = new ArrayList<>();
+
+        for (BookOrder bookOrder : list) {
+            BookOrderResponse response = BookOrderResponse.builder()
+                    .id(bookOrder.getId())
+                    .size(bookOrder.getSize())
+                    .category(bookOrder.getCategory())
+                    .color(bookOrder.getColor())
+                    .quantity(bookOrder.getQuantity())
+                    .totalPrice(bookOrder.getTotalPrice())
+                    .fabric(bookOrder.getFabric())
+                    .description(bookOrder.getDescription())
+                    .typePrint(bookOrder.getTypePrint())
+                    .user(bookOrder.getUser())
+                    .address(bookOrder.getAddress())
+                    .customerName(bookOrder.getCustomerName())
+                    .imageSkins(bookOrder.getImageCus())
+                    .build();; // Giả sử bạn có constructor hoặc mapper
+            listResponse.add(response);
+        }
+
+        return listResponse;
+    }
+
+
 }
