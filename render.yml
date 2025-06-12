@@ -1,0 +1,31 @@
+services:
+  - type: web
+    name: spring-backend
+    env: java
+    buildCommand: mvn clean install # hoặc mvn clean install nếu dùng Maven
+    startCommand: java -jar build/libs/*.jar # hoặc path cụ thể tới .jar
+    envVars:
+      - key: DB_URL
+        value: jdbc:mysql://root:gSmLgEEBFUqYEjEpChrstTRAOCjgtGGk@shinkansen.proxy.rlwy.net:41750/railway
+      - key: DB_USERNAME
+        value: root
+      - key: DB_PASSWORD
+        value: 12345
+      - key: POSTMARK_API_KEY
+        value: 4002171e-df25-4263-addf-310b50b6d338
+      - key: POSTMARK_FROM
+        value: namphse173452@fpt.edu.vn
+      - key: MAIL_USERNAME
+        value: namphse173452@fpt.edu.vn
+      - key: MAIL_PASSWORD
+        value: rebffxrhqnvecmwt
+      - key: PAYOS_CLIENT_ID
+        value: a92b2548-b526-4152-a937-494966244dab
+      - key: PAYOS_API_KEY
+        value: c9fa3881-cbfe-49e7-b366-24cc8e19d10f
+      - key: PAYOS_CHECKSUM_KEY
+        value: 97dce50c3667b3ede0c6ea01b0780f0b3648b7f82522edecebb9466e378bc86a
+      - key: PAYOS_RETURN_URL
+        value: https://your-frontend.com/payment-success
+      - key: PAYOS_CANCEL_URL
+        value: https://your-frontend.com/payment-cancel
