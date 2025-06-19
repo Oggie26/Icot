@@ -1,5 +1,6 @@
 package Project.example.Project_1.enity;
 
+import Project.example.Project_1.enums.EnumSize;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
@@ -25,6 +26,8 @@ public class CartItem {
     @JoinColumn(name = "product_id")
     Product product;  // Liên kết với sản phẩm
 
+    @Enumerated(EnumType.STRING)
+    EnumSize size;
     Integer quantity;  // Số lượng sản phẩm
     Double price;  // Giá sản phẩm tại thời điểm thêm vào giỏ
 }

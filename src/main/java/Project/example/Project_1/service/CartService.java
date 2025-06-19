@@ -4,6 +4,7 @@ import Project.example.Project_1.enity.Cart;
 import Project.example.Project_1.enity.CartItem;
 import Project.example.Project_1.enity.Product;
 import Project.example.Project_1.enity.User;
+import Project.example.Project_1.enums.EnumSize;
 import Project.example.Project_1.enums.EnumStatus;
 import Project.example.Project_1.enums.ErrorCode;
 import Project.example.Project_1.exception.AppException;
@@ -40,7 +41,7 @@ public class CartService {
 
 
     @Transactional
-    public void addProductToCart(String productId, Integer quantity) {
+    public void addProductToCart(String productId, Integer quantity, EnumSize size) {
         User user = getAuthenticatedUser();
         Product product = getProductById(productId);
         Cart cart = getOrCreateCartEntity(user);
@@ -50,7 +51,7 @@ public class CartService {
         if (existingItem.isPresent()) {
             existingItem.get().setQuantity(existingItem.get().getQuantity() + quantity);
         } else {
-            addNewItemToCart(cart, product, quantity);
+            addNewItemToCart(cart, product, quantity, size);
         }
         cart.updateTotalPrice();
         cartRepository.save(cart);
@@ -124,12 +125,13 @@ public class CartService {
         return cartRepository.save(newCart);
     }
 
-    private void addNewItemToCart(Cart cart, Product product, Integer quantity) {
+    private void addNewItemToCart(Cart cart, Product product, Integer quantity, EnumSize size) {
         CartItem newItem = CartItem.builder()
                 .product(product)
                 .cart(cart)
                 .price(product.getPrice())
                 .quantity(quantity)
+                .size(size)
                 .build();
         cart.getItems().add(newItem);
     }

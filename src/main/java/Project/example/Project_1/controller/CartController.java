@@ -1,5 +1,6 @@
 package Project.example.Project_1.controller;
 
+import Project.example.Project_1.enums.EnumSize;
 import Project.example.Project_1.response.ApiResponse;
 import Project.example.Project_1.response.CartResponse;
 import Project.example.Project_1.service.CartService;
@@ -33,8 +34,8 @@ public class CartController {
     @Operation(summary = "Thêm sản phẩm vào giỏ hàng", description = "API Thêm sản phẩm vào giỏ hàng")
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse<Void> addItemToCart(
-            @RequestParam String productId, @RequestParam(defaultValue = "1" ) @Min(1) int quantity) {
-        cartService.addProductToCart(productId, quantity);
+            @RequestParam String productId, @RequestParam(defaultValue = "1" ) @Min(1) int quantity, @RequestParam EnumSize size) {
+        cartService.addProductToCart(productId, quantity, size);
         return ApiResponse.<Void>builder()
                 .code(HttpStatus.OK.value())
                 .message("Thêm sản phẩm vào giỏ hàng thành công")
