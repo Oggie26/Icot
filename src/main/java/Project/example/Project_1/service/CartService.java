@@ -147,6 +147,8 @@ public class CartService {
                 .map(item -> CartItemResponse.builder()
                         .productId(item.getProduct().getId())
                         .productName(item.getProduct().getProductName())
+                        .color(item.getProduct().getColor())
+                        .size(item.getSize())
                         .price(item.getPrice())
                         .quantity(item.getQuantity())
                         .image(item.getProduct().getImageThumbnail())
