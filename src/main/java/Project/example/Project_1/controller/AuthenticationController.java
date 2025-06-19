@@ -2,9 +2,11 @@ package Project.example.Project_1.controller;
 
 import Project.example.Project_1.request.LoginRequest;
 import Project.example.Project_1.request.RegisterRequest;
+import Project.example.Project_1.request.RegisterRequestMobile;
 import Project.example.Project_1.response.ApiResponse;
 import Project.example.Project_1.response.LoginResponse;
 import Project.example.Project_1.response.RegisterResponse;
+import Project.example.Project_1.response.RegisterResponseMobile;
 import Project.example.Project_1.service.AuthenticationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -45,6 +47,17 @@ public class AuthenticationController {
                 .code(HttpStatus.CREATED.value())
                 .message("Đăng kí thành công")
                 .result(authenticationService.register(registerRequest))
+                .build();
+    }
+
+    @PostMapping("register/mobile")
+    @Operation(summary = "Đăng kí", description = "API đăng kí")
+    @ResponseStatus(HttpStatus.CREATED)
+    public ApiResponse<RegisterResponseMobile> registerMobile(@RequestBody @Valid RegisterRequestMobile registerRequest){
+        return ApiResponse.<RegisterResponseMobile>builder()
+                .code(HttpStatus.CREATED.value())
+                .message("Đăng kí thành công")
+                .result(authenticationService.registerMobile(registerRequest))
                 .build();
     }
 

@@ -4,6 +4,7 @@ import Project.example.Project_1.response.ApiResponse;
 import Project.example.Project_1.response.CartResponse;
 import Project.example.Project_1.service.CartService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.Min;
 import lombok.AccessLevel;
@@ -20,6 +21,7 @@ import java.util.List;
 @RequestMapping("/carts")
 @Tag(name = "Cart Controller")
 @RequiredArgsConstructor
+@SecurityRequirement(name = "api")
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Slf4j
 public class CartController {

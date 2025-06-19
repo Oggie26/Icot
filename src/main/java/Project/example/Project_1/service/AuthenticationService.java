@@ -9,8 +9,10 @@ import Project.example.Project_1.exception.AppException;
 import Project.example.Project_1.repository.UserRepository;
 import Project.example.Project_1.request.LoginRequest;
 import Project.example.Project_1.request.RegisterRequest;
+import Project.example.Project_1.request.RegisterRequestMobile;
 import Project.example.Project_1.response.LoginResponse;
 import Project.example.Project_1.response.RegisterResponse;
+import Project.example.Project_1.response.RegisterResponseMobile;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -70,6 +72,38 @@ public class AuthenticationService implements UserDetailsService {
                 .role(user.getRole())
                 .build();
     }
+
+    @Transactional
+    public RegisterResponseMobile registerMobile(RegisterRequestMobile request) {
+        if (userRepository.findUserByUsername(request.getUsername()).isPresent()) {
+            throw new AppException(ErrorCode.USERNAME_EXISTED);
+        }
+        if (userRepository.findUserByEmailAndIsDeletedFalse(request.getEmail()).isPresent()) {
+            throw new AppException(ErrorCode.EMAIL_EXISTED);
+        }
+
+        User user = User.builder()
+                .username(request.getUsername())
+                .password(passwordEncoder.encode(request.getPassword()))
+                .email(request.getEmail())
+                .fullName(request.getFullName())
+                .role(EnumRole.CUSTOMER)
+                .phone(request.getPhone())
+                .point(0)
+                .avatar("")
+                .status(EnumStatus.ACTIVE)
+                .build();
+        user.setIsDeleted(false);
+        userRepository.save(user);
+
+        return RegisterResponseMobile.builder()
+                .userId(user.getId())
+                .email(user.getEmail())
+                .fullName(user.getFullName())
+                .phone(user.getPhone())
+                .build();
+    }
+
 
     @Transactional()
     public RegisterResponse register(RegisterRequest request) {
