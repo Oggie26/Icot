@@ -65,6 +65,11 @@ public class Order extends  AbstractEntity{
     @JoinColumn(name = "address_id")
     @JsonIgnore
     Address address;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "user_id")
+    @JsonIgnore
+    User user;
 }
 
 

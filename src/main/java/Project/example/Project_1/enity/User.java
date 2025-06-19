@@ -73,7 +73,9 @@ public class User extends AbstractEntity implements UserDetails {
     @JsonIgnore
     List<Feedback> feedbacks;
 
-    @OneToOne
+    @JsonIgnore
+    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
+    List<Order> orders;
 
     @JsonIgnore
     @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
