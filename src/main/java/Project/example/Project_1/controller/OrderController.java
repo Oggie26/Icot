@@ -5,6 +5,7 @@ import Project.example.Project_1.enums.EnumPaymentMethod;
 import Project.example.Project_1.response.ApiResponse;
 import Project.example.Project_1.response.OrderResponse;
 import Project.example.Project_1.service.OrderService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
@@ -21,6 +22,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/orders")
 @Tag(name = "Order Controller")
+@SecurityRequirement(name = "api")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Slf4j
