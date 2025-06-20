@@ -39,7 +39,11 @@ public class Filter extends OncePerRequestFilter {
             "/api/auth/login",
             "/api/auth/register",
             "/api/auth/register/mobile",
-            "/api/user/{id}"
+            "/api/user/{id}",
+            "/api/products",
+            "/api/products/{productId}",
+            "/api/carts"
+
     );
 
     private boolean isPermitted(String uri){

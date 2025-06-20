@@ -72,5 +72,4 @@ public class SecurityConfig {
     public ModelMapper modelMapper() {
         return new ModelMapper();
     }
-
 }
