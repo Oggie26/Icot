@@ -24,6 +24,7 @@ import java.util.List;
 @Tag(name = "Order Controller")
 @SecurityRequirement(name = "api")
 @RequiredArgsConstructor
+@CrossOrigin("*")
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Slf4j
 public class OrderController {
