@@ -45,6 +45,8 @@ public class OrderItem {
     @JoinColumn(name = "book_order_id")
     private BookOrder bookOrder;
 
+
+
     public Double calculateTotalPrice() {
         return this.price * this.quantity;
     }

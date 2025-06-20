@@ -1,12 +1,13 @@
 package Project.example.Project_1.controller;
 
+import Project.example.Project_1.enity.Order;
+import Project.example.Project_1.enums.EnumPaymentMethod;
 import Project.example.Project_1.request.PaymentInitRequest;
 import Project.example.Project_1.request.PaymentRequest;
-import Project.example.Project_1.response.ApiResponse;
-import Project.example.Project_1.response.PaymentBookOrder;
-import Project.example.Project_1.response.PaymentInitResponse;
-import Project.example.Project_1.response.PaymentOrderResponse;
+import Project.example.Project_1.response.*;
+import Project.example.Project_1.service.OrderService;
 import Project.example.Project_1.service.PayOsService;
+import Project.example.Project_1.service.PaymentService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Webhook;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -43,18 +44,45 @@ public class PaymentController {
     @Autowired
     PayOsService  payOsService;
 
-    @PostMapping()
-    @ResponseStatus(HttpStatus.OK)
-    @Operation(summary = "Payment", description = "API get payment ")
-    public ApiResponse<PaymentOrderResponse> paymentOrder(@RequestParam @Valid Long orderId ,
-                                                                 HttpServletRequest http) throws Exception {
-        String clientIp = getClientIp(http);
-        PaymentOrderResponse order = payOsService.paymentOrder(orderId,clientIp);
-        return ApiResponse.<PaymentOrderResponse>builder()
-                .code(HttpStatus.OK.value())
-                .message("Payment successfully")
-                .result(order)
-                .build();
+    @Autowired
+    PaymentService paymentService;
+
+    @Autowired
+    OrderService orderService;
+
+//    @PostMapping()
+//    @ResponseStatus(HttpStatus.OK)
+//    @Operation(summary = "Payment", description = "API get payment")
+//    public ApiResponse<PaymentOrderResponse> paymentOrder(
+//            @RequestParam @Valid Long orderId,
+//            HttpServletRequest http
+//    ) throws Exception {
+//        String clientIp = getClientIp(http);
+//        PaymentOrderResponse order = payOsService.paymentOrder(orderId, clientIp);
+//
+//        return ApiResponse.<PaymentOrderResponse>builder()
+//                .code(HttpStatus.OK.value())
+//                .message("Payment successfully")
+//                .result(order)
+//                .build();
+//    }
+
+
+    @PostMapping
+    @Operation(summary = "Tạo đơn hàng", description = "Tạo một đơn hàng mới từ giỏ hàng và địa chỉ đã chọn")
+    public ResponseEntity<ApiResponse<OrderResponse>> paymentOrder(
+            @RequestParam Long cartId,
+            @RequestParam Long addressId,
+            @RequestParam EnumPaymentMethod paymentMethod
+    ) {
+        OrderResponse response = orderService.createOrder(cartId, addressId, paymentMethod);
+        return ResponseEntity.ok(
+                ApiResponse.<OrderResponse>builder()
+                        .code(HttpStatus.OK.value())
+                        .message("Tạo đơn hàng thành công")
+                        .result(response)
+                        .build()
+        );
     }
 
     @PostMapping("/payOs")
@@ -68,6 +96,17 @@ public class PaymentController {
                 .result(response)
                 .build();
     }
+
+//    @PostMapping("/cartId")
+//    @ResponseStatus(HttpStatus.OK)
+//    @Operation(summary = "Thanh toán tiền mặt")
+//    public ApiResponse<PaymentOrderResponse> checkoutPayment(@RequestParam @Valid Long cartId, @RequestBody Long addressId){
+//         return ApiResponse.<PaymentOrderResponse>builder()
+//                .code(HttpStatus.OK.value())
+//                .message("Thanh toán thành công")
+//                .result(paymentService.paymentCode(cartId))
+//                .build();
+//    }
 
 
 
