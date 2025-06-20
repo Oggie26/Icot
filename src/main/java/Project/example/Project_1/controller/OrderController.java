@@ -32,7 +32,6 @@ public class OrderController {
     OrderService orderService;
 
     @GetMapping("/history-order")
-    @PreAuthorize("hasAnyRole('CUSTOMER')")
     public ApiResponse<List<Order>> getHistoryOrder() {
         return ApiResponse.<List<Order>>builder()
                 .code(HttpStatus.OK.value())
