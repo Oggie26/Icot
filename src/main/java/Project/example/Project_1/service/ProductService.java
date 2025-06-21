@@ -436,6 +436,8 @@ public class ProductService {
                 .feedbacks(product.getFeedbacks())
                 .category(product.getCategory())
                 .typePrint(product.getTypePrint())
+                .status(product.getStatus())
+                .fabric(product.getFabric())
                 .description(product.getDescription())
                 .typePrint(product.getTypePrint())
                 .build();

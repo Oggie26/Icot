@@ -87,6 +87,7 @@ public class OrderService {
                 .totalAmount(order.getTotalAmount())
                 .paymentStatus(order.getPaymentStatus())
                 .orderResponseItemList(itemResponses)
+                .status(order.getStatus())
                 .build();
     }
 
