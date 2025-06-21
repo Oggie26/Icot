@@ -43,7 +43,7 @@ public class OrderController {
     }
 
     @GetMapping("/{id}")
-    public ApiResponse<OrderResponse> getOrderById(@RequestParam  Long id) {
+    public ApiResponse<OrderResponse> getOrderById(@PathVariable Long id) {
         return ApiResponse.<OrderResponse>builder()
                 .code(HttpStatus.OK.value())
                 .message("Lấy danh sách mua hàng thành công")
@@ -52,7 +52,7 @@ public class OrderController {
     }
 
     @PatchMapping("/{id}")
-    public ApiResponse<Void> updateStauts(@RequestParam Long id, @RequestBody EnumProcess status , @RequestBody String image) {
+    public ApiResponse<Void> updateStatus(@PathVariable Long id, @RequestBody EnumProcess status , @RequestBody String image) {
         orderService.updateStatusOrder(id,status,image);
         return ApiResponse.<Void>builder()
                 .code(HttpStatus.OK.value())
