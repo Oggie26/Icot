@@ -54,6 +54,8 @@ public class OrderService {
             throw new AppException(ErrorCode.INVALID_PAYMENT_METHOD);
         }
         Order order = buildOrder(cart, address);
+        order.setIsDeleted(false);
+        order.setUser(user);
         List<OrderItem> orderItems = createOrderItemsFromCart(cart, order);
         orderItems.forEach(orderItem -> {
             Product product = productRepository.findByIdAndIsDeletedFalse(orderItem.getProduct().getId()).orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_FOUND));

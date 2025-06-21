@@ -221,6 +221,7 @@ public class ProductService {
                 .category(category)
                 .fabric(fabric)
                 .typePrint(typePrint)
+                .status(EnumStatus.ACTIVE)
                 .build();
 
         productRepository.save(product);
