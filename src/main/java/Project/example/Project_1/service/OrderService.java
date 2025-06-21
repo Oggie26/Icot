@@ -149,11 +149,10 @@ public class OrderService {
 
     public List<Order> getOrdersByCustomer() {
         User user = getAuthenticatedUser();
-        List<Order> list = orderRepository.findAll()
+        return orderRepository.findOrderByUser(user)
                 .stream()
-                .filter(order -> orderRepository.findOrderByUser(user).getIsDeleted())
+                .filter(order -> !order.getIsDeleted())
                 .toList();
-        return list;
     }
 
     private void clearCart(Cart cart) {
