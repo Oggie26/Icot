@@ -2,6 +2,7 @@ package Project.example.Project_1.controller;
 
 import Project.example.Project_1.enity.Order;
 import Project.example.Project_1.enums.EnumPaymentMethod;
+import Project.example.Project_1.enums.EnumProcess;
 import Project.example.Project_1.response.ApiResponse;
 import Project.example.Project_1.response.OrderResponse;
 import Project.example.Project_1.service.OrderService;
@@ -41,6 +42,23 @@ public class OrderController {
                 .build();
     }
 
+    @GetMapping("/{id}")
+    public ApiResponse<OrderResponse> getOrderById(@RequestParam  Long id) {
+        return ApiResponse.<OrderResponse>builder()
+                .code(HttpStatus.OK.value())
+                .message("Lấy danh sách mua hàng thành công")
+                .result(orderService.getOrderById(id))
+                .build();
+    }
+
+    @PatchMapping("/{id}")
+    public ApiResponse<Void> updateStauts(@RequestParam Long id, @RequestBody EnumProcess status , @RequestBody String image) {
+        orderService.updateStatusOrder(id,status,image);
+        return ApiResponse.<Void>builder()
+                .code(HttpStatus.OK.value())
+                .message("Thay đổi thành công")
+                .build();
+    }
 //    @GetMapping("/payment-callback")
 //    public ApiResponse<String> handlePaymentCallback(@RequestParam Map<String, String> params) throws UnsupportedEncodingException {
 //        String orderId = params.get("orderId");
@@ -70,6 +88,8 @@ public class OrderController {
         }
         return clientIp;
     }
+
+
 
 }
 

@@ -53,7 +53,7 @@ public class OrderService {
         if (paymentMethod == null) {
             throw new AppException(ErrorCode.INVALID_PAYMENT_METHOD);
         }
-        Order order = buildOrder(cart, address, paymentMethod);
+        Order order = buildOrder(cart, address);
         List<OrderItem> orderItems = createOrderItemsFromCart(cart, order);
         orderItems.forEach(orderItem -> {
             Product product = productRepository.findByIdAndIsDeletedFalse(orderItem.getProduct().getId()).orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
@@ -132,7 +132,7 @@ public class OrderService {
                 .collect(Collectors.toList());
     }
 
-    private Order buildOrder(Cart cart, Address address, EnumPaymentMethod paymentMethod) {
+    private Order buildOrder(Cart cart, Address address) {
         return Order.builder()
                 .totalAmount(cart.getTotalPrice())
                 .username(cart.getUser().getUsername())
@@ -158,5 +158,12 @@ public class OrderService {
         cart.getItems().clear();
         cart.setTotalPrice(0.0);
         cartRepository.save(cart);
+    }
+
+    public void updateStatusOrder(Long orderId, EnumProcess status, String image ) {
+        Order order = orderRepository.findById(orderId).orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_FOUND));
+        order.setStatus(status);
+        order.setImageOrderSuccess(image);
+        orderRepository.save(order);
     }
 }
