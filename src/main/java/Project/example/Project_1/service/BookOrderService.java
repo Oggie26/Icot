@@ -374,7 +374,12 @@ public class BookOrderService {
     public void paymentSuccess(Long id){
         BookOrder bookOrder = bookOrderRepository.findByIdAndIsDeletedFalse(id)
                 .orElseThrow(() -> new AppException(ErrorCode.BOOKORDER_NOT_FOUND));
-        bookOrder.setStatus(EnumBookOrder.PAYMENT);
+
+        if(bookOrder.getStatus().equals(EnumBookOrder.PENDING)){
+            if (!bookOrder.getIsDeleted()){
+                bookOrder.setStatus(EnumBookOrder.PAYMENT);
+            }
+        }
         bookOrderRepository.save(bookOrder);
     }
 

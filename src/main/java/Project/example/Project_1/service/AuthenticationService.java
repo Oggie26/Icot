@@ -62,8 +62,9 @@ public class AuthenticationService implements UserDetailsService {
         if(user == null){
             throw new AppException(ErrorCode.USER_NOT_EXISTED);
         }
-        if (user.getStatus().equals(EnumStatus.BLOCKED))
+        if (user.getStatus().equals(EnumStatus.BLOCKED)){
             throw new AppException(ErrorCode.ACCOUNT_BLOCKED);
+        }
         String token = tokenService.generateToken(user);
         // Trả về Token
         return LoginResponse.builder()
