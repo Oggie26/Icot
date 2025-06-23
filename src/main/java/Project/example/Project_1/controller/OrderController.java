@@ -34,8 +34,8 @@ public class OrderController {
     OrderService orderService;
 
     @GetMapping("/history-order")
-    public ApiResponse<List<Order>> getHistoryOrder() {
-        return ApiResponse.<List<Order>>builder()
+    public ApiResponse<List<OrderResponse>> getHistoryOrder() {
+        return ApiResponse.<List<OrderResponse>>builder()
                 .code(HttpStatus.OK.value())
                 .message("Lấy danh sách mua hàng thành công")
                 .result(orderService.getOrdersByCustomer())

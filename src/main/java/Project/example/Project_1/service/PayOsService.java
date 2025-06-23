@@ -148,8 +148,8 @@ public class PayOsService {
                 .orderCode(order.getId())
                 .amount(amount)
                 .description("Thanh toán đơn hàng #" + order.getId())
-                .returnUrl("https://localhost:3000/success")
-                .cancelUrl("https://localhost:3000/cancel")
+                .returnUrl("http://localhost:5173/success")
+                .cancelUrl("http://localhost:5173/cancel")
                 .items(items)
                 .expiredAt((long) (System.currentTimeMillis() + 3600_000))
                 .build();

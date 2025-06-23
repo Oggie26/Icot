@@ -147,13 +147,42 @@ public class OrderService {
                 .build();
     }
 
-    public List<Order> getOrdersByCustomer() {
+    public List<OrderResponse> getOrdersByCustomer() {
         User user = getAuthenticatedUser();
-        return orderRepository.findOrderByUser(user)
-                .stream()
-                .filter(order -> !order.getIsDeleted())
-                .toList();
+
+        return orderRepository.findOrderByUser(user).stream()
+                .filter(order -> !Boolean.TRUE.equals(order.getIsDeleted()))
+                .map(this::convertToResponse)
+                .collect(Collectors.toList());
     }
+
+    private OrderResponse convertToResponse(Order order) {
+        List<OrderItemResponse> itemResponses = order.getOrderItems().stream()
+                .map(item -> OrderItemResponse.builder()
+                        .id(item.getId())
+                        .productId(item.getProduct().getId())
+                        .productName(item.getProduct().getProductName())
+                        .quantity(item.getQuantity())
+                        .price(item.getPrice())
+                        .totalPrice(item.calculateTotalPrice())
+                        .thumbnailProduct(item.getProduct().getImageThumbnail())
+                        .build())
+                .collect(Collectors.toList());
+
+        return OrderResponse.builder()
+                .orderId(order.getId())
+                .totalAmount(order.getTotalAmount())
+                .status(order.getStatus())
+                .username(order.getUser().getUsername())
+                .orderDate(order.getOrderDate())
+                .paymentMethod(order.getPaymentMethod())
+                .paymentStatus(order.getPaymentStatus())
+                .address(order.getAddress())
+                .orderResponseItemList(itemResponses) // ✅ dùng list đã build
+                .imageOrderSuccess(order.getImageOrderSuccess())
+                .build();
+    }
+
 
     private void clearCart(Cart cart) {
         cartItemRepository.deleteAll(cart.getItems());

@@ -129,4 +129,15 @@ public class BookOrderController {
                 .build();
     }
 
+    @PatchMapping("/{id}")
+    @Operation(summary = "Cập nhật trạng thái thanh toán")
+    @ResponseStatus(HttpStatus.OK)
+    public ApiResponse<Void> paymentSuccess(@PathVariable Long id) {
+        bookOrderService.paymentSuccess(id);
+        return ApiResponse.<Void>builder()
+                .code(HttpStatus.OK.value())
+                .message("Cập nhật thành công")
+                .build();
+    }
+
 }

@@ -371,5 +371,12 @@ public class BookOrderService {
         return listResponse;
     }
 
+    public void paymentSuccess(Long id){
+        BookOrder bookOrder = bookOrderRepository.findByIdAndIsDeletedFalse(id)
+                .orElseThrow(() -> new AppException(ErrorCode.BOOKORDER_NOT_FOUND));
+        bookOrder.setStatus(EnumBookOrder.PAYMENT);
+        bookOrderRepository.save(bookOrder);
+    }
+
 
 }
