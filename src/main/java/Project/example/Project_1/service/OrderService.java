@@ -41,6 +41,9 @@ public class OrderService {
     private OrderItemRepository orderItemRepository;
 
     @Autowired
+    SizeRepository sizeRepository;
+
+    @Autowired
     private CartItemRepository cartItemRepository;
 
     @Transactional
@@ -107,6 +110,7 @@ public class OrderService {
                         .price(item.getPrice())
                         .totalPrice(item.calculateTotalPrice())
                         .thumbnailProduct(item.getProduct().getImageThumbnail())
+                        .size(item.getProduct().getSizes().getFirst().getSize())
                         .build())
                 .collect(Collectors.toList());
         return OrderResponse.builder()
