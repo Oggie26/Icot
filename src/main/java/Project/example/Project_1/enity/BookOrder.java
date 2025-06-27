@@ -50,6 +50,9 @@ public class BookOrder extends AbstractEntity {
     @Column
     String customerName;
 
+    @Column
+    String imageDelivery;
+
     //Category
     @ManyToOne(fetch = FetchType.EAGER)
     @JsonIgnore
@@ -72,6 +75,10 @@ public class BookOrder extends AbstractEntity {
     @OneToMany(mappedBy = "bookOrder", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonIgnore
     List<ImageCus> imageCus;
+
+    @OneToMany(mappedBy = "bookOrder", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
+    List<ImageDesign> imageDesign;
 
     //User
     @ManyToOne

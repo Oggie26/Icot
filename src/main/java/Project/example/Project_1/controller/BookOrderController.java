@@ -3,10 +3,7 @@ package Project.example.Project_1.controller;
 import Project.example.Project_1.enity.BookOrder;
 import Project.example.Project_1.enums.EnumBookOrder;
 import Project.example.Project_1.repository.BookOrderRepository;
-import Project.example.Project_1.request.BookOrderCreateRequest;
-import Project.example.Project_1.request.BookOrderUpdateRequest;
-import Project.example.Project_1.request.CancelRequest;
-import Project.example.Project_1.request.ChangeStatus;
+import Project.example.Project_1.request.*;
 import Project.example.Project_1.response.ApiResponse;
 import Project.example.Project_1.response.BookOrderResponse;
 import Project.example.Project_1.response.PageResponse;
@@ -18,7 +15,9 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -107,6 +106,17 @@ public class BookOrderController {
                 .build();
     }
 
+    @GetMapping("/mybookorder")
+    @Operation(summary = "Lấy tất cả BookOrder đang ACTIVE")
+    @ResponseStatus(HttpStatus.OK)
+    public ApiResponse<List<BookOrderResponse>> getMyBookingOrders() {
+        return ApiResponse.<List<BookOrderResponse>>builder()
+                .code(HttpStatus.OK.value())
+                .message("Lấy tất cả BookOrder của user thành công")
+                .result(bookOrderService.getMyBookOrders())
+                .build();
+    }
+
     @PutMapping("/{bookOrderId}")
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Change a status to do Booking Order", description = "API retrieve Booking Order ")
@@ -139,5 +149,21 @@ public class BookOrderController {
                 .message("Cập nhật thành công")
                 .build();
     }
+
+    @PatchMapping("/delivery/{id}")
+    @Operation(summary = "Cập nhật trạng thái giao hàng")
+    @ResponseStatus(HttpStatus.OK)
+    public ApiResponse<Void> delivery(
+            @PathVariable Long id,
+            @RequestParam("imageDelivery") MultipartFile imageDelivery) {
+
+        bookOrderService.deliveryBookOrder(id, imageDelivery);
+
+        return ApiResponse.<Void>builder()
+                .code(HttpStatus.OK.value())
+                .message("Cập nhật thành công")
+                .build();
+    }
+
 
 }

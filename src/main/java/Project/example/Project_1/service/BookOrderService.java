@@ -6,10 +6,7 @@ import Project.example.Project_1.enums.EnumOrderType;
 import Project.example.Project_1.enums.ErrorCode;
 import Project.example.Project_1.exception.AppException;
 import Project.example.Project_1.repository.*;
-import Project.example.Project_1.request.BookOrderCreateRequest;
-import Project.example.Project_1.request.BookOrderUpdateRequest;
-import Project.example.Project_1.request.CancelRequest;
-import Project.example.Project_1.request.ChangeStatus;
+import Project.example.Project_1.request.*;
 import Project.example.Project_1.response.BookOrderResponse;
 import Project.example.Project_1.response.PageResponse;
 import jakarta.transaction.Transactional;
@@ -20,10 +17,17 @@ import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -34,6 +38,10 @@ public class BookOrderService {
 
     @Autowired
     CategoryRepository categoryRepository;
+
+    @Autowired
+    ImageDesignRepository imageDesignRepository;
+
 
     @Autowired
     FabricRepository fabricRepository;
@@ -217,6 +225,8 @@ public class BookOrderService {
                 .size(bookOrder.getSize())
                 .category(bookOrder.getCategory())
                 .color(bookOrder.getColor())
+                .imageSkins(bookOrder.getImageCus())
+                .imageDesigns(bookOrder.getImageDesign())
                 .quantity(bookOrder.getQuantity())
                 .totalPrice(bookOrder.getTotalPrice())
                 .fabric(bookOrder.getFabric())
@@ -294,39 +304,49 @@ public class BookOrderService {
 
         EnumBookOrder currentStatus = bookOrder.getStatus();
 
-        switch (currentStatus) {
-            case PAYMENT:
-                // Gán tên designer và chuyển sang ASSIGNED_TASK
-                if (request.getDesignName() == null || request.getDesignName().isEmpty()) {
-                    throw new AppException(ErrorCode.INVALID_REQUEST);
-                }
-                bookOrder.setDesignName(request.getDesignName());
-                bookOrder.setStatus(EnumBookOrder.ASSIGNED_TASK);
-                break;
+        if (currentStatus == EnumBookOrder.PAYMENT) {
+            if (request.getDesignName() == null || request.getDesignName().isEmpty()) {
+                throw new AppException(ErrorCode.INVALID_REQUEST);
+            }
+            bookOrder.setDesignName(request.getDesignName());
+            bookOrder.setStatus(EnumBookOrder.ASSIGNED_TASK);
 
-            case ASSIGNED_TASK:
-                // Gán design (nếu chưa có)
-                if (request.getDesignId() == null) {
-                    throw new AppException(ErrorCode.INVALID_REQUEST);
-                }
+        } else if (currentStatus == EnumBookOrder.ASSIGNED_TASK) {
+            List<ImageDesign> imageDesignList = new ArrayList<>();
 
-                Design design = designRepository.findByIdAndIsDeletedFalse(request.getDesignId())
-                        .orElseThrow(() -> new AppException(ErrorCode.DESIGN_NOT_FOUND));
-                bookOrder.setDesign(design);
-                bookOrder.setStatus(EnumBookOrder.CUSTOMER_RECEIVED);
-                break;
+            if (request.getDesignId() == null) {
+                throw new AppException(ErrorCode.INVALID_REQUEST);
+            }
 
-            case CUSTOMER_REJECTED:
-                // Cho phép phản hồi và quay lại trạng thái ASSIGNED_TASK
-                if (request.getResponse() == null || request.getResponse().isEmpty()) {
-                    throw new AppException(ErrorCode.INVALID_REQUEST);
-                }
-                bookOrder.setResponse(request.getResponse());
-                bookOrder.setStatus(EnumBookOrder.ASSIGNED_TASK);
-                break;
+            if (request.getImageDesign() != null && !request.getImageDesign().isEmpty()) {
+                imageDesignList = request.getImageDesign().stream()
+                        .map(imageRequest -> {
+                            ImageDesign imageDesign = new ImageDesign();
+                            imageDesign.setImage(imageRequest.getImage());
+                            imageDesign.setIsDeleted(false);
+                            imageDesign.setBookOrder(bookOrder);
+                            return imageDesign;
+                        }).collect(Collectors.toList());
+            }
+            imageDesignRepository.saveAll(imageDesignList);
+            bookOrder.setStatus(EnumBookOrder.DELIVERY);
 
-            default:
-                throw new AppException(ErrorCode.INVALID_STATUS);
+        } else if (currentStatus == EnumBookOrder.CUSTOMER_ACCEPTED) {
+            bookOrder.setStatus(EnumBookOrder.DELIVERY);
+
+        } else if (currentStatus == EnumBookOrder.CUSTOMER_REJECTED) {
+            if (request.getResponse() == null || request.getResponse().isEmpty()) {
+                throw new AppException(ErrorCode.INVALID_REQUEST);
+            }
+            bookOrder.setResponse(request.getResponse());
+            bookOrder.setStatus(EnumBookOrder.ASSIGNED_TASK);
+
+        } else if (currentStatus == EnumBookOrder.DELIVERY) {
+            bookOrder.setImageDelivery(bookOrder.getImageDelivery()); // nên check nếu cần set từ request
+            bookOrder.setStatus(EnumBookOrder.FINISHED);
+
+        } else {
+            throw new AppException(ErrorCode.INVALID_STATUS);
         }
 
         // Lưu lịch sử xử lý
@@ -338,8 +358,38 @@ public class BookOrderService {
 
         processOrderRepository.save(processOrder);
         bookOrderRepository.save(bookOrder);
+
         return bookOrder;
     }
+
+
+    public void deliveryBookOrder(Long bookOrderId, MultipartFile imageDelivery) {
+        BookOrder bookOrder = bookOrderRepository.findByIdAndIsDeletedFalse(bookOrderId)
+                .orElseThrow(() -> new AppException(ErrorCode.BOOKORDER_NOT_FOUND));
+
+        // Đường dẫn tuyệt đối để lưu file
+        String uploadDir = System.getProperty("user.dir") + "/uploads/delivery"; // Thư mục nằm trong project
+        String fileName = UUID.randomUUID() + "_" + imageDelivery.getOriginalFilename();
+
+        File uploadPath = new File(uploadDir);
+        if (!uploadPath.exists() && !uploadPath.mkdirs()) {
+            throw new RuntimeException("Không thể tạo thư mục lưu file: " + uploadDir);
+        }
+
+        File destination = new File(uploadPath, fileName);
+        try {
+            imageDelivery.transferTo(destination);
+        } catch (IOException e) {
+            throw new RuntimeException("Lỗi khi lưu file ảnh giao hàng", e);
+        }
+
+        // Gán đường dẫn tương đối để truy cập qua browser
+        bookOrder.setImageDelivery("/uploads/delivery/" + fileName);
+        bookOrder.setStatus(EnumBookOrder.FINISHED);
+        bookOrderRepository.save(bookOrder);
+    }
+
+
 
     public List<BookOrderResponse> getBookOrders() {
         List<BookOrder> list = bookOrderRepository.findAll();
@@ -370,6 +420,50 @@ public class BookOrderService {
 
         return listResponse;
     }
+
+    public List<BookOrderResponse> getMyBookOrders() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new AppException(ErrorCode.UNAUTHENTICATED);
+        }
+
+        String username = authentication.getName();
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new AppException(ErrorCode.UNAUTHENTICATED));
+
+        List<BookOrder> bookOrders = bookOrderRepository.findBookOrderByUser(user);
+        List<BookOrderResponse> responseList = new ArrayList<>();
+
+        for (BookOrder bookOrder : bookOrders) {
+            // Lấy danh sách imageDesign theo bookOrder nếu cần
+            List<ImageDesign> imageDesigns = imageDesignRepository.findByBookOrder(bookOrder);
+
+            BookOrderResponse response = BookOrderResponse.builder()
+                    .id(bookOrder.getId())
+                    .size(bookOrder.getSize())
+                    .category(bookOrder.getCategory())
+                    .color(bookOrder.getColor())
+                    .quantity(bookOrder.getQuantity())
+                    .totalPrice(bookOrder.getTotalPrice())
+                    .fabric(bookOrder.getFabric())
+                    .description(bookOrder.getDescription())
+                    .typePrint(bookOrder.getTypePrint())
+                    .user(bookOrder.getUser())
+                    .enumBookOrder(bookOrder.getStatus())
+                    .address(bookOrder.getAddress())
+                    .customerName(bookOrder.getCustomerName())
+                    .imageSkins(bookOrder.getImageCus())
+                    .imageDesigns(imageDesigns) // Gán danh sách hình thiết kế
+                    .createdDate(bookOrder.getCreatedAt())
+                    .designName(bookOrder.getDesignName())
+                    .build();
+
+            responseList.add(response);
+        }
+
+        return responseList;
+    }
+
 
     public void paymentSuccess(Long id){
         BookOrder bookOrder = bookOrderRepository.findByIdAndIsDeletedFalse(id)

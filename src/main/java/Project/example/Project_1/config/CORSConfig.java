@@ -17,7 +17,13 @@ public class CORSConfig implements WebMvcConfigurer {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        // Phục vụ các file trong src/main/resources/static
         registry.addResourceHandler("/static/**")
                 .addResourceLocations("classpath:/static/");
+
+        // Phục vụ file ảnh đã upload vào thư mục bên ngoài
+        registry.addResourceHandler("/uploads/**")
+                .addResourceLocations("file:uploads/");
     }
+
 }

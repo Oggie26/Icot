@@ -42,7 +42,8 @@ public class Filter extends OncePerRequestFilter {
             "/api/user/{id}",
             "/api/products",
             "/api/products/{productId}",
-            "/api/carts"
+            "/api/carts",
+             "/api/bookOrder/delivery/{id}"
 
     );
 

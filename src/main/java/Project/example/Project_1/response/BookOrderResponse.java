@@ -32,8 +32,10 @@ public class BookOrderResponse {
     EnumBookOrder enumBookOrder;
     TypePrint typePrint;
     List<ImageCus> imageSkins;
+    List<ImageDesign> imageDesigns;
     String customerName;
     Address address;
     String designName;
+
 
 }
