@@ -1,6 +1,7 @@
 package Project.example.Project_1.controller;
 
 import Project.example.Project_1.enity.BookOrder;
+import Project.example.Project_1.enity.ImageDesign;
 import Project.example.Project_1.enums.EnumBookOrder;
 import Project.example.Project_1.repository.BookOrderRepository;
 import Project.example.Project_1.request.*;
@@ -138,6 +139,23 @@ public class BookOrderController {
                 .result(bookOrderService.getBookOrders())
                 .build();
     }
+
+
+    @GetMapping("/image/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(
+            summary = "Lấy danh sách ảnh thiết kế của đơn hàng",
+            description = "Trả về tất cả các ảnh thiết kế thuộc BookOrder theo ID"
+    )
+    public ApiResponse<List<ImageDesign>> getImageDesignByBookOrderId(@PathVariable Long id) {
+        List<ImageDesign> designs = bookOrderService.getAllImageDesignById(id);
+        return ApiResponse.<List<ImageDesign>>builder()
+                .code(HttpStatus.OK.value())
+                .message("Lấy ảnh thiết kế thành công")
+                .result(designs)
+                .build();
+    }
+
 
     @PatchMapping("/{id}")
     @Operation(summary = "Cập nhật trạng thái thanh toán")

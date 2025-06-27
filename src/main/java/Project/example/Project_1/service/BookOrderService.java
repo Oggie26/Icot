@@ -417,6 +417,19 @@ public class BookOrderService {
         bookOrderRepository.save(bookOrder);
     }
 
+    public List<ImageDesign> getAllImageDesignById(Long id){
+
+        BookOrder bookOrder = bookOrderRepository.findByIdAndIsDeletedFalse(id)
+                .orElseThrow(() -> new AppException(ErrorCode.BOOKORDER_NOT_FOUND));
+
+        List<ImageDesign> list = imageDesignRepository.findByBookOrder(bookOrder)
+                .stream()
+                .filter(imageDesign -> imageDesign.getImage() != null)
+                .toList();
+
+        return list;
+    }
+
 
 
 
