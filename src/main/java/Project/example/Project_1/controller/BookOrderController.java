@@ -155,15 +155,25 @@ public class BookOrderController {
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse<Void> delivery(
             @PathVariable Long id,
-            @RequestParam("imageDelivery") MultipartFile imageDelivery) {
-
+            @RequestBody ImageDeliveryRequest imageDelivery) {
         bookOrderService.deliveryBookOrder(id, imageDelivery);
-
         return ApiResponse.<Void>builder()
                 .code(HttpStatus.OK.value())
                 .message("Cập nhật thành công")
                 .build();
     }
 
+    @PatchMapping("/designer/{id}")
+    @Operation(summary = "Cập nhật trạng thái giao hàng")
+    @ResponseStatus(HttpStatus.OK)
+    public ApiResponse<Void> designer(
+            @PathVariable Long id,
+            @RequestBody DesignerUploadRequest request) {
+        bookOrderService.designerUploadInfo(id, request);
+        return ApiResponse.<Void>builder()
+                .code(HttpStatus.OK.value())
+                .message("Cập nhật thành công")
+                .build();
+    }
 
 }

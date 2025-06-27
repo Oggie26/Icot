@@ -342,9 +342,8 @@ public class BookOrderService {
             bookOrder.setStatus(EnumBookOrder.ASSIGNED_TASK);
 
         } else if (currentStatus == EnumBookOrder.DELIVERY) {
-            bookOrder.setImageDelivery(bookOrder.getImageDelivery()); // nên check nếu cần set từ request
+            bookOrder.setImageDelivery(bookOrder.getImageDelivery());
             bookOrder.setStatus(EnumBookOrder.FINISHED);
-
         } else {
             throw new AppException(ErrorCode.INVALID_STATUS);
         }
@@ -363,31 +362,61 @@ public class BookOrderService {
     }
 
 
-    public void deliveryBookOrder(Long bookOrderId, MultipartFile imageDelivery) {
+//    public void deliveryBookOrder(Long bookOrderId, MultipartFile imageDelivery) {
+//        BookOrder bookOrder = bookOrderRepository.findByIdAndIsDeletedFalse(bookOrderId)
+//                .orElseThrow(() -> new AppException(ErrorCode.BOOKORDER_NOT_FOUND));
+//
+//        // Đường dẫn tuyệt đối để lưu file
+//        String uploadDir = System.getProperty("user.dir") + "/uploads/delivery"; // Thư mục nằm trong project
+//        String fileName = UUID.randomUUID() + "_" + imageDelivery.getOriginalFilename();
+//
+//        File uploadPath = new File(uploadDir);
+//        if (!uploadPath.exists() && !uploadPath.mkdirs()) {
+//            throw new RuntimeException("Không thể tạo thư mục lưu file: " + uploadDir);
+//        }
+//
+//        File destination = new File(uploadPath, fileName);
+//        try {
+//            imageDelivery.transferTo(destination);
+//        } catch (IOException e) {
+//            throw new RuntimeException("Lỗi khi lưu file ảnh giao hàng", e);
+//        }
+//
+//        // Gán đường dẫn tương đối để truy cập qua browser
+//        bookOrder.setImageDelivery("/uploads/delivery/" + fileName);
+//        bookOrder.setStatus(EnumBookOrder.FINISHED);
+//        bookOrderRepository.save(bookOrder);
+//    }
+
+    public void deliveryBookOrder(Long bookOrderId, ImageDeliveryRequest request) {
         BookOrder bookOrder = bookOrderRepository.findByIdAndIsDeletedFalse(bookOrderId)
                 .orElseThrow(() -> new AppException(ErrorCode.BOOKORDER_NOT_FOUND));
-
-        // Đường dẫn tuyệt đối để lưu file
-        String uploadDir = System.getProperty("user.dir") + "/uploads/delivery"; // Thư mục nằm trong project
-        String fileName = UUID.randomUUID() + "_" + imageDelivery.getOriginalFilename();
-
-        File uploadPath = new File(uploadDir);
-        if (!uploadPath.exists() && !uploadPath.mkdirs()) {
-            throw new RuntimeException("Không thể tạo thư mục lưu file: " + uploadDir);
-        }
-
-        File destination = new File(uploadPath, fileName);
-        try {
-            imageDelivery.transferTo(destination);
-        } catch (IOException e) {
-            throw new RuntimeException("Lỗi khi lưu file ảnh giao hàng", e);
-        }
-
-        // Gán đường dẫn tương đối để truy cập qua browser
-        bookOrder.setImageDelivery("/uploads/delivery/" + fileName);
+        bookOrder.setImageDelivery(request.getImageDelivery());
         bookOrder.setStatus(EnumBookOrder.FINISHED);
         bookOrderRepository.save(bookOrder);
     }
+
+    public void designerUploadInfo(Long bookOrderId, DesignerUploadRequest request) {
+        BookOrder bookOrder = bookOrderRepository.findByIdAndIsDeletedFalse(bookOrderId)
+                .orElseThrow(() -> new AppException(ErrorCode.BOOKORDER_NOT_FOUND));
+
+        // Xử lý danh sách thiết kế
+        if (request.getImageDesign() != null && !request.getImageDesign().isEmpty()) {
+            List<ImageDesign> imageDesignList = request.getImageDesign().stream()
+                    .map(imageRequest -> {
+                        ImageDesign imageDesign = new ImageDesign();
+                        imageDesign.setImage(imageRequest.getImage());
+                        imageDesign.setIsDeleted(false);
+                        imageDesign.setBookOrder(bookOrder);
+                        return imageDesign;
+                    }).collect(Collectors.toList());
+
+            imageDesignRepository.saveAll(imageDesignList);
+            bookOrder.setStatus(EnumBookOrder.CUSTOMER_RECEIVED);
+        }
+        bookOrderRepository.save(bookOrder);
+    }
+
 
 
 

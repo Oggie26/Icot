@@ -5,6 +5,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 @Data
 public class ImageDeliveryRequest {
-    MultipartFile imageDelivery;
+    String imageDelivery;
 }
 
