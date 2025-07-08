@@ -5,6 +5,7 @@ import Project.example.Project_1.enums.ErrorCode;
 import Project.example.Project_1.exception.AppException;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Query;
 
 import java.util.Optional;
 
@@ -28,4 +29,8 @@ public interface UserRepository extends JpaRepository<User, String>, JpaSpecific
 
     boolean existsByEmailAndIdNot(String email, String id);
     boolean existsByPhoneAndIdNot(String phone, String id);
+
+    @Query("SELECT COUNT(u) FROM User u")
+    Long countTotalUsers();
+
 }
