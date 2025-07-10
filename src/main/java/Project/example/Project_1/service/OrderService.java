@@ -201,4 +201,10 @@ public class OrderService {
         order.setImageOrderSuccess(image);
         orderRepository.save(order);
     }
+
+    public void deleteCart(Long cartId) {
+        Cart cart = cartRepository.findById(cartId)
+                .orElseThrow(() -> new AppException(ErrorCode.CART_NOT_FOUND));
+        clearCart(cart);
+    }
 }

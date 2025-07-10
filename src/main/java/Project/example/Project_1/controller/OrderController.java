@@ -1,5 +1,6 @@
 package Project.example.Project_1.controller;
 
+import Project.example.Project_1.enity.Cart;
 import Project.example.Project_1.enity.Order;
 import Project.example.Project_1.enums.EnumPaymentMethod;
 import Project.example.Project_1.enums.EnumProcess;
@@ -57,6 +58,15 @@ public class OrderController {
         return ApiResponse.<Void>builder()
                 .code(HttpStatus.OK.value())
                 .message("Thay đổi thành công")
+                .build();
+    }
+
+    @DeleteMapping("/{cartId}")
+    public ApiResponse<Void> deleteOrderById(@PathVariable Long cartId) {
+        orderService.deleteCart(cartId);
+        return ApiResponse.<Void>builder()
+                .code(HttpStatus.OK.value())
+                .message("Xoá thành công")
                 .build();
     }
 //    @GetMapping("/payment-callback")
