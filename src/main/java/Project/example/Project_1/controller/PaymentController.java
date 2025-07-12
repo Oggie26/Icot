@@ -8,6 +8,7 @@ import Project.example.Project_1.response.*;
 import Project.example.Project_1.service.OrderService;
 import Project.example.Project_1.service.PayOsService;
 import Project.example.Project_1.service.PaymentService;
+import Project.example.Project_1.service.VNPayService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Webhook;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -50,6 +51,9 @@ public class PaymentController {
     @Autowired
     OrderService orderService;
 
+    @Autowired
+    VNPayService vnPayService;
+
 //    @PostMapping()
 //    @ResponseStatus(HttpStatus.OK)
 //    @Operation(summary = "Payment", description = "API get payment")
@@ -70,20 +74,40 @@ public class PaymentController {
 
     @PostMapping
     @Operation(summary = "Tạo đơn hàng", description = "Tạo một đơn hàng mới từ giỏ hàng và địa chỉ đã chọn")
-    public ResponseEntity<ApiResponse<OrderResponse>> paymentOrder(
+    public ResponseEntity<ApiResponse<?>> paymentOrder(
             @RequestParam Long cartId,
             @RequestParam Long addressId,
-            @RequestParam EnumPaymentMethod paymentMethod
-    ) {
+            @RequestParam EnumPaymentMethod paymentMethod,
+            HttpServletRequest request
+    ) throws UnsupportedEncodingException, NoSuchAlgorithmException, InvalidKeyException {
+
+        String clientIp = getClientIp(request);
+
+        if (paymentMethod == EnumPaymentMethod.VNPAY) {
+            OrderResponse orderResponse = orderService.createOrder(cartId, addressId, paymentMethod);
+            String redirectUrl = vnPayService.createPaymentUrl(
+                    orderResponse.getOrderId(),
+                    orderResponse.getTotalAmount(),
+                    clientIp
+            );
+            return ResponseEntity.ok(
+                    ApiResponse.<Void>builder()
+                            .code(HttpStatus.OK.value())
+                            .message("Chuyển hướng sang VNPAY")
+                            .redirectUrl(redirectUrl)
+                            .build()
+            );
+        }
         OrderResponse response = orderService.createOrder(cartId, addressId, paymentMethod);
         return ResponseEntity.ok(
                 ApiResponse.<OrderResponse>builder()
                         .code(HttpStatus.OK.value())
-                        .message("Tạo đơn hàng thành công")
+                        .message("Đặt hàng thành công")
                         .result(response)
                         .build()
         );
     }
+
 
     @PostMapping("/payOs")
     @ResponseStatus(HttpStatus.OK)

@@ -6,6 +6,7 @@ import Project.example.Project_1.exception.AppException;
 import Project.example.Project_1.repository.*;
 import Project.example.Project_1.response.OrderItemResponse;
 import Project.example.Project_1.response.OrderResponse;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -46,8 +47,11 @@ public class OrderService {
     @Autowired
     private CartItemRepository cartItemRepository;
 
+    @Autowired
+    VNPayService vnPayService;
+
     @Transactional
-    public OrderResponse createOrder(Long cartId, Long addressId, EnumPaymentMethod paymentMethod) {
+    public OrderResponse createOrder(Long cartId, Long addressId, EnumPaymentMethod paymentMethod ) {
         User user = getAuthenticatedUser();
         Cart cart = cartRepository.findById(cartId)
                 .orElseThrow(() -> new AppException(ErrorCode.CART_NOT_FOUND));
@@ -66,10 +70,12 @@ public class OrderService {
         orderItemRepository.saveAll(orderItems);
         order.setOrderItems(orderItems);
         orderRepository.save(order);
+        cart.setTotalPrice(order.getTotalAmount());
+        cartRepository.save(cart);
+
         if (order.getPaymentMethod() == EnumPaymentMethod.COD) {
             clearCart(cart);
         }
-
         List<OrderItemResponse> itemResponses = order.getOrderItems().stream()
                 .map(item -> OrderItemResponse.builder()
                         .id(item.getId())
@@ -93,6 +99,15 @@ public class OrderService {
                 .status(order.getStatus())
                 .build();
     }
+
+    private String getClientIp(HttpServletRequest request) {
+        String clientIp = request.getHeader("X-Forwarded-For");
+        if (clientIp == null || clientIp.isEmpty()) {
+            clientIp = request.getRemoteAddr();
+        }
+        return clientIp;
+    }
+
 
     private User getAuthenticatedUser() {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
