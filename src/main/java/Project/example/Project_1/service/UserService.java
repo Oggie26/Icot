@@ -148,6 +148,7 @@ public class UserService {
         user.setRole(userUpdateRequest.getRole());
         user.setStatus(user.getStatus() != null ? user.getStatus() : EnumStatus.INACTIVE);
         user.setIsDeleted(false);
+        user.setFullName(userUpdateRequest.getFullName());
         userRepository.save(user);
 
         return UserStaffResponse.builder()
