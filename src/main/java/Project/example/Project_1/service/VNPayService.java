@@ -32,6 +32,7 @@ public class VNPayService {
     public String createPaymentUrl(Long orderId, Double amount, String ipAddress) throws UnsupportedEncodingException {
         Map<String, String> params = new HashMap<>();
         String returnUrl = "myapp://payment-success?orderId=" + orderId;
+
         params.put("vnp_Version", "2.1.0");
         params.put("vnp_Command", "pay");
         params.put("vnp_TmnCode", tmnCode);
@@ -44,16 +45,25 @@ public class VNPayService {
         params.put("vnp_ReturnUrl", returnUrl);
         params.put("vnp_IpAddr", ipAddress);
 
+        // Set timezone for VN
+        TimeZone timeZone = TimeZone.getTimeZone("Asia/Ho_Chi_Minh");
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
-        String createDate = sdf.format(new Date());
-        params.put("vnp_CreateDate", createDate);
+        sdf.setTimeZone(timeZone);
 
-        Calendar expireCalendar = Calendar.getInstance();
-        expireCalendar.setTime(new Date());
-        expireCalendar.add(Calendar.MINUTE, 50);
+        // Set create and expire dates
+        Date now = new Date();
+        String createDate = sdf.format(now);
+
+        Calendar expireCalendar = Calendar.getInstance(timeZone);
+        expireCalendar.setTime(now);
+        expireCalendar.add(Calendar.MINUTE, 15); // 15 phút là thời gian hợp lý
+
         String expireDate = sdf.format(expireCalendar.getTime());
+
+        params.put("vnp_CreateDate", createDate);
         params.put("vnp_ExpireDate", expireDate);
 
+        // Build hash data & query string
         List<String> fieldNames = new ArrayList<>(params.keySet());
         Collections.sort(fieldNames);
 
@@ -67,20 +77,24 @@ public class VNPayService {
                 query.append(fieldName).append('=').append(encodedValue).append('&');
             }
         }
-        // Remove trailing '&'
-        if (hashData.length() > 0) {
-            hashData.deleteCharAt(hashData.length() - 1);
-        }
-        if (query.length() > 0) {
-            query.deleteCharAt(query.length() - 1);
-        }
 
+        // Remove trailing '&'
+        if (hashData.length() > 0) hashData.deleteCharAt(hashData.length() - 1);
+        if (query.length() > 0) query.deleteCharAt(query.length() - 1);
+
+        // Generate secure hash
         String secureHash = hmacSHA512(hashSecret, hashData.toString());
         query.append("&vnp_SecureHash=").append(URLEncoder.encode(secureHash, StandardCharsets.UTF_8.toString()));
 
+        // Build final URL
         String paymentUrl = vnpUrl + "?" + query;
-        logger.info("Generated hashData: {}", hashData);
-        logger.info("Generated secureHash: {}", secureHash);
+
+        // Log for debug
+        logger.info("CreateDate: {}", createDate);
+        logger.info("ExpireDate: {}", expireDate);
+        logger.info("Client IP: {}", ipAddress);
+        logger.info("HashData: {}", hashData);
+        logger.info("SecureHash: {}", secureHash);
         logger.info("Payment URL: {}", paymentUrl);
 
         return paymentUrl;
@@ -128,11 +142,11 @@ public class VNPayService {
                 hashData.append(fieldName).append('=').append(encodedValue).append('&');
             }
         }
-        if (hashData.length() > 0) {
-            hashData.deleteCharAt(hashData.length() - 1);
-        }
+
+        if (hashData.length() > 0) hashData.deleteCharAt(hashData.length() - 1);
 
         String calculatedHash = hmacSHA512(hashSecret, hashData.toString());
+
         logger.info("Callback hashData: {}", hashData);
         logger.info("Calculated hash: {}", calculatedHash);
         logger.info("Received hash: {}", receivedHash);
