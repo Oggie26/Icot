@@ -331,17 +331,7 @@ public class BookOrderService {
             imageDesignRepository.saveAll(imageDesignList);
             bookOrder.setStatus(EnumBookOrder.DELIVERY);
 
-        } else if (currentStatus == EnumBookOrder.CUSTOMER_ACCEPTED) {
-            bookOrder.setStatus(EnumBookOrder.DELIVERY);
-
-        } else if (currentStatus == EnumBookOrder.CUSTOMER_REJECTED) {
-            if (request.getResponse() == null || request.getResponse().isEmpty()) {
-                throw new AppException(ErrorCode.INVALID_REQUEST);
-            }
-            bookOrder.setResponse(request.getResponse());
-            bookOrder.setStatus(EnumBookOrder.ASSIGNED_TASK);
-
-        } else if (currentStatus == EnumBookOrder.DELIVERY) {
+        }  else if (currentStatus == EnumBookOrder.DELIVERY) {
             bookOrder.setImageDelivery(bookOrder.getImageDelivery());
             bookOrder.setStatus(EnumBookOrder.FINISHED);
         } else {
