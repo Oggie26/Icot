@@ -11,4 +11,7 @@ import java.util.Optional;
 public interface ProductRepository extends JpaRepository<Product, String>, JpaSpecificationExecutor<Product> {
     Optional<Product> findByIdAndIsDeletedFalse(String id);
     Optional<Product> findByProductName(String productName);
+    @Query("SELECT COUNT(p) FROM Product p")
+    String getTotalOrderCount();
+
 }

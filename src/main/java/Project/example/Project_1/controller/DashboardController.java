@@ -52,4 +52,15 @@ public class DashboardController {
                 .build();
     }
 
+    @GetMapping("/total-product")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Get total number of product", description = "Đếm tổng số product")
+    public ApiResponse<String> getTotalProducts() {
+        return ApiResponse.<String>builder()
+                .code(HttpStatus.OK.value())
+                .message("Get total product successfully")
+                .result(dashboardService.getTotalProduct())
+                .build();
+    }
+
 }
