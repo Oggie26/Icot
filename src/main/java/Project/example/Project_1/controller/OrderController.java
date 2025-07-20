@@ -4,6 +4,7 @@ import Project.example.Project_1.enity.Cart;
 import Project.example.Project_1.enity.Order;
 import Project.example.Project_1.enums.EnumPaymentMethod;
 import Project.example.Project_1.enums.EnumProcess;
+import Project.example.Project_1.repository.OrderRepository;
 import Project.example.Project_1.response.ApiResponse;
 import Project.example.Project_1.response.OrderResponse;
 import Project.example.Project_1.service.OrderService;
@@ -33,6 +34,9 @@ public class OrderController {
 
     @Autowired
     OrderService orderService;
+
+    @Autowired
+    OrderRepository orderRepository;
 
     @GetMapping("/history-order")
     public ApiResponse<List<OrderResponse>> getHistoryOrder() {
@@ -67,6 +71,17 @@ public class OrderController {
         return ApiResponse.<Void>builder()
                 .code(HttpStatus.OK.value())
                 .message("Xoá thành công")
+                .build();
+    }
+
+    @GetMapping("")
+    public ApiResponse<List<Order>> getAllOrders() {
+        List<Order> list = orderRepository.findAll().stream()
+                .filter(order -> !order.getIsDeleted())
+                .toList();
+        return ApiResponse.<List<Order>>builder()
+                .code(HttpStatus.OK.value())
+                .result(list)
                 .build();
     }
 //    @GetMapping("/payment-callback")
