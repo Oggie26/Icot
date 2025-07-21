@@ -104,7 +104,7 @@ public class BookOrderService {
         processOrder.setBookOrder(bookOrder);
         processOrder.setIsDeleted(false);
         bookOrder.setStatus(EnumBookOrder.PENDING);
-        Double totalPrice = (((fabric.getPrice() + typePrint.getPrice()) / 0.3 ) * bookOrder.getQuantity());
+        Double totalPrice = 250000.0;
         bookOrder.setTotalPrice(totalPrice);
 
 
