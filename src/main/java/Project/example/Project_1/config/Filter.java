@@ -38,6 +38,7 @@ public class Filter extends OncePerRequestFilter {
             "/swagger-resources/**",
             "/api/auth/login",
             "/api/auth/register",
+            "/api/auth/ping",
             "/api/auth/register/mobile",
             "/api/user/{id}",
             "/api/products",
