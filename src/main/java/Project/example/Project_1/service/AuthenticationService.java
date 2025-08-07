@@ -9,10 +9,12 @@ import Project.example.Project_1.exception.AppException;
 import Project.example.Project_1.repository.UserRepository;
 import Project.example.Project_1.request.LoginRequest;
 import Project.example.Project_1.request.RegisterRequest;
+import Project.example.Project_1.request.RegisterRequestMobile;
 import Project.example.Project_1.response.LoginResponse;
 import Project.example.Project_1.response.RegisterResponse;
-import Project.example.Project_1.response.UserResponse;
+import Project.example.Project_1.response.RegisterResponseMobile;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -29,9 +31,10 @@ public class AuthenticationService implements UserDetailsService {
 
     @Autowired
     UserRepository userRepository;
-
     @Autowired
     TokenService tokenService;
+    @Autowired
+    PasswordEncoder passwordEncoder;
 
 
     @Override
@@ -40,21 +43,28 @@ public class AuthenticationService implements UserDetailsService {
     }
 
     public Optional<User> getCurrentAccount() {
-        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return userRepository.findUserByIdAndIsDeletedFalse(String.valueOf(user.getId())).isPresent() ?
-                userRepository.findUserByIdAndIsDeletedFalse(String.valueOf(user.getId())) : null;
+//        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+//        return userRepository.findUserByIdAndIsDeletedFalse(String.valueOf(user.getId())).isPresent() ?
+//                userRepository.findUserByIdAndIsDeletedFalse(String.valueOf(user.getId())) : null;
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (authentication == null || !authentication.isAuthenticated()) {
+                return Optional.empty();
+            }
+            User user = (User) authentication.getPrincipal();
+            return userRepository.findUserByIdAndIsDeletedFalse(String.valueOf(user.getId()));
     }
 
     //Login
     @Transactional
     public LoginResponse login(LoginRequest request) {
-        User user = userRepository.findUserByIdAndIsDeletedFalse(request.getUsername())
+        User user = userRepository.findUserByUsername(request.getUsername())
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
         if(user == null){
             throw new AppException(ErrorCode.USER_NOT_EXISTED);
         }
-        if (user.getStatus().equals(EnumStatus.BLOCKED))
+        if (user.getStatus().equals(EnumStatus.BLOCKED)){
             throw new AppException(ErrorCode.ACCOUNT_BLOCKED);
+        }
         String token = tokenService.generateToken(user);
         // Trả về Token
         return LoginResponse.builder()
@@ -64,17 +74,50 @@ public class AuthenticationService implements UserDetailsService {
                 .build();
     }
 
+    @Transactional
+    public RegisterResponseMobile registerMobile(RegisterRequestMobile request) {
+        if (userRepository.findUserByUsername(request.getUsername()).isPresent()) {
+            throw new AppException(ErrorCode.USERNAME_EXISTED);
+        }
+        if (userRepository.findUserByEmailAndIsDeletedFalse(request.getEmail()).isPresent()) {
+            throw new AppException(ErrorCode.EMAIL_EXISTED);
+        }
+
+        User user = User.builder()
+                .username(request.getUsername())
+                .password(passwordEncoder.encode(request.getPassword()))
+                .email(request.getEmail())
+                .fullName(request.getFullName())
+                .role(EnumRole.CUSTOMER)
+                .phone(request.getPhone())
+                .point(0)
+                .avatar("")
+                .status(EnumStatus.ACTIVE)
+                .build();
+        user.setIsDeleted(false);
+        userRepository.save(user);
+
+        return RegisterResponseMobile.builder()
+                .userId(user.getId())
+                .email(user.getEmail())
+                .fullName(user.getFullName())
+                .phone(user.getPhone())
+                .build();
+    }
+
+
     @Transactional()
     public RegisterResponse register(RegisterRequest request) {
         if (userRepository.findUserByUsername(request.getUsername()).isPresent()) {
             throw new AppException(ErrorCode.USERNAME_EXISTED);
         }
-        if (userRepository.findUserByEmail(request.getEmail()).isPresent()) {
+        if (userRepository.findUserByEmailAndIsDeletedFalse(request.getEmail()).isPresent()) {
             throw new AppException(ErrorCode.EMAIL_EXISTED);
         }
+
         User user = User.builder()
                .username(request.getUsername())
-               .password(request.getPassword())
+               .password(passwordEncoder.encode(request.getPassword()))
                .email(request.getEmail())
                .fullName(request.getFullName())
                .role(EnumRole.CUSTOMER)
@@ -97,6 +140,4 @@ public class AuthenticationService implements UserDetailsService {
                 .birthday(user.getBirthday())
                 .build();
     }
-
-
 }

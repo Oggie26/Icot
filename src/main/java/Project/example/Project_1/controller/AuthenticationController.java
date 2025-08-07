@@ -2,11 +2,14 @@ package Project.example.Project_1.controller;
 
 import Project.example.Project_1.request.LoginRequest;
 import Project.example.Project_1.request.RegisterRequest;
+import Project.example.Project_1.request.RegisterRequestMobile;
 import Project.example.Project_1.response.ApiResponse;
 import Project.example.Project_1.response.LoginResponse;
 import Project.example.Project_1.response.RegisterResponse;
+import Project.example.Project_1.response.RegisterResponseMobile;
 import Project.example.Project_1.service.AuthenticationService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,7 +21,9 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 @RequestMapping("/api/auth")
 @SecurityRequirement(name = "api")
 @CrossOrigin("*")
-public class AuthenticationAPI {
+@Tag(name = "Authentication Controller")
+
+public class AuthenticationController {
 
     @Autowired
     AuthenticationService authenticationService;
@@ -39,11 +44,25 @@ public class AuthenticationAPI {
     @ResponseStatus(HttpStatus.CREATED)
     public ApiResponse<RegisterResponse> register(@RequestBody @Valid RegisterRequest registerRequest){
         return ApiResponse.<RegisterResponse>builder()
-                .code(HttpStatus.OK.value())
+                .code(HttpStatus.CREATED.value())
                 .message("Đăng kí thành công")
                 .result(authenticationService.register(registerRequest))
                 .build();
     }
 
+    @PostMapping("register/mobile")
+    @Operation(summary = "Đăng kí", description = "API đăng kí")
+    @ResponseStatus(HttpStatus.CREATED)
+    public ApiResponse<RegisterResponseMobile> registerMobile(@RequestBody @Valid RegisterRequestMobile registerRequest){
+        return ApiResponse.<RegisterResponseMobile>builder()
+                .code(HttpStatus.CREATED.value())
+                .message("Đăng kí thành công")
+                .result(authenticationService.registerMobile(registerRequest))
+                .build();
+    }
+    @GetMapping("/ping")
+    public String ping() {
+        return "OK";
+    }
 
 }

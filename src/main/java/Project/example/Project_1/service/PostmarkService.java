@@ -58,7 +58,7 @@ public class PostmarkService {
         Map<String, Object> emailPayload = new HashMap<>();
         emailPayload.put("From", fromAddress);
         emailPayload.put("To", toAddress);
-        emailPayload.put("TemplateId", Integer.parseInt(templateId)); // đảm bảo TemplateId là số
+        emailPayload.put("TemplateId", Integer.parseInt(templateId));
         emailPayload.put("MessageStream", "outbound");
         emailPayload.put("TemplateModel", templateModel);
 
