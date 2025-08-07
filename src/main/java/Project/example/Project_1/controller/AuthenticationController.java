@@ -60,6 +60,9 @@ public class AuthenticationController {
                 .result(authenticationService.registerMobile(registerRequest))
                 .build();
     }
-
+    @GetMapping("/ping")
+    public String ping() {
+        return "OK";
+    }
 
 }
